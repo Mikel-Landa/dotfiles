@@ -32,9 +32,11 @@ sudo apt install -y \
 	gpg \
 	fzf \
 	exa \
-	bat
+	bat \
+	fd-find
 
 [ -f $HOME/.local/bin/bat ] || ln -s /usr/bin/batcat $HOME/.local/bin/bat
+[ -f $HOME/.local/bin/fd ] || ln -s $(which fdfind) ~/.local/bin/fd
 
 # Neovim
 green "Installing neovim..."
@@ -113,5 +115,5 @@ sudo apt install -y alacritty
 
 # Install asdf
 
-green "Installing asdf"
+green "Installing asdf..."
 [ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
