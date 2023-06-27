@@ -1,6 +1,8 @@
 declare -A paths
 
 paths["local"]="$HOME/.local/bin"
+paths["bin"]="$HOME/bin"
+paths[".bin"]="$HOME/.bin"
 paths["dotnet"]="$HOME/.dotnet"
 paths["cargo"]="$HOME/.cargo/bin"
 paths["nvim"]="$HOME/.local/share/neovim/bin"
