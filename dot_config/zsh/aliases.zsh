@@ -85,6 +85,7 @@ function enkode() {
 
 # terraform
 alias tf="terraform"
+alias grunt="terragrunt"
 
 # bat
 alias cat="bat -pp --theme \"Visual Studio Dark+\"" 

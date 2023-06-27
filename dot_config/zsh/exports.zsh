@@ -8,3 +8,5 @@ export BROWSER="firefoz"
 export MANPAGER='nvim +Man!'
 export MANWIDTH=999
 export XDG_CURRENT_DESKTOP="Wayland"
+
+[ -f $HOME/.variables ] && . $HOME/.variables
