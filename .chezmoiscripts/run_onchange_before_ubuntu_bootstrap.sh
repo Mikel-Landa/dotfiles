@@ -75,11 +75,6 @@ nvm install 18
 sudo apt-get install -y npm
 nvm use 18
 
-# Treesitter for nvim
-green "Installing tree-sitter-cli..."
-
-sudo npm install tree-sitter-cli -g
-
 # Install lunarvim
 
 green "Installing lunarvim..."
@@ -104,7 +99,7 @@ fc-cache -fv
 # Install tmux
 green "Installing tmux..."
 sudo apt install -y tmux
-[-d ~/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+[ -d ~/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Install starship
 green "Installing starship..."
@@ -115,3 +110,8 @@ curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 green "Installing allacritty..."
 sudo add-apt-repository ppa:aslatter/ppa -y
 sudo apt install -y alacritty
+
+# Install asdf
+
+green "Installing asdf"
+[ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
