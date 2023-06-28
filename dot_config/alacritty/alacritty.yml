@@ -47,7 +47,7 @@ window:
 
 live_config_reload: true
 scrolling:
-    history: 50000
+    history: 100000
     multiplier: 10
 selection:
     semantic_escape_chars: ',│`|:"'' ()[]{}<>'
