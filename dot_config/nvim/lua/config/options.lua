@@ -5,3 +5,10 @@ local opt = vim.opt
 
 opt.wrap = true
 opt.linebreak = true
+
+vim.filetype.add({
+  extension = {
+    tfvars = "terraform",
+    tfstate = "json",
+  },
+})
