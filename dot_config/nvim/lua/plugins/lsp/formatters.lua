@@ -18,7 +18,7 @@ return {
         root_dir = require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", "Makefile", ".git"),
         sources = vim.list_extend(opts.sources, {
           nls.builtins.formatting.black,
-          nls.builtins.formatting.packer,
+          -- nls.builtins.formatting.packer,
           nls.builtins.formatting.terraform_fmt,
         }),
       }

@@ -1,13 +1,8 @@
-#!/bin/sh
 
-COMPLETIONS_DIR="$HOME/.config/zsh/completions/"
+# Load completions folder
+fpath=($HOME/.config/zsh/completions/ $fpath)
 
-source $COMPLETIONS_DIR/kubectl.zsh
-
-source /usr/share/doc/fzf/examples/key-bindings.zsh
+# FZF
 source /usr/share/doc/fzf/examples/completion.zsh
-
 # ASDF
-# append completions to fpath
-fpath=(${ASDF_DIR}/completions $fpath)
-# initialise completions with ZSH's compinit
+fpath=($HOME/.config/zsh/completions/ ${ASDF_DIR}/completions $fpath)

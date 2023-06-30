@@ -1,4 +1,3 @@
-#!/bin/bash
 # NPM alias nrs="npm run serve"
 
 # DJANGO

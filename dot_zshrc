@@ -9,7 +9,8 @@ HISTFILE=~/.zsh_history
 plug "$HOME/.config/zsh/aliases.zsh"
 plug "$HOME/.config/zsh/exports.zsh"
 plug "$HOME/.config/zsh/autocompletions.zsh"
-plug "$HOME/.config/zsh/sanekeybindings.zsh"
+plug "$HOME/.config/zsh/keybindings.zsh"
+plug "$HOME/.config/zsh/plugins/sanekeybindings.zsh"
 
 # plugins
 plug "zsh-users/zsh-autosuggestions"
@@ -21,7 +22,12 @@ plug "zap-zsh/fzf"
 plug "zap-zsh/exa"
 plug "zsh-users/zsh-syntax-highlighting"
 
-. "$HOME/.asdf/asdf.sh"
-eval "$(starship init zsh)"
+## This variable tells zsh which non-alphanumeric characters are part of a word
+## (e.g for kill-word or backward-kill-word if '/' not in there, it will stop the deletion)
+## More info: https://github.com/ohmyzsh/ohmyzsh/wiki/FAQ/91d647269f69f7357b0dafa0ce050003edfb1e92#other-problems
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
-autoload -Uz compinit && compinit
+# Load asdf
+. "$HOME/.asdf/asdf.sh"
+
+eval "$(starship init zsh)"
