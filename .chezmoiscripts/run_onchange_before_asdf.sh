@@ -23,10 +23,16 @@ green "Installing asdf..."
 
 ## HASHICORP
 asdf_install terraform https://github.com/asdf-community/asdf-hashicorp.git
-asdf_install packer https://github.com/asdf-community/asdf-hashicorp.git
-
 asdf install terraform latest
-asdf install packer latest
-
 asdf global terraform latest
+
+asdf_install packer https://github.com/asdf-community/asdf-hashicorp.git
+asdf install packer latest
 asdf global packer latest
+
+## Kubectl
+asdf_install kubectl https://github.com/asdf-community/asdf-kubectl.git
+asdf install kubectl latest
+asdf global kubectl latest
+
+kubectl completion zsh >$HOME/local/share/zsh/completions/_kubectl

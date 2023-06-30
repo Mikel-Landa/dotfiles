@@ -1,6 +1,6 @@
 
 # Load completions folder
-fpath=($HOME/.config/zsh/completions/ $fpath)
+fpath=($HOME/.config/zsh/completions/ $HOME/local/share/zsh/completions/ $fpath)
 
 # FZF
 source /usr/share/doc/fzf/examples/completion.zsh

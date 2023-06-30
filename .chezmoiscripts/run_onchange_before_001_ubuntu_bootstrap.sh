@@ -70,8 +70,7 @@ green "Install Node and npm..."
 export PROFILE="/dev/null" # Dont append nvm sources to rc
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 nvm install 16
 nvm install 18
 sudo apt-get install -y npm
@@ -113,3 +112,6 @@ green "Installing allacritty..."
 sudo add-apt-repository ppa:aslatter/ppa -y
 sudo apt install -y alacritty
 
+## GENERAL CONFIG
+
+mkdir -p $HOME/local/share/zsh/completions
