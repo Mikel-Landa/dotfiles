@@ -1,5 +1,9 @@
 #!/bin/sh
 
+COMPLETIONS_DIR="$HOME/.config/zsh/completions/"
+
+source $COMPLETIONS_DIR/kubectl.zsh
+
 source /usr/share/doc/fzf/examples/key-bindings.zsh
 source /usr/share/doc/fzf/examples/completion.zsh
 

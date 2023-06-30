@@ -113,7 +113,3 @@ green "Installing allacritty..."
 sudo add-apt-repository ppa:aslatter/ppa -y
 sudo apt install -y alacritty
 
-# Install asdf
-
-green "Installing asdf..."
-[ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
