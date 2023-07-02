@@ -2,8 +2,8 @@
 
 set -e
 
-# Load asdf
-[ $(type -t asdf) ] || . "$HOME/.asdf/asdf.sh"
+# Load
+[ $(type -t asdf) ] && . "$HOME/.asdf/asdf.sh"
 
 GREEN="\n\033[0;32m"
 RED='\n\033[0;31m'

@@ -112,6 +112,15 @@ green "Installing allacritty..."
 sudo add-apt-repository ppa:aslatter/ppa -y
 sudo apt install -y alacritty
 
+# LazyGit
+
+green "Installing LazyGit..."
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+tar xf lazygit.tar.gz lazygit
+sudo install lazygit /usr/local/bin
+rm -f lazygit*
+
 ## GENERAL CONFIG
 
 mkdir -p $HOME/local/share/zsh/completions
