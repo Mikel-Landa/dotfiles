@@ -90,6 +90,5 @@ alias grunt="terragrunt"
 alias cat="bat -pp --theme \"Visual Studio Dark+\"" 
 alias catt="bat --theme \"Visual Studio Dark+\"" 
 
-
 # editor
 alias v="nvim"

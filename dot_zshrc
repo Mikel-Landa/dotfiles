@@ -30,4 +30,7 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 # Load asdf
 . "$HOME/.asdf/asdf.sh"
 
+# Load autojump
+. /usr/share/autojump/autojump.sh
+
 eval "$(starship init zsh)"
