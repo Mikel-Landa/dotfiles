@@ -9,3 +9,6 @@ export MANWIDTH=999
 export XDG_CURRENT_DESKTOP="Wayland"
 
 [ -f $HOME/.variables ] && . $HOME/.variables
+
+#TERRAGRUNT
+export TERRAGRUNT_PARALLELISM="5"
