@@ -8,6 +8,7 @@ return {
     opts = {
       -- make sure mason installs the server
       servers = {
+        terraformls = {},
         taplo = {},
         helm_ls = {},
         yamlls = {
