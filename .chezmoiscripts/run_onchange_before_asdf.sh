@@ -28,10 +28,7 @@ green "Installing asdf..."
 asdf_install terraform https://github.com/asdf-community/asdf-hashicorp.git
 asdf install terraform latest
 asdf global terraform latest
-
-asdf_install packer https://github.com/asdf-community/asdf-hashicorp.git
-asdf install packer latest
-asdf global packer latest
+[ -d "$HOME/.terraform.d/plugin-cache" ] || mkdir -p "$HOME/.terraform.d/plugin-cache"
 
 ## Kubectl
 asdf_install kubectl https://github.com/asdf-community/asdf-kubectl.git

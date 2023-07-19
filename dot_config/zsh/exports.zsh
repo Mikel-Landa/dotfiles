@@ -12,3 +12,8 @@ export XDG_CURRENT_DESKTOP="Wayland"
 
 #TERRAGRUNT
 export TERRAGRUNT_PARALLELISM="5"
+export TERRAGRUNT_INCLUDE_MODULE_PREFIX="true"
+
+# TERRAFORM
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+
