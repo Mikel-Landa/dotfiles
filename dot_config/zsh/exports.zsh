@@ -15,5 +15,9 @@ export TERRAGRUNT_PARALLELISM="5"
 export TERRAGRUNT_INCLUDE_MODULE_PREFIX="true"
 
 # TERRAFORM
-export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+# export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+export TF_REGISTRY_DISCOVERY_RETRY=5
+
+# DOTNET
+export DOTNET_ROOT="/usr/lib/dotnet"
 
