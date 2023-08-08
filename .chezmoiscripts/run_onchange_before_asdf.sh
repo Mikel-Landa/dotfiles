@@ -10,16 +10,16 @@ function green() {
 	echo -e "${GREEN}$1${NC}"
 }
 
+# Install asdf
+green "Installing asdf..."
+[ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
+
 function asdf_install() {
 	asdf plugin-add $@ && status_code=$? || status_code=$?
 	if [ $status_code -eq 0 ] || [ $status_code -eq 2 ]; then
 		green "$1 is installed"
 	fi
 }
-
-# Install asdf
-green "Installing asdf..."
-[ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
 
 # Load
 [ $(type -t asdf) ] && . "$HOME/.asdf/asdf.sh"
