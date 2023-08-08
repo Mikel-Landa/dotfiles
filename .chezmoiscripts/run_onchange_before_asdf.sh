@@ -2,9 +2,6 @@
 
 set -e
 
-# Load
-[ $(type -t asdf) ] && . "$HOME/.asdf/asdf.sh"
-
 GREEN="\n\033[0;32m"
 RED='\n\033[0;31m'
 NC="\033[0m"
@@ -19,10 +16,13 @@ function asdf_install() {
 		green "$1 is installed"
 	fi
 }
-# Install asdf
 
+# Install asdf
 green "Installing asdf..."
 [ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
+
+# Load
+[ $(type -t asdf) ] && . "$HOME/.asdf/asdf.sh"
 
 ## HASHICORP
 asdf_install terraform https://github.com/asdf-community/asdf-hashicorp.git
