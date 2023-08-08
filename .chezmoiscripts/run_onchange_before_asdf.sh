@@ -22,7 +22,7 @@ function asdf_install() {
 }
 
 # Load
-[ $(type -t asdf) ] && . "$HOME/.asdf/asdf.sh"
+[ $(type -t asdf) ] || . "$HOME/.asdf/asdf.sh"
 
 ## HASHICORP
 asdf_install terraform https://github.com/asdf-community/asdf-hashicorp.git
