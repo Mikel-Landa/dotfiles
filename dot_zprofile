@@ -5,6 +5,7 @@ paths["bin"]="$HOME/bin"
 paths[".bin"]="$HOME/.bin"
 paths["dotnet"]="$HOME/.dotnet"
 paths["cargo"]="$HOME/.cargo/bin"
+paths["go"]="/usr/local/go/bin"
 paths["nvim"]="$HOME/.local/share/neovim/bin"
 
 for k v in ${(kv)paths}; do

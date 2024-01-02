@@ -22,6 +22,7 @@ sudo apt-get update && sudo apt-get upgrade -y
 dconf write "/org/gnome/desktop/input-sources/xkb-options" "[ 'caps:swapescape']"
 
 # Set up basic dependencies
+sudo apt-get update && sudo apt-get install -y
 sudo apt install -y \
 	curl \
 	git \
