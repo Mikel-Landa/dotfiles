@@ -44,3 +44,12 @@ sudo chsh $USERNAME -s $(which zsh)
 # Apply Config
 GITHUB_USERNAME="Mikel-Landa"
 chezmoi init --apply --verbose https://github.com/$GITHUB_USERNAME/dotfiles.git
+
+# Populate git email
+if [[ ! -n $EMAIL ]]; then
+echo Specify work email:
+read EMAIL
+fi
+
+mkdir -p ~/.config/git
+echo -e "[user]\n\temail= $EMAIL" > ~/.config/git/config

@@ -1,0 +1,9 @@
+[user]
+	name = Mikel Landa
+	useConfigOnly = true
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[commit]
+    gpgsign = true
