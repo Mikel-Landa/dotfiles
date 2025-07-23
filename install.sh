@@ -42,4 +42,5 @@ USERNAME=$USER
 sudo chsh $USERNAME -s $(which zsh)
 
 # Apply Config
-chezmoi apply --force
+GITHUB_USERNAME="Mikel-Landa"
+chezmoi init --apply --verbose https://github.com/$GITHUB_USERNAME/dotfiles.git
