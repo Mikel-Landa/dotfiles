@@ -1,0 +1,147 @@
+
+function ansible-devel() {
+    local ansible_repo="$HOME/code/ansible"
+    if [ -d "$ansible_repo" ]
+    then
+        source "$ansible_repo/hacking/env-setup"
+        cd $HOME/code/opn-ansible
+    else
+        echo "Unable to locate ansible git repo in ${ansible_repo}!" >&2
+    fi
+}
+
+extract() {
+
+    local OIFS="$IFS"
+    local IFS=$'\n'
+
+    for i in "$*"
+    do
+        [ ! -f "$i" ] || [ ! -r "$i" ] && echo "'$i' is not present or could not be read" && continue
+
+        case $i in
+          *.tar.bz2|*.tbz2) bzip2 -dc $i | tar xvf -    ;;
+          *.tar.gz|*.tgz)   gzip -dc $i  | tar xvf -    ;;
+          *.tar.xz) tar --xz xvf $i;;
+          *.bz2)     bzip2 -dc $i     ;;
+          *.rar)     rar x $i   ;;
+          *.gz)      gzip -d $i   ;;
+          *.tar)     tar xvf $i    ;;
+          *.zip)     unzip $i   ;;
+          *.Z)       uncompress $i  ;;
+          *.7z)      7z x $i  ;;
+          *.deb)     ar xv $i ;;
+          *.ztb)     unzip $i ;;
+          *.jar)     unzip $i ;;
+          *)         echo "'$i' cannot be extracted via extract()" ;;
+
+    esac
+    done
+}
+
+stamp2date() {
+    date --utc --date "1970-01-01 $1 sec" "+%Y-%m-%d %T"
+}
+
+debug_tb() {
+    local PROTO=smtp # Can be IMAP, POP3, NNTP, or SMTP
+    #PR_LOG_NONE    = 0, /* nothing */
+    #PR_LOG_ALWAYS  = 1, /* always printed */
+    #PR_LOG_ERROR   = 2, /* error messages */
+    #PR_LOG_WARNING = 3, /* warning messages */
+    #PR_LOG_DEBUG   = 4, /* debug messages */
+    local LEVEL=5
+    export NSPR_LOG_MODULES=$PROTO:$LEVEL
+    export NSPR_LOG_FILE=/tmp/tbird.log
+    thunderbird
+}
+
+dig_all() {
+    [ -z "$1" ] && return
+    [ -n "$2" ] && NS="$2"
+    dig +nocmd $1 any +multiline +noall +answer $NS
+}
+
+
+_playlist-create() {
+    for i in $@ ; do
+        [ ! -e "$i" ] && continue
+            find -H $i -type f -iname \*.mp3 -o -iname  \*.ogg -o -iname \*.flac  -o -iname \*.aac -o -iname \*.wav -o -iname \*.m4a | sort -f
+    done | grep -v ".tmp" | tee $PLAYLIST
+}
+
+playlist() {
+    local playlist="$1"
+    [ -z "$playlist" ] && playlist=$PLAYLIST
+
+    local opts
+    [ -n "$2" ] && opts="-shuffle "
+
+    if [ -r "$playlist" ] && [ $(stat -c %s "$playlist") -ne "0" ] ; then
+        eval mplayer -quiet -noautosub $opts -loop 0 -playlist $playlist
+    fi
+}
+
+playlist-artist() {
+    local playlist=$PLAYLIST.artist
+    local md5=$(md5sum $playlist | awk '{print $1}')
+
+    local found
+
+    found=$(for i in "$@" ; do
+        if [ -n $artists ] ; then
+            grep -i $i $PLAYLIST
+        fi
+    done | sort -u)
+    [ -z "$found" ] && return 1
+
+    local nmd5=$(echo -e "$found" | md5sum | awk '{print $1}')
+    if [ -z "$md5" ] || [ "$nmd5" != "$md5" ] ; then
+        echo -e "$found" > $playlist
+    fi
+    playlist $playlist
+}
+
+coverage() {
+    HARNESS_PERL_SWITCHES=-MDevel::Cover prove -l $@
+    cover -ignore_re '^t/.*'
+    [ $? -eq 0 ] && mv cover_db/coverage.html cover_db/index.html
+}
+
+clean_file() {
+    local file
+    file="$*"
+    if [ ! -f "$file" ] ; then
+        return;
+    fi
+    dos2unix "$file"
+    perl -p -i -e 's/\t/    /g' "$file"
+    rm_ws "$file"
+}
+
+clean_git() {
+    local files="";
+
+    files="$(git status --porcelain | grep -v '^??' | awk '{print $NF}')"
+    if [ -z "$files" || [ $files == 'db/testbase' ] ; then
+        files="$(git ls-files t/*.t t/lib lib bin script dev-bin client server frontend)"
+    fi
+    local file=""
+
+    _ifs=$IFS
+    IFS=$(echo -e "$IFS" | sed -e 's/ //g');
+    for file in $files ; do
+        clean_file $file
+    done
+    IFS=$_ifs
+}
+
+is_grub_installed() {
+    local dev=""
+    dev=$1
+    if [ -n "$dev" ] ; then
+        sudo dd bs=512 count=1 if=$1 2>/dev/null | strings
+    fi
+}
+
+# vim: filetype=zsh syntax=zsh

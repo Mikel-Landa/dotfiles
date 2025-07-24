@@ -1,0 +1,8 @@
+unixtime() {
+    if [ -n "$1" ]
+    then
+        date --utc "$1" +%s
+    else
+        date --utc +%s
+    fi
+}

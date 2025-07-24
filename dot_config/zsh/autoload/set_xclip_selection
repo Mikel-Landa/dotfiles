@@ -1,0 +1,6 @@
+set_xclip_selection() {
+    export XCLIP_SELECTION=${1:-clipboard}
+    export PASSWORD_STORE_X_SELECTION=$XCLIP_SELECTION
+}
+
+# vim: ft=zsh

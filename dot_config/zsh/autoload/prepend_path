@@ -1,0 +1,9 @@
+prepend_path() {
+    local i
+    for i in $*
+    do
+        [[ -d $i ]] && path=($i $path)
+    done
+}
+
+# vim: ft=zsh

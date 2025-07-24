@@ -1,0 +1,42 @@
+# This file should be sourced at the final line of your zshrc
+
+# Only refresh compinit when the file is older that today
+# compinit also determines when we zcompile everything in our fpath
+_ZCOMP=${ZDOTDIR:-$HOME}/.zcompdump
+today=$(date --date '00:00 today' +%s)
+INIT_DIR=$ZDOTDIR/init
+if [[ ! -e $_ZCOMP || $today -gt $(stat --format %Y $_ZCOMP) ]];
+then
+    starship init zsh > $INIT_DIR/startship.zsh
+    zoxide init zsh > $INIT_DIR/zoxide.zsh
+    mise activate zsh > $INIT_DIR/mise.zsh
+    fzf --zsh > $INIT_DIR/fzf.zsh
+    kubectl completion zsh > $INIT_DIR/kubectl.zsh
+    
+    xsource $INIT_DIR/startship.zsh
+    xsource $INIT_DIR/zoxide.zsh
+    xsource $INIT_DIR/mise.zsh
+    xsource $INIT_DIR/fzf.zsh
+    xsource $INIT_DIR/kubectl.zsh
+
+    compinit -i
+    touch ${_ZCOMP}
+
+    # recompile all our things automaticly. It won't work for our
+    # current shell, but it will for all subsequent shells
+    lpass status -q && lpass sync --background
+    xzcompilefpath
+    xzcompilehomedir
+else
+    xsource $INIT_DIR/startship.zsh
+    xsource $INIT_DIR/zoxide.zsh
+    xsource $INIT_DIR/mise.zsh
+    xsource $INIT_DIR/fzf.zsh
+    xsource $INIT_DIR/kubectl.zsh
+    compinit -C;
+fi
+unset _ZCOMP
+
+export PS1 # let sudo keep bits of my profile
+
+# vim: ft=zsh

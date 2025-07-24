@@ -1,0 +1,3 @@
+date2stamp() {
+    date --utc --date "$1" +%s
+}

@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+xzcompilefpath() {
+    local i
+    for i in $fpath
+    do
+        xzcompiledir $i
+    done
+}

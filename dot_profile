@@ -1,0 +1,43 @@
+#
+# This is my .profile, it is what needs to be present for *every* time a
+# shell starts. This shell could be bash/zsh or other shells. Please
+# look at their respective documentation. As you may know my primary
+# shell is zsh.
+#
+# zsh: This file is sourced by ~/.zshenv
+# bash: This file is sourced at the startup of bash
+#
+
+UMASK_LOOSE=002
+UMASK_STRICT=022
+WHOAMI=${USER:-$LOGNAME}
+
+# LANG=C.UTF-8
+#TZ=America/Curacao
+#TZ=Europe/Amsterdam
+
+VISUAL=nvim
+EDITOR=nvim
+ED=nvim
+PAGER=less
+LESS='-n -i -g -q -R -X -K -F'
+
+GIT_DISCOVERY_ACROSS_FILESYSTEM=0
+
+
+
+
+BIN=$HOME/bin
+LOCAL=$HOME/.local
+CARGO=$HOME/.cargo/bin
+GOPATH='$HOME/go'
+ZDOTDIR=$HOME/.config/zsh
+
+PATH=$CARGO:$GOPATH/bin:$BIN:$LOCAL/bin:$PATH:/sbin:/usr/sbin
+
+# Some environment variables need to be exported tho..
+export VISUAL EDITOR ED \
+    PAGER LESS \
+    GOPATH
+
+# vim: ft=sh

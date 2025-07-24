@@ -1,0 +1,33 @@
+# Speed up tips for ZSH
+# See https://htr3n.github.io/2018/07/faster-zsh/ for more information
+#zmodload zsh/zprof     # Enable this when you want to profile your zshrc
+
+ZDOTDIR=$HOME/.config/zsh
+
+# automatically remove duplicates from these arrays
+typeset -U path PATH cdpath CDPATH fpath FPATH manpath MANPATH
+
+# These options are *mandatory* for stuf to work down below. Ok, maybe
+# not the vim one, but you will see directly that you use it
+setopt vi                   # If EDITOR is set to vim, we have this for free
+setopt sh_word_split        # if you call func() $foo where foo="foo bar"
+                            # split the words to foo bar
+setopt extendedglob         # see optionsrc for more information
+
+# uses sources, because xsource isn't loaded (yet)
+source $ZDOTDIR/autoloadrc  # load all the autoloading things
+
+xsource $ZDOTDIR/optionsrc  # (un)setopt
+xsource $ZDOTDIR/promptrc   # deal with completions and the likes
+xsource $ZDOTDIR/keybindrc  # keybindings
+
+xsource $HOME/.aliasrc      # aliases
+# xsource $HOME/.env.local    # local environment
+
+xsource /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+xsource /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+xsource $ZDOTDIR/endzshrc
+
+# vim: filetype=zsh syntax=zsh

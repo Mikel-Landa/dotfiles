@@ -1,0 +1,5 @@
+
+exec < /dev/tty
+local -r file="$(fzf)"
+[ -n "$file" ] && ${VISUAL:-${EDITOR:-vim}} "$file"
+

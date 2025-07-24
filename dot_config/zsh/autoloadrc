@@ -1,0 +1,42 @@
+# Load all the functions that we have in autoload
+
+# required for non interactive use
+setopt extendedglob
+typeset -U fpath FPATH
+
+fpath=(
+    $ZDOTDIR/autoload
+    $ZDOTDIR/completion
+    $fpath
+)
+
+autoloading=(
+    ${fpath[1]}/^**.zwc(:t)
+);
+
+if [[ -o interactive ]]; then
+
+    autoloading=(
+        $autoloading
+        add-zsh-hook
+        is-at-least
+        promptinit
+        compinit
+    )
+fi
+
+autoload -Uz $autoloading
+
+autoload ${fpath[1]}/*(:t)
+#if [[ -d "$autoload_path" ]]; then
+#    local autoload_func
+#    for autoload_func in $autoload_path/^**.zwc; do
+#        autoload -Uz ${autoload_func:t}
+#    done
+#else
+#    echo "unable to load $autoload_path"
+#fi
+#unset autoload_path
+autoload -Uz add-zsh-hook
+
+# vim: ft=zsh

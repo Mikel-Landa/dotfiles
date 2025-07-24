@@ -1,0 +1,80 @@
+# History settings
+HISTSIZE=50000
+SAVEHIST=10000
+HISTFILE=$HOME/.zsh_history
+
+setopt append_history           # append the history
+setopt share_history            # share history between sessions
+                                # with this option, you should not enable inc_append_history
+#setopt inc_append_history      # append to history in the current
+                                # session and not just when the session ends
+#setopt extended_history         # include statistics of when/how long/etc a
+                                # command has run
+
+#setopt hist_ignore_dups         # do not store dupes executed after eachother
+
+# When HISTSIZE is smaller than SAVEHIST hist_expire_dups_first acts
+# as hist_ignore_all_dups, so let's just set the correct options when that
+# happens
+
+#setopt hist_expire_dups_first   # removes copies when the histfile fills up
+setopt hist_ignore_all_dups     # removes copies of the same line
+
+setopt hist_save_no_dups        # don't save dupes from the same session
+setopt hist_find_no_dups        # if we find dupes in the history, don't show
+                                # them in editor commands)
+setopt hist_reduce_blanks       # remove blank lines from the command which
+                                # mean nothing to the shell
+
+# Disable this on boxes that are affected by bug
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=924736
+is-at-least 5.5   &&  unsetopt hist_reduce_blanks
+# bugfix is incoming, lets see what it does
+is-at-least 5.7.2 &&  setopt hist_reduce_blanks
+
+setopt hist_ignore_space        # lines starting with space don't go into the
+                                # history
+setopt no_hist_beep             # silence..!
+setopt hist_verify
+setopt hist_no_store            # don't store history/fc commands
+#setopt hist_no_functions        # don't show history of function definitions
+
+setopt bg_nice                  # nice bg commands
+setopt notify                   # notify when a command returns exit code
+
+setopt no_beep                  # silence..!
+
+unsetopt auto_cd                # disable $ ./bin as cd ./bin
+setopt extendedglob             # ls ^bla.* will not show ^bla.txt for example
+
+setopt correct                  # correct incorrent cmd's
+setopt correctall               # correct everything, use
+                                # `nocorrect mv foo bar` to negate this feature
+                                # for a command
+
+setopt hash_list_all            # fill the lookup table for tab completions
+
+unsetopt promptcr               # prevent the prompt overwriting output when
+                                # there is no newline
+
+unsetopt nomatch                #
+setopt prompt_subst             # Enable prompt substition
+
+setopt glob_subst               # global substitution
+#setopt globdots                 # Also look for . files
+
+setopt longlistjobs
+setopt completeinword
+
+# Directories
+setopt auto_pushd               # cd foo == pushd foo
+setopt pushd_ignore_dups        # no duplicates in the list
+setopt pushdminus
+setopt auto_name_dirs           # foo=/path/to/foo is the same as
+                                # hash -d foo=/path/to/foo
+
+# Misc
+setopt interactivecomments      # $ # foo doesn't become an error when hitting
+                                # enter
+
+# vim: ft=zsh

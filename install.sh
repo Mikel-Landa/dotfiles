@@ -7,12 +7,12 @@ set -o pipefail
 sudo apt-get update
 sudo apt-get install -y \
 curl \
+wget \
 git \
 gcc \
 zsh \
 zsh-autosuggestions \
 zsh-syntax-highlighting \
-fzf \
 eza \
 ripgrep \
 ranger \
@@ -37,7 +37,22 @@ curl https://mise.run | sh
 chezmoi \
 kubectl
 
+# Fzf (ubuntu package is very out of date)
+curl -s https://api.github.com/repos/junegunn/fzf/releases/latest \
+| grep 'browser_download_url.*fzf-0.64.0-linux_amd64.tar.gz' \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| wget -qi -
+
+tar -xzf fzf-0.64.0-linux_amd64.tar.gz
+sudo install fzf /usr/bin
+rm fzf-0.64.0-linux_amd64.tar.gz fzf
+INIT_DIR=${ZDOTDIR:-$HOME/.config/zsh}/init
+mkdir -p $INIT_DIR
+fzf --zsh > $INIT_DIR/fzf.zsh
+
 # Make zsh the default shell (sudo to not ask for password again)
+if [[ ! -d $HOME/.local/share/chezmoi ]]; then
 USERNAME=$USER
 sudo chsh $USERNAME -s $(which zsh)
 
@@ -53,3 +68,4 @@ fi
 
 mkdir -p ~/.config/git
 echo -e "[user]\n\temail= $EMAIL" > ~/.config/git/config
+fi
