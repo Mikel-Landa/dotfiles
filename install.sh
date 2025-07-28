@@ -27,7 +27,8 @@ cargo binstall -y \
 bat \
 starship \
 zoxide \
-zellij
+zellij \
+nu
 
 # Mise
 curl https://mise.run | sh
