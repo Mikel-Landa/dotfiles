@@ -1,3 +1,7 @@
+#!/usr/bin/env zsh
+
+autoload -U compinit
+
 # ls
 alias la=tree
 alias cat=bat
@@ -65,3 +69,4 @@ f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy }
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
 
 # vim: filetype=zsh syntax=zsh
+

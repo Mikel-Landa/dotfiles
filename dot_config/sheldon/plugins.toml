@@ -1,0 +1,69 @@
+# Sheldon configuration file
+#
+# See https://sheldon.cli.rs
+
+shell = "zsh"
+
+[templates]
+defer = '''
+    {{- hooks?.pre | nl }}
+    {%- for file in files %}zsh-defer source "{{ file }}"{{ "\n" }}
+    {%- endfor %}
+    {{- hooks?.post | nl }}'''
+
+# Completions
+# -----------
+
+[plugins.docker-zsh-completion]
+github = "greymd/docker-zsh-completion"
+
+[plugins.rust-zsh-completions]
+github = "ryutok/rust-zsh-completions"
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+
+# Sourced
+# -------
+
+[plugins.local-0]
+local = "~/.config/zsh/plugins"
+use = ["{history,path}.plugin.zsh"]
+
+[plugins.pure]
+github = "sindresorhus/pure"
+use = ["{async,pure}.zsh"]
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+# Deferred plugins
+# ----------------
+
+[plugins.autoenv]
+github = "zpm-zsh/autoenv"
+apply = ["defer"]
+
+[plugins.local-1]
+local = "~/.config/zsh/plugins"
+use = ["{aliases*,gpg-agent,keybindings}.plugin.zsh"]
+apply = ["defer"]
+
+[plugins.zsh-you-should-use]
+github = "MichaelAquilina/zsh-you-should-use"
+apply = ["defer"]
+hooks.pre = "export YSU_MODE=ALL"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+use = ["{{ name }}.zsh"]
+apply = ["defer"]
+
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"
+apply = ["defer"]
+
+# This works best if it is placed last.
+[plugins.compinit]
+local = "~/.config/zsh/plugins"
+apply = ["defer"]

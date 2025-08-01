@@ -1,9 +1,0 @@
-xzcompile() {
-    local i="$@"
-    if [[ ! -s ${i}.zwc  || ${i} -nt ${1}.zwc ]]
-    then
-        zcompile ${i}
-    fi
-}
-
-# vim: ft=zsh

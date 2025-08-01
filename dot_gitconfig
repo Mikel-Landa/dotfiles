@@ -9,3 +9,7 @@
     gpgsign = true
 [push]
 	autoSetupRemote = true
+[fetch]
+	prune = true
+[log]
+	showSignature = true

@@ -28,10 +28,10 @@ curl https://sh.rustup.rs -sSf | sh -s -- -y
 cargo install cargo-binstall
 cargo binstall -y \
 bat \
-starship \
 zoxide \
 zellij \
-nu
+nu \
+sheldon
 
 # Mise
 curl https://mise.run | sh

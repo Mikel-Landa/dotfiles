@@ -1,7 +1,0 @@
-islong() {
-    local IFS="\n"
-    for i in "$@"
-    do
-        echo -E "$i: ${#i}"
-    done
-}

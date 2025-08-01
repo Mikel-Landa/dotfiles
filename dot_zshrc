@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+##DEBUG ZSH
+# zmodload zsh/zprof
+
+# LOCALE
+export LC_ALL=en_US.UTF-8
+
+# Source all the things ✨
+eval "$(sheldon source)"
+
+# Local bin
+if [ -d "$HOME/.local/bin" ]; then
+    path_push "$HOME/.local/bin"
+fi
+
+# Cargo env
+if [ -d "$HOME/.cargo" ]; then
+    path_push "$HOME/.cargo/bin"
+fi
+
+# Go env
+export GO111MODULE=on
+export GOPATH="$HOME/.go"
+if [ -d "$GOPATH" ]; then
+    path_push "$GOPATH/bin"
+fi
+
+##DEBUG ZSH
+# zprof

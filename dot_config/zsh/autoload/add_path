@@ -1,9 +1,0 @@
-add_path() {
-    local i
-    for i in $*
-    do
-        [[ -d $i ]] && path+=$i
-    done
-}
-
-# vim: ft=zsh
