@@ -9,7 +9,10 @@ if [[ ! -e $_ZCOMP || $today -gt $(stat --format %Y $_ZCOMP) ]];
 then
     compinit -i
     touch ${_ZCOMP}
-
+    # recompile all our things automaticly. It won't work for our
+    # current shell, but it will for all subsequent shells
+    xzcompilefpath
+    xzcompilehomedir
     #SOURCE BUILDING
     starship init zsh > $INIT_DIR/startship.zsh
     zoxide init zsh > $INIT_DIR/zoxide.zsh
@@ -26,11 +29,7 @@ then
 
     
 
-    # recompile all our things automaticly. It won't work for our
-    # current shell, but it will for all subsequent shells
-    lpass status -q && lpass sync --background
-    xzcompilefpath
-    xzcompilehomedir
+    
 else
     compinit -C;
 

@@ -1,21 +1,4 @@
 
 get_public_ip() {
-  local proto_ver=${1:-any}
-
-  case $proto_ver in
-    4) ipv=IPv4; proto=-4; type=a;;
-    6) ipv=IPv6; proto=-6; type=aaaa;;
-    any) ipv=IP; proto=""; type=any;;
-    *) echo "Unsupported version: $proto_ver!" >&2; return 1;;
-  esac
-
-  dig_result="$(dig $proto +short +time=1 +tries=1 $type \
-    myip.opendns.com @resolver1.opendns.com 2>/dev/null \
-    | grep -v 'no servers')"
-  if [ -z "$dig_result" ] && [ $proto_ver = 'any' ]
-  then
-    get_public_ip 4
-  else
-    echo "$ipv: $dig_result"
-  fi
+  curl https://ipinfo.io/ip
 }

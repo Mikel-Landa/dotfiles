@@ -17,7 +17,10 @@ eza \
 ripgrep \
 ranger \
 zip \
-gpg
+gpg \
+pkg-config \
+libssl-dev \
+build-essential
 
 # Rust packages
 curl https://sh.rustup.rs -sSf | sh -s -- -y
