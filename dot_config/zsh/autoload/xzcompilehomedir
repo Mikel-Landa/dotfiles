@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+
+xzcompilehomedir() {
+    targets=(
+        $HOME/.profile
+        $HOME/.zshenv
+        $HOME/.zshrc
+        $HOME/.config/zsh/plugins
+    )
+    for i in $targets
+    do
+        [[ -d "$i" ]] && xzcompiledir $i
+        [[ -f "$i" ]] && xzcompile $i
+    done
+    unset i
+    unset targets
+}

@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+xzcompilefpath() {
+    local i
+    for i in $fpath
+    do
+        # zdharma-continuum/fast-syntax-highlighting has wrong fpath config for this, skip it
+        if [[ "$i" != *zdharma-continuum/fast-syntax-highlighting* ]]; then
+        xzcompiledir $i
+        fi
+    done
+}

@@ -1,0 +1,6 @@
+[tools]
+chezmoi = "latest"
+go = "latest"
+kubectl = "latest"
+node = "lts"
+terraform = "1.4"

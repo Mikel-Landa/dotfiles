@@ -23,13 +23,26 @@ fi
 
 # If the user wants it, load from all found directories
 compinit -u -C -d "${ZSH_COMPDUMP}"
+xzcompilefpath
 
 # Append zcompdump metadata if missing
 if (( $zcompdump_refresh )); then
   echo "\n$zcompdump_revision\n$zcompdump_fpath" >>! "$ZSH_COMPDUMP"
 fi
 
-unset zcompdump_revision zcompdump_fpath zcompdump_refresh
+# Do once a day
+_ZCOMP=${ZDOTDIR:-$HOME}/.zcompdump
+today=$(date --date '00:00 today' +%s)
+if [[ ! -e $_ZCOMP || $today -gt $(stat --format %Y $_ZCOMP) ]];
+then
+  touch ${_ZCOMP}
+  xzcompilefpath
+  xzcompilehomedir
+fi
+
+unset zcompdump_revision zcompdump_fpath zcompdump_refresh _ZCOMP
+
+# Evals
 eval "$(zoxide init zsh --cmd j)"
 eval "$(mise activate zsh)"
 eval "$(fzf --zsh)"

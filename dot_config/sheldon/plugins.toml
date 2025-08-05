@@ -14,6 +14,9 @@ defer = '''
 # Completions
 # -----------
 
+# [plugins.zsh-autocomplete]
+# github = "marlonrichert/zsh-autocomplete"
+
 [plugins.docker-zsh-completion]
 github = "greymd/docker-zsh-completion"
 
@@ -34,19 +37,19 @@ use = ["{history,path}.plugin.zsh"]
 github = "sindresorhus/pure"
 use = ["{async,pure}.zsh"]
 
+# [plugins.powerlevel10k]
+# github = "romkatv/powerlevel10k"
+# use = ["powerlevel10k.zsh-theme"]
+
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
 # Deferred plugins
 # ----------------
 
-[plugins.autoenv]
-github = "zpm-zsh/autoenv"
-apply = ["defer"]
-
 [plugins.local-1]
 local = "~/.config/zsh/plugins"
-use = ["{aliases*,gpg-agent,keybindings}.plugin.zsh"]
+use = ["{autoload,aliases*,gpg-agent,keybindings}.plugin.zsh"]
 apply = ["defer"]
 
 [plugins.zsh-you-should-use]
