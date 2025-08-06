@@ -2,6 +2,7 @@
 
 # Load all stock functions (from $fpath files) called below.
 autoload -U compaudit compinit
+# autoload -Uz xzcompilefpath
 
 # Figure out the SHORT hostname
 SHORT_HOST=${HOST/.*/}
@@ -23,7 +24,6 @@ fi
 
 # If the user wants it, load from all found directories
 compinit -u -C -d "${ZSH_COMPDUMP}"
-xzcompilefpath
 
 # Append zcompdump metadata if missing
 if (( $zcompdump_refresh )); then
@@ -41,9 +41,3 @@ then
 fi
 
 unset zcompdump_revision zcompdump_fpath zcompdump_refresh _ZCOMP
-
-# Evals
-eval "$(zoxide init zsh --cmd j)"
-eval "$(mise activate zsh)"
-eval "$(fzf --zsh)"
-eval "$(kubectl completion zsh)"

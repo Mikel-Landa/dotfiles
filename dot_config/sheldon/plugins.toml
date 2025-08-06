@@ -44,12 +44,15 @@ use = ["{async,pure}.zsh"]
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
+[plugins.autoload]
+local = "~/.config/zsh/plugins"
+
 # Deferred plugins
 # ----------------
 
 [plugins.local-1]
 local = "~/.config/zsh/plugins"
-use = ["{autoload,aliases*,gpg-agent,keybindings}.plugin.zsh"]
+use = ["{aliases*,gpg-agent,keybindings}.plugin.zsh"]
 apply = ["defer"]
 
 [plugins.zsh-you-should-use]
@@ -68,5 +71,10 @@ apply = ["defer"]
 
 # This works best if it is placed last.
 [plugins.compinit]
+local = "~/.config/zsh/plugins"
+apply = ["defer"]
+
+# After compinit so completions work
+[plugins.evals]
 local = "~/.config/zsh/plugins"
 apply = ["defer"]

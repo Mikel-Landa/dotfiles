@@ -15,10 +15,14 @@ export LC_ALL=en_US.UTF-8
 
 setopt vi  # If EDITOR is set to vim, we have this for free
 setopt extendedglob
+setopt sh_word_split        # if you call func() $foo where foo="foo bar"
+                            # split the words to foo bar
+setopt interactive_comments # allow for comments in interactive shells
+
+export ZSH_EVALCACHE_DIR=${ZSH_EVALCACHE_DIR:-"$HOME/.zsh-evalcache"}
 
 # Source all the things ✨
 eval "$(sheldon source)"
-
 
 # Local bin
 if [ -d "$HOME/.local/bin" ]; then

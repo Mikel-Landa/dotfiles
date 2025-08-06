@@ -19,6 +19,7 @@ alias gco="git checkout"
 alias gst="git status"
 alias glog="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bold)%C(black)%d %C(cyan)%ar %C(green)%an%n%C(bold)%C(white)%s %N' --abbrev-commit"
 alias gm="git merge"
+alias gb="git branch"
 
 # vim
 # if (which vim) then alias vi = vim else do nothing
