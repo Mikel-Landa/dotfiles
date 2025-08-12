@@ -19,6 +19,7 @@ setopt sh_word_split        # if you call func() $foo where foo="foo bar"
                             # split the words to foo bar
 setopt interactive_comments # allow for comments in interactive shells
 
+
 export ZSH_EVALCACHE_DIR=${ZSH_EVALCACHE_DIR:-"$HOME/.zsh-evalcache"}
 
 # Source all the things ✨
@@ -32,6 +33,10 @@ fi
 # Cargo env
 if [ -d "$HOME/.cargo" ]; then
     path_push "$HOME/.cargo/bin"
+fi
+
+if [ -d "/opt/nvim" ]; then
+    path_push "/opt/nvim/bin"
 fi
 
 # Go env
@@ -50,6 +55,20 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 # source ~/.p10k.zsh
+
+## Autostart Zellij
+# ZELLIJ_AUTO_ATTACH=${ZELLIJ_AUTO_ATTACH:-true}
+# if [[ -z "$ZELLIJ" ]]; then
+#     if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
+#         zellij attach -c
+#     else
+#         zellij
+#     fi
+
+#     if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
+#         exit
+#     fi
+# fi
 
 ##PROFILE ZSH
 # zprof

@@ -20,7 +20,8 @@ zip \
 gpg \
 pkg-config \
 libssl-dev \
-build-essential
+build-essential \
+lazygit
 
 # Rust packages
 curl https://sh.rustup.rs -sSf | sh -s -- -y
@@ -31,7 +32,9 @@ bat \
 zoxide \
 zellij \
 nu \
-sheldon
+sheldon \
+tree-sitter-cli \
+fd-find
 
 # Mise
 curl https://mise.run | sh
@@ -39,7 +42,11 @@ curl https://mise.run | sh
 # Chezmoi
 ~/.local/bin/mise use -g \
 chezmoi \
-kubectl
+kubectl \
+go
+
+# LazyGit
+go install github.com/jesseduffield/lazygit@latest
 
 # Fzf (ubuntu package is very out of date)
 curl -s https://api.github.com/repos/junegunn/fzf/releases/latest \
