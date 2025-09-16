@@ -13,7 +13,7 @@ alias ltree="eza --tree --level=2  --icons --git"
 # GIT
 alias gad="git add --all"
 alias gcm="git commit -m"
-alias gp="git push origin HEAD"
+alias gp="git push"
 alias gpl="git pull origin"
 alias gco="git checkout"
 alias gst="git status"
@@ -45,6 +45,9 @@ alias kns="kubens"
 alias kl="kubectl logs -f"
 alias ke="kubectl exec -it"
 alias kcns='kubectl config set-context --current --namespace'
+
+#TMUX
+alias t='tmux'
 
 function ranger {
 	local IFS=$'\t\n'

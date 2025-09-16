@@ -4,3 +4,4 @@ _evalcache zoxide init zsh --cmd j
 _evalcache mise activate zsh
 _evalcache fzf --zsh
 _evalcache kubectl completion zsh
+_evalcache helm completion zsh

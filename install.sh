@@ -34,7 +34,8 @@ zellij \
 nu \
 sheldon \
 tree-sitter-cli \
-fd-find
+fd-find \
+tmux
 
 # Mise
 curl https://mise.run | sh
@@ -80,3 +81,6 @@ fi
 mkdir -p ~/.config/git
 echo -e "[user]\n\temail= $EMAIL" > ~/.config/git/config
 fi
+
+#TMUX
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

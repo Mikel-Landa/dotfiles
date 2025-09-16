@@ -1,3 +1,6 @@
+if true then
+  return {}
+end
 return {
   "swaits/zellij-nav.nvim",
   lazy = true,
