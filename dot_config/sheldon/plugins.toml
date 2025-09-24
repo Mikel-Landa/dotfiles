@@ -60,6 +60,12 @@ github = "MichaelAquilina/zsh-you-should-use"
 apply = ["defer"]
 hooks.pre = "export YSU_MODE=ALL"
 
+[plugins.color-man-pages]
+github = "ohmyzsh/ohmyzsh"
+use = ["plugins/colored-man-pages/colored-man-pages.plugin.zsh"]
+apply = ["defer"]
+hooks.pre = "autoload -U colors && colors"
+
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
