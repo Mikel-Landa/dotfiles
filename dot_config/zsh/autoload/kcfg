@@ -1,0 +1,4 @@
+function kcfg(){
+    file=$(ls ~/.kube | egrep  '^[^a-z.]|config' | fzf)
+    export KUBECONFIG=~/.kube/$file
+}

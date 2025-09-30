@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage:
+#   ./pick-aks [--admin] [--kubeconfig /path/to/kubeconfig]
+#
+# - By default merges into $HOME/.kube/config (or $KUBECONFIG if set)
+# - Use --admin for cluster-admin credentials (if you need K8s RBAC bypass for break-glass)
+# - Works across all Enabled subscriptions in your current Azure context
+
+KUBECONFIG_PATH="${KUBECONFIG:-$HOME/.kube/config}"
+USE_ADMIN="false"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  --kubeconfig)
+    KUBECONFIG_PATH="$2"
+    shift 2
+    ;;
+  --admin)
+    USE_ADMIN="true"
+    shift
+    ;;
+  -h | --help)
+    echo "Usage: $0 [--admin] [--kubeconfig /path/to/kubeconfig]"
+    exit 0
+    ;;
+  *)
+    echo "Unknown argument: $1" >&2
+    exit 1
+    ;;
+  esac
+done
+
+require() { command -v "$1" >/dev/null 2>&1 || {
+  echo "Missing dependency: $1" >&2
+  exit 1
+}; }
+require az
+require jq
+require fzf
+
+# Ensure ~/.kube exists
+mkdir -p "$(dirname "$KUBECONFIG_PATH")"
+
+# Login if needed
+if ! az account show >/dev/null 2>&1; then
+  echo "Not logged in to Azure CLI. Launching 'az login'..."
+  az login
+fi
+
+# Ensure Resource Graph extension (cross-subscription query)
+if ! az extension show --name resource-graph >/dev/null 2>&1; then
+  echo "Installing Azure Resource Graph extension..."
+  az extension add --name resource-graph >/dev/null
+fi
+
+# Collect all enabled subscriptions from the current context
+readarray -t SUBS < <(az account list --query "[?state=='Enabled'].id" -o tsv)
+if [[ ${#SUBS[@]} -eq 0 ]]; then
+  echo "No enabled subscriptions found in your Azure context." >&2
+  exit 1
+fi
+
+# Query AKS clusters across those subscriptions
+JSON=$(
+  az graph query \
+    --subscriptions "${SUBS[@]}" \
+    --first 1000 \
+    -q "Resources
+        | where type =~ 'microsoft.containerservice/managedclusters'
+        | project name=name,
+                  resourceGroup=resourceGroup,
+                  subscriptionId=subscriptionId,
+                  location=location,
+                  kubernetesVersion=tostring(properties.kubernetesVersion)
+        | order by name asc" \
+    -o json
+)
+
+COUNT=$(jq 'length' <<<"$JSON")
+if [[ "$COUNT" -eq 0 ]]; then
+  echo "No AKS clusters found across your enabled subscriptions." >&2
+  exit 2
+fi
+
+# Build a list for fzf: NAME \t RG \t SUB \t LOCATION \t VERSION
+SELECTION=$(
+  jq -r '.data[] | [.name, .resourceGroup, .subscriptionId, .location, (.kubernetesVersion // "-")] | @tsv' <<<"$JSON" |
+    column -s$'\t' -t |
+    fzf \
+      --prompt="Pick AKS cluster > " \
+      --header=$'NAME\tRESOURCE_GROUP\tSUBSCRIPTION\tLOCATION\tK8S' \
+      --with-nth=1,2,4,5 \
+      --border
+)
+
+if [[ -z "${SELECTION:-}" ]]; then
+  echo "No cluster selected." >&2
+  exit 3
+fi
+
+NAME=$(awk '{print $1}' <<<"$SELECTION")
+RG=$(awk '{print $2}' <<<"$SELECTION")
+SUB=$(awk '{print $3}' <<<"$SELECTION")
+
+# Switch to the selected subscription
+az account set --subscription "$SUB"
+
+# Build args for get-credentials
+ARGS=(-g "$RG" -n "$NAME" --overwrite-existing)
+[[ "$USE_ADMIN" == "true" ]] && ARGS+=(--admin)
+ARGS+=(--file "$KUBECONFIG_PATH")
+
+echo "Merging kubeconfig for AKS: name=$NAME, rg=$RG, sub=$SUB -> $KUBECONFIG_PATH"
+az aks get-credentials "${ARGS[@]}"
+
+export KUBECONFIG=$KUBECONFIG_PATH
+kubelogin convert-kubeconfig -l azurecli
