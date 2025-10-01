@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+file=${1:-examples/composite.yaml}
+yq -i '.metadata |= {"name": .name}' $file
+yq -i '.spec |= {"parameters": .parameters, "resourceRefs": .resourceRefs, "writeConnectionSecretToRef": .writeConnectionSecretToRef}' $file
+yq -i 'del(.status)' $file

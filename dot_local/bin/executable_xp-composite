@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+file=examples/claim.yaml
+composite=$(yq '.spec.resourceRef | (.kind | downcase) + "." + .apiVersion' $file)
+composite=${composite%/*}
+name=$(yq '.spec.resourceRef.name' $file)
+kubectl get $composite $name -o yaml > examples/composite.yaml
+xp-trim $file

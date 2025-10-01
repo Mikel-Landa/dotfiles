@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+file=examples/composite.yaml
+resources=($(yq '.spec.resourceRefs[] | (.kind | downcase) + "," + (.apiVersion | split("/") | .[0]) + "," + .name' $file))
+mkdir -p observed
+for resource in ${resources[@]}
+do
+IFS=', ' read -r -a parts <<< "$resource"
+kind=${parts[0]}
+version=${parts[1]}
+name=${parts[2]}
+kubectl get "$kind.$version" $name -o yaml > observed/$name.$kind.yaml
+done
