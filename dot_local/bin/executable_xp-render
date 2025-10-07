@@ -3,4 +3,5 @@ set -euo pipefail
 
 rm -rf .out
 mkdir -p .out
-crossplane render --include-full-xr examples/composite.yaml apis/composition.yaml examples/functions.yaml | tee .out/full.yaml | kubectl-slice --template '{{.kind | lower}}-{{.metadata.name}}.yaml' --output-dir .out
+crossplane render --observed-resources observed --include-full-xr examples/composite.yaml apis/composition.yaml examples/functions.yaml | tee .out/full.yaml | kubectl-slice --template '{{.kind | lower}}-{{.metadata.name}}.yaml' --output-dir .out
+

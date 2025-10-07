@@ -50,25 +50,17 @@ fi
 PURE_CMD_MAX_EXEC_TIME=2
 POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=2 #for powerlevel10k
 
+# Right side prompt (for kubectl)
+_lineup=$'\e[1A'
+_linedown=$'\e[1B'
+_kutl='%F{red}$ZSH_KUBECTL_PROMPT%f'
+RPROMPT=%{${_lineup}%}${_kutl}%{${_linedown}%}
+
 ## Characters included **will** be considered part of the word
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 # source ~/.p10k.zsh
-
-## Autostart Zellij
-# ZELLIJ_AUTO_ATTACH=${ZELLIJ_AUTO_ATTACH:-true}
-# if [[ -z "$ZELLIJ" ]]; then
-#     if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
-#         zellij attach -c
-#     else
-#         zellij
-#     fi
-
-#     if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
-#         exit
-#     fi
-# fi
 
 ##PROFILE ZSH
 # zprof

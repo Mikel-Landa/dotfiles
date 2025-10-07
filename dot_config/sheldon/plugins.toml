@@ -75,6 +75,11 @@ apply = ["defer"]
 github = "zdharma-continuum/fast-syntax-highlighting"
 apply = ["defer"]
 
+[plugins.zsh-kubectl-prompt]
+github = "superbrothers/zsh-kubectl-prompt"
+use = ["kubectl.zsh"]
+apply = ["defer"]
+
 # This works best if it is placed last.
 [plugins.compinit]
 local = "~/.config/zsh/plugins"

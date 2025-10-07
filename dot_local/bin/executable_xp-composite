@@ -6,4 +6,4 @@ composite=$(yq '.spec.resourceRef | (.kind | downcase) + "." + .apiVersion' $fil
 composite=${composite%/*}
 name=$(yq '.spec.resourceRef.name' $file)
 kubectl get $composite $name -o yaml > examples/composite.yaml
-xp-trim $file
+xp-trim examples/composite.yaml

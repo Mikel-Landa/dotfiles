@@ -22,6 +22,7 @@ alias gm="git merge"
 alias gb="git branch"
 alias gr="git rebase"
 alias gf="git fetch"
+alias ggr="cd $(git rev-parse --show-toplevel)"
 
 # vim
 # if (which vim) then alias vi = vim else do nothing
