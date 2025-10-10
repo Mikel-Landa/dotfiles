@@ -44,9 +44,13 @@ require fzf
 mkdir -p "$(dirname "$KUBECONFIG_PATH")"
 
 # Login if needed
-if ! az account show >/dev/null 2>&1; then
-  echo "Not logged in to Azure CLI. Launching 'az login'..."
-  az login
+token_date=$(az account get-access-token --query "expiresOn" --output tsv)
+token_epoch=$(date -d "$token_date" +%s)
+current_epoch=$(date +%s)
+
+if [[ $token_epoch -lt $current_epoch ]]; then
+    echo "Not logged in to Azure CLI. Launching 'az login'..."
+    az login
 fi
 
 # Ensure Resource Graph extension (cross-subscription query)
