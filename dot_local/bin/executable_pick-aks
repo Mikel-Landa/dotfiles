@@ -49,8 +49,9 @@ token_epoch=$(date -d "$token_date" +%s)
 current_epoch=$(date +%s)
 
 if [[ $token_epoch -lt $current_epoch ]]; then
-    echo "Not logged in to Azure CLI. Launching 'az login'..."
-    az login
+  echo "Not logged in to Azure CLI. Please log in and try again"
+  az login
+  # exit 1
 fi
 
 # Ensure Resource Graph extension (cross-subscription query)

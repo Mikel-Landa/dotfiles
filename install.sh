@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
-set -o pipefail
+set -euo pipefail
 
 # Prerequisites
 sudo apt-get update
@@ -21,7 +20,8 @@ gpg \
 pkg-config \
 libssl-dev \
 build-essential \
-lazygit
+lazygit \
+sshuttle
 
 # Rust packages
 curl https://sh.rustup.rs -sSf | sh -s -- -y

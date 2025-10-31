@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Check if it's open on a terminal
+if [ -t 0 ]; then
+convert-case.py $@ | tee >( tr -d $'\n' | uclip )
+else
+convert-case.py $@ | tr -d $'\n'
+fi

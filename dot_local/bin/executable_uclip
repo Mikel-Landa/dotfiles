@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+#WSL
+if command -v "clip.exe" >/dev/null 2>&1;then
+    clip.exe
+#Linux
+elif command -v "xclip" >/dev/null 2>&1; then
+    xclip -sel clip
+else
+    echo "Not a valid clip command (clip.exe|xclip)"
+    exit 1
+fi

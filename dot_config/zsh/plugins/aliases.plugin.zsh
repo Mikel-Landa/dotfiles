@@ -16,12 +16,15 @@ alias gcm="git commit -m"
 alias gp="git push"
 alias gpl="git pull origin"
 alias gco="git checkout"
-alias gs="git status"
+alias gs="git stash"
+alias gsp="git stash pop"
+alias gst="git status"
 alias glog="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bold)%C(black)%d %C(cyan)%ar %C(green)%an%n%C(bold)%C(white)%s %N' --abbrev-commit"
 alias gm="git merge"
 alias gb="git branch"
 alias gr="git rebase"
 alias gf="git fetch"
+alias gda="git restore . && git clean -fd"
 ggr () {
 	cd $(git rev-parse --show-toplevel)
 }
