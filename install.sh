@@ -21,6 +21,7 @@ pkg-config \
 libssl-dev \
 build-essential \
 lazygit \
+tmux \
 sshuttle
 
 # Rust packages
@@ -35,7 +36,7 @@ nu \
 sheldon \
 tree-sitter-cli \
 fd-find \
-tmux
+tlrc
 
 # Mise
 curl https://mise.run | sh
