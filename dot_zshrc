@@ -50,11 +50,11 @@ fi
 PURE_CMD_MAX_EXEC_TIME=2
 POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=2 #for powerlevel10k
 
-# Right side prompt (for kubectl)
-_lineup=$'\e[1A'
-_linedown=$'\e[1B'
-_kutl='%F{blue}$ZSH_KUBECTL_PROMPT%f'
-RPROMPT=%{${_lineup}%}${_kutl}%{${_linedown}%}
+# # Right side prompt (for kubectl)
+# _lineup=$'\e[1A'
+# _linedown=$'\e[1B'
+# _kutl='%F{blue}$ZSH_KUBECTL_PROMPT%f'
+# RPROMPT=%{${_lineup}%}${_kutl}%{${_linedown}%}
 
 ## Characters included **will** be considered part of the word
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
