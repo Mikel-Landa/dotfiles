@@ -1,18 +1,47 @@
 [user]
 	name = Mikel Landa
 	useConfigOnly = true
+
+
+[url "git@github.com:"]
+  insteadOf = "gh:"
+
+
+
+[column]
+	ui = auto
+
+[branch]
+	sort = -committerdate
+
+[tag]
+  sort = -taggerdate
+
+[help]
+	autoCorrect = prompt
+
+[status]
+  branch = true
+  showStash = true
+  
 [init]
 	defaultBranch = main
+	
 [pull]
 	rebase = true
+	
 [commit]
   gpgsign = true
+  
 [push]
 	autoSetupRemote = true
 	useForceIfIncludes = true
+	
 [fetch]
 	prune = true
+	
 [diff]
   tool = vscode
+  
 [difftool "vscode"]
   cmd = code --wait --diff $LOCAL $REMOTE
