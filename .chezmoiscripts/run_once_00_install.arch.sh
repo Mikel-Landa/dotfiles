@@ -19,12 +19,17 @@ if ! command -v paru >/dev/null 2>&1; then
 fi
 
 # Rust prerequisites
+if ! command -v rustc >/dev/null 2>&1 && command -v cargo >/dev/null 2>&1; then
 curl https://sh.rustup.rs -sSf | sh -s -- -y
+fi
 . "$HOME/.cargo/env"
+if ! command -v cargo-binstall >/dev/null 2>&1 && command -v cargo >/dev/null 2>&1; then
 cargo install cargo-binstall
+fi
+
 
 # Metapac (sudo to ask password once)
-sudo paru -S metapac
+paru -S metapac
 
 
 # Mise
