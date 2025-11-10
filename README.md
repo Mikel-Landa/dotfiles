@@ -1,2 +1,2 @@
 # Install
-`bash <(curl -SsL https://raw.githubusercontent.com/Mikel-Landa/dotfiles/refs/heads/main/install.sh)`
+`sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Mikel-Landa`
