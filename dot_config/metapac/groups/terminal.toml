@@ -1,0 +1,14 @@
+arch = [
+    "zsh",
+    "zsh-autosuggestions",
+    "zsh-syntax-highlighting",
+    "neovim",
+    "eza",
+    "ripgrep",
+    "lazygit",
+    "tmux",
+    "go-yq",
+    "jq",
+]
+
+cargo = ["bat", "zoxide", "nu", "sheldon", "tree-sitter-cli", "fd-find"]

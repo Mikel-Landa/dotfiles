@@ -1,0 +1,16 @@
+arch = [
+    "base",
+    "base-devel",
+    "linux",
+    "linux-firmware",
+    "networkmanager",
+    "zip",
+    "gnupg",
+    "pkgconf",
+    "vim",
+    "git",
+    "curl",
+    "wget",
+    "gcc",
+    "openssl",
+]
