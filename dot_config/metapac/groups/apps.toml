@@ -1,1 +1,3 @@
 arch = ["visual-studio-code-bin"]
+
+apt = ["code"]

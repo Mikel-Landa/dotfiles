@@ -16,3 +16,21 @@ arch = [
     "gcc",
     "openssl",
 ]
+
+apt = [
+    "build-essential",
+    "network-manager",
+    "zip",
+    "gnupg2",
+    "pinentry-tty",
+    "pinentry-curses",
+    "pkg-config",
+    "vim",
+    "git",
+    "curl",
+    "wget",
+    "gcc",
+    "libssl-dev",
+]
+
+mise = ["kubectl", "go"]

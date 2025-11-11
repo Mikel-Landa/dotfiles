@@ -40,3 +40,6 @@ export VISUAL EDITOR ED \
     GOPATH
 
 # vim: ft=sh
+
+## Enable git to ask for passphrase
+export GPG_TTY=$(tty)

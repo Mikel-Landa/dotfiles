@@ -1,1 +1,3 @@
 arch = ["sshuttle"]
+
+apt = ["sshuttle"]

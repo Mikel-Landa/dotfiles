@@ -9,6 +9,27 @@ arch = [
     "tmux",
     "go-yq",
     "jq",
+    "fzf",
 ]
 
-cargo = ["bat", "zoxide", "nu", "sheldon", "tree-sitter-cli", "fd-find"]
+apt = [
+    "zsh",
+    "zsh-autosuggestions",
+    "zsh-syntax-highlighting",
+    "neovim",
+    "ripgrep",
+    "tmux",
+    "yq",
+    "jq",
+]
+
+cargo = [
+    "bat",
+    "zoxide",
+    "nu",
+    "sheldon",
+    "tree-sitter-cli",
+    "fd-find",
+    "eza",
+    "lazygit",
+]
