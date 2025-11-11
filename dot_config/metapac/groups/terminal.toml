@@ -9,7 +9,6 @@ arch = [
     "tmux",
     "go-yq",
     "jq",
-    "fzf",
 ]
 
 apt = [
@@ -33,3 +32,5 @@ cargo = [
     "eza",
     "lazygit",
 ]
+
+mise = ["fzf"]
