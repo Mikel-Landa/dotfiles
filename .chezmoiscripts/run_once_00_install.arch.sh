@@ -46,12 +46,3 @@ if [[ ! -d ~/.tmux/plugins/tpm ]]; then
 mkdir -p ~/.tmux/plugins
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
-
-# Populate git email
-if [[ ! -n $EMAIL ]]; then
-echo Specify work email:
-read EMAIL
-fi
-
-mkdir -p ~/.config/git
-echo -e "[user]\n\temail= $EMAIL" > ~/.config/git/config

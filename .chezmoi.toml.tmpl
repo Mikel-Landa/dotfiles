@@ -1,0 +1,9 @@
+encryption = "age"
+[age]
+    identity = "~/chezmoi-encrypt.txt"
+    recipient = "age1t6d6xlasxkzhe0k0hqapwtwun20unvgdsx8ht7hvxw0su6zegfeqdpc5eg"
+
+{{- $email := promptStringOnce . "email" "Personal Email address"}}
+
+[data]
+    email = {{ $email | quote }}

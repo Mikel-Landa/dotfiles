@@ -6,6 +6,8 @@ arch = [
     "networkmanager",
     "zip",
     "gnupg",
+    "pinentry",
+    "pinentry-tty",
     "pkgconf",
     "vim",
     "git",

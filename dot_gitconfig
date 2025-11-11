@@ -1,12 +1,10 @@
 [user]
 	name = Mikel Landa
 	useConfigOnly = true
-
-
+	signingkey = 7C906F517916F1BB
+	
 [url "git@github.com:"]
   insteadOf = "gh:"
-
-
 
 [column]
 	ui = auto
@@ -45,3 +43,10 @@
   
 [difftool "vscode"]
   cmd = code --wait --diff $LOCAL $REMOTE
+
+
+[include]
+    path = ~/.gitconfig-personal
+
+[includeIf "gitdir:~/repos/"]
+    path = ~/.gitconfig-work
