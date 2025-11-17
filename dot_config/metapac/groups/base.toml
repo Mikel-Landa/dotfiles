@@ -34,3 +34,5 @@ apt = [
 ]
 
 mise = ["kubectl", "go"]
+
+cargo = ["difftastic"]

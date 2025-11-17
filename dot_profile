@@ -43,3 +43,4 @@ export VISUAL EDITOR ED \
 
 ## Enable git to ask for passphrase
 export GPG_TTY=$(tty)
+export MISE_DEFAULT_CONFIG_FILENAME='.mise.local.toml'

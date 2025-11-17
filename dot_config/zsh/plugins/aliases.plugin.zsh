@@ -24,9 +24,9 @@ alias gm="git merge"
 alias gb="git branch"
 alias gr="git rebase"
 alias gf="git fetch"
-alias gda="git restore . && git clean -fd"
-ggr () {
-	cd $(git rev-parse --show-toplevel)
+gda(){
+	GIT_ROOT=$(git rev-parse --show-toplevel) 
+	git restore $GIT_ROOT && git clean -fd $GIT_ROOT
 }
 
 # vim

@@ -3,9 +3,7 @@ arch = [
     "zsh-autosuggestions",
     "zsh-syntax-highlighting",
     "neovim",
-    "eza",
     "ripgrep",
-    "lazygit",
     "tmux",
     "go-yq",
     "jq",
@@ -22,15 +20,8 @@ apt = [
     "jq",
 ]
 
-cargo = [
-    "bat",
-    "zoxide",
-    "nu",
-    "sheldon",
-    "tree-sitter-cli",
-    "fd-find",
-    "eza",
-    "lazygit",
-]
+cargo = ["bat", "zoxide", "nu", "sheldon", "tree-sitter-cli", "fd-find", "eza"]
 
 mise = ["fzf"]
+
+go = ["github.com/jesseduffield/lazygit"]
