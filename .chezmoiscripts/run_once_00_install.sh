@@ -12,15 +12,19 @@ cargo install cargo-binstall
 fi
 
 if ! command -v metapac >/dev/null 2>&1; then
-cargo binstall -y metapac
+    mkdir -p ~/personal ~/bin
+    git clone git@github.com:Mikel-Landa/metapac.git ~/personal/metapac
+    cd ~/personal/metapac
+    cargo build --release
+    mv target/release/metapac ~/bin
 fi
 
 #Mise
 curl https://mise.run | sh
 
-# Make zsh the default shell (sudo to not ask for password again)
+# Make zsh the default shell
 USERNAME=$USER
-sudo chsh $USERNAME -s $(which zsh)
+chsh $USERNAME -s $(which zsh)
 
 #TMUX
 if [[ ! -d ~/.tmux/plugins/tpm ]]; then

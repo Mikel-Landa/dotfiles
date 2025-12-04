@@ -4,7 +4,7 @@
 	signingkey = 7C906F517916F1BB
 	
 [url "git@github.com:"]
-  insteadOf = "gh:"
+	insteadOf = "gh:"
 
 [column]
 	ui = auto
@@ -13,14 +13,14 @@
 	sort = -committerdate
 
 [tag]
-  sort = -taggerdate
+	sort = version:refname
 
 [help]
 	autoCorrect = prompt
 
 [status]
-  branch = true
-  showStash = true
+	branch = true
+	showStash = true
   
 [init]
 	defaultBranch = main
@@ -29,29 +29,45 @@
 	rebase = true
 	
 [commit]
-  gpgsign = true
+	gpgsign = true
   
 [push]
+	default = simple
 	autoSetupRemote = true
 	useForceIfIncludes = true
+	followTags = true
 	
 [fetch]
 	prune = true
 	
-[diff]
-  tool = vscode
-  external = difft
-  
-[difftool "vscode"]
-  cmd = code --wait --diff $LOCAL $REMOTE
+[rerere]
+	enabled = true
+	autoupdate = true
 
+[merge]
+	# (just 'diff3' if git version < 2.3)
+	conflictstyle = zdiff3
+
+[diff]
+	algorithm = histogram
+	colorMoved = zebra
+	mnemonicPrefix = true
+	renames = true
+	external = difft
 
 [include]
     path = ~/.gitconfig-personal
 
 [includeIf "gitdir:~/repos/"]
     path = ~/.gitconfig-work
+
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+
 [core]
 	excludesfile = ~/.gitignore
+
 [alias]
 	root = rev-parse --show-toplevel
