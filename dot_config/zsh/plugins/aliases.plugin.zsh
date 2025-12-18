@@ -29,6 +29,17 @@ gda(){
 	git restore $GIT_ROOT && git clean -fd $GIT_ROOT
 }
 
+
+is_wsl() {
+  [[ -n "$WSL_DISTRO_NAME" || -n "$WSL_INTEROP" || "$WSLENV" == *:* ]]
+}
+
+if is_wsl; then 
+# Install zed inside wsl for now, as mise support is not used otherwise
+alias zed='export ZED_ALLOW_EMULATED_GPU=1 && export DISPLAY=:0 && WAYLAND_DISPLAY="" ~/.local/zed.app/bin/zed'
+fi
+
+
 # vim
 # if (which vim) then alias vi = vim else do nothing
 VIM=$(which vim)

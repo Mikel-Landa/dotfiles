@@ -2,7 +2,7 @@
 	name = Mikel Landa
 	useConfigOnly = true
 	signingkey = 7C906F517916F1BB
-	
+
 [url "git@github.com:"]
 	insteadOf = "gh:"
 
@@ -21,25 +21,25 @@
 [status]
 	branch = true
 	showStash = true
-  
+
 [init]
 	defaultBranch = main
-	
+
 [pull]
 	rebase = true
-	
+
 [commit]
 	gpgsign = true
-  
+
 [push]
 	default = simple
 	autoSetupRemote = true
 	useForceIfIncludes = true
 	followTags = true
-	
+
 [fetch]
 	prune = true
-	
+
 [rerere]
 	enabled = true
 	autoupdate = true
