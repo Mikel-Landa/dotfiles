@@ -2,7 +2,7 @@
 	name = Mikel Landa
 	useConfigOnly = true
 	signingkey = 7C906F517916F1BB
-
+	
 [url "git@github.com:"]
 	insteadOf = "gh:"
 
@@ -21,25 +21,25 @@
 [status]
 	branch = true
 	showStash = true
-
+  
 [init]
 	defaultBranch = main
-
+	
 [pull]
 	rebase = true
-
+	
 [commit]
 	gpgsign = true
-
+  
 [push]
 	default = simple
 	autoSetupRemote = true
 	useForceIfIncludes = true
 	followTags = true
-
+	
 [fetch]
 	prune = true
-
+	
 [rerere]
 	enabled = true
 	autoupdate = true
@@ -53,7 +53,6 @@
 	colorMoved = zebra
 	mnemonicPrefix = true
 	renames = true
-	external = difft
 
 [include]
     path = ~/.gitconfig-personal
@@ -71,3 +70,14 @@
 
 [alias]
 	root = rev-parse --show-toplevel
+	
+	# `git log` with patches shown with difftastic.
+	dl = -c diff.external=difft log -p --ext-diff
+
+	# Show the most recent commit with difftastic.
+	ds = -c diff.external=difft show --ext-diff
+
+	# `git diff` with difftastic.
+	df = -c diff.external=difft diff
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE

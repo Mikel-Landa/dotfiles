@@ -41,10 +41,12 @@ fi
 
 # Go env
 export GO111MODULE=on
-export GOPATH="$HOME/.go"
-if [ -d "$GOPATH" ]; then
-    path_push "$GOPATH/bin"
-fi
+
+# not needed when using mise for go installs
+# export GOPATH="$HOME/.go"
+# if [ -d "$GOPATH" ]; then
+#     path_push "$GOPATH/bin"
+# fi
 
 ## PURE PROMT
 PURE_CMD_MAX_EXEC_TIME=2

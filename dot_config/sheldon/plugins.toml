@@ -75,6 +75,13 @@ apply = ["defer"]
 github = "zdharma-continuum/fast-syntax-highlighting"
 apply = ["defer"]
 
+[plugins.forgit]
+github = "wfxr/forgit"
+rev = "26.01.0"
+use = ["forgit.plugin.zsh"]
+apply = ["defer"]
+hooks.pre = "export forgit_checkout_commit=fgco"
+
 # [plugins.zsh-kubectl-prompt]
 # github = "superbrothers/zsh-kubectl-prompt"
 # use = ["kubectl.zsh"]

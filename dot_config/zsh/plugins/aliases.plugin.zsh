@@ -13,12 +13,12 @@ alias ltree="eza --tree --level=2  --icons --git"
 # GIT
 alias gad="git add --all"
 alias gcm="git commit -m"
+alias gc="git commit"
 alias gp="git push"
 alias gpl="git pull origin"
 alias gco="git checkout"
-alias gs="git stash --all"
 alias gsp="git stash pop"
-alias gst="git status"
+alias gs="git status"
 alias glog="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bold)%C(black)%d %C(cyan)%ar %C(green)%an%n%C(bold)%C(white)%s %N' --abbrev-commit"
 alias gm="git merge"
 alias gb="git branch"
@@ -33,11 +33,6 @@ gda(){
 is_wsl() {
   [[ -n "$WSL_DISTRO_NAME" || -n "$WSL_INTEROP" || "$WSLENV" == *:* ]]
 }
-
-if is_wsl; then 
-# Install zed inside wsl for now, as mise support is not used otherwise
-alias zed='export ZED_ALLOW_EMULATED_GPU=1 && export DISPLAY=:0 && WAYLAND_DISPLAY="" ~/.local/zed.app/bin/zed'
-fi
 
 
 # vim

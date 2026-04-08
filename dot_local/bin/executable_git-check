@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+dirs=("${@:-$HOME/repos}")
+dirty_dirs=()
+for dir in `fd '\.git$' "${dirs[@]}" -E '\.terraform\/' -HIpt d -x dirname | sort`
+do
+    if [[ ! -z "$(git -C $dir status --porcelain)" ]] || ! [[ "$(git -C $dir rev-parse --abbrev-ref HEAD)" =~ main|master|trunk ]]; then 
+        dirty_dirs+=($dir)
+    fi  
+done
+echo "The following git repositories are dirty:"
+printf '%s\n' "${dirty_dirs[@]}"

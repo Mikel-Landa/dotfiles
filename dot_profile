@@ -31,13 +31,15 @@ BIN=$HOME/bin
 LOCAL=$HOME/.local
 CARGO=$HOME/.cargo/bin
 GOPATH=$HOME/go
+# Explicit set to avoid mise override
+GOBIN=$HOME/go/bin
 
-PATH=$CARGO:$GOPATH/bin:$BIN:$LOCAL/bin:$PATH:/sbin:/usr/sbin
+PATH=$CARGO:$GOBIN:$BIN:$LOCAL/bin:$PATH:/sbin:/usr/sbin
 
 # Some environment variables need to be exported tho..
 export VISUAL EDITOR ED \
     PAGER LESS \
-    GOPATH
+    GOPATH GOBIN
 
 # vim: ft=sh
 
