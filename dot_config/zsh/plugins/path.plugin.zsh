@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 # Add a directory to the PATH environment variable.
 path_push() {

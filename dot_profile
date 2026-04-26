@@ -8,10 +8,6 @@
 # bash: This file is sourced at the startup of bash
 #
 
-UMASK_LOOSE=002
-UMASK_STRICT=022
-WHOAMI=${USER:-$LOGNAME}
-
 # LANG=C.UTF-8
 #TZ=America/Curacao
 #TZ=Europe/Amsterdam
@@ -24,22 +20,20 @@ LESS='-n -i -g -q -R -X -K -F'
 
 GIT_DISCOVERY_ACROSS_FILESYSTEM=0
 
-
-
-
-BIN=$HOME/bin
-LOCAL=$HOME/.local
-CARGO=$HOME/.cargo/bin
 GOPATH=$HOME/go
 # Explicit set to avoid mise override
 GOBIN=$HOME/go/bin
 
-PATH=$CARGO:$GOBIN:$BIN:$LOCAL/bin:$PATH:/sbin:/usr/sbin
+# Only prepend once per shell tree (subshells inherit PATH already)
+case ":$PATH:" in
+    *":$HOME/.cargo/bin:"*) ;;
+    *) PATH=$HOME/.cargo/bin:$GOBIN:$HOME/bin:$HOME/.local/bin:$PATH:/sbin:/usr/sbin ;;
+esac
 
-# Some environment variables need to be exported tho..
-export VISUAL EDITOR ED \
+export PATH VISUAL EDITOR ED \
     PAGER LESS \
-    GOPATH GOBIN
+    GOPATH GOBIN \
+    GIT_DISCOVERY_ACROSS_FILESYSTEM
 
 # vim: ft=sh
 

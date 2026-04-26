@@ -31,9 +31,9 @@ function _history {
 alias history='_history -i'
 
 ## History file configuration
-export HISTSIZE=5000000
+export HISTSIZE=200000
 export SAVEHIST=$HISTSIZE
-export HISTFILE="$HOME/.zhistory"
+export HISTFILE="${ZDOTDIR:-$HOME}/.zhistory"
 
 ## History command configuration
 setopt extended_history       # Write the history file in the ':start:elapsed;command' format

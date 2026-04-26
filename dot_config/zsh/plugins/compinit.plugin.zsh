@@ -22,22 +22,25 @@ if ! command grep -q -Fx "$zcompdump_revision" "$ZSH_COMPDUMP" 2>/dev/null \
   zcompdump_refresh=1
 fi
 
+# Case-insensitive completion (full bidirectional)
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+setopt NO_CASE_GLOB
+
 # If the user wants it, load from all found directories
-compinit -u -C -d "${ZSH_COMPDUMP}"
+compinit -C -d "${ZSH_COMPDUMP}"
 
 # Append zcompdump metadata if missing
 if (( $zcompdump_refresh )); then
   echo "\n$zcompdump_revision\n$zcompdump_fpath" >>! "$ZSH_COMPDUMP"
 fi
 
-# Do once a day
-_ZCOMP=${ZDOTDIR:-$HOME}/.zcompdump
-today=$(date --date '00:00 today' +%s)
-if [[ ! -e $_ZCOMP || $today -gt $(stat --format %Y $_ZCOMP) ]];
-then
-  touch ${_ZCOMP}
+# Recompile autoload + home dotfiles at most once per day
+if [[ ! -e $ZSH_COMPDUMP || $(date +%s) -gt $(( $(stat -c %Y "$ZSH_COMPDUMP") + 86400 )) ]]; then
   xzcompilefpath
   xzcompilehomedir
 fi
 
-unset zcompdump_revision zcompdump_fpath zcompdump_refresh _ZCOMP
+unset zcompdump_revision zcompdump_fpath zcompdump_refresh

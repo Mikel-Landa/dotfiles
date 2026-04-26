@@ -27,7 +27,4 @@ fi
 
 autoload -Uz $autoloading
 
-autoload ${fpath[1]}/*(:t)
-autoload -Uz add-zsh-hook
-
 # vim: ft=zsh

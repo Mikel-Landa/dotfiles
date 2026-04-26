@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-autoload -U compinit
-
 # ls
 alias la=tree
 alias cat=bat
@@ -30,16 +28,8 @@ gda(){
 }
 
 
-is_wsl() {
-  [[ -n "$WSL_DISTRO_NAME" || -n "$WSL_INTEROP" || "$WSLENV" == *:* ]]
-}
-
-
 # vim
-# if (which vim) then alias vi = vim else do nothing
-VIM=$(which vim)
-[ $? -eq 0 ] && alias vi='vim'
-unset VIM
+(( $+commands[vim] )) && alias vi='vim'
 alias v="nvim"
 
 
@@ -51,12 +41,11 @@ alias ka="kubectl apply -f"
 alias kg="kubectl get"
 alias kd="kubectl describe"
 alias kdel="kubectl delete"
-alias kl="kubectl logs"
+alias kl="kubectl logs -f"
 alias kgpo="kubectl get pod"
 alias kgd="kubectl get deployments"
 alias kc="kubectx"
 alias kns="kubens"
-alias kl="kubectl logs -f"
 alias ke="kubectl exec -it"
 alias kcns='kubectl config set-context --current --namespace'
 
@@ -66,27 +55,18 @@ alias t='tmux'
 #TERRAFORM
 alias tf='terraform'
 
-function ranger {
-	local IFS=$'\t\n'
-	local tempfile="$(mktemp -t tmp.XXXXXX)"
-	local ranger_cmd=(
-		command
-		ranger
-		--cmd="map Q chain shell echo %d > "$tempfile"; quitall"
-	)
-
-	${ranger_cmd[@]} "$@"
-	if [[ -f "$tempfile" ]] && [[ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]]; then
-		cd -- "$(cat "$tempfile")" || return
-	fi
-	command rm -f -- "$tempfile" 2>/dev/null
-}
-alias rr='ranger'
-
 # navigation
 cx() { cd "$@" && l; }
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }
-f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy }
+_clipcopy() {
+    if (( $+commands[wl-copy] )); then wl-copy
+    elif (( $+commands[xclip] )); then xclip -selection clipboard
+    elif (( $+commands[xsel] )); then xsel --clipboard --input
+    elif (( $+commands[pbcopy] )); then pbcopy
+    else cat >/dev/null
+    fi
+}
+f() { find . -type f -not -path '*/.*' | fzf | _clipcopy }
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
 
 # vim: filetype=zsh syntax=zsh
