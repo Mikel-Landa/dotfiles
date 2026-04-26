@@ -1,5 +1,18 @@
 {
+  "permissions": {
+    "defaultMode": "default"
+  },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/read-agents-md.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -32,5 +45,12 @@
       }
     }
   },
-  "theme": "dark"
+  "theme": "dark",
+  "editorMode": "normal",
+  "showTurnDuration": true,
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/mikel/.claude/statusline.sh"
+  }
 }
