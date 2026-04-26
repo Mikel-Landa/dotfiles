@@ -7,7 +7,6 @@ arch = [
     "zip",
     "gnupg",
     "pinentry",
-    "pinentry-tty",
     "pkgconf",
     "vim",
     "git",
@@ -15,6 +14,10 @@ arch = [
     "wget",
     "gcc",
     "openssl",
+    "python-evdev",         # for niri's tab cycling script
+    "keyd",                 # swap caps and esc
+    "cliphist",
+    "nm-connection-editor",
 ]
 
 apt = [
@@ -33,6 +36,11 @@ apt = [
     "libssl-dev",
 ]
 
-mise = ["kubectl", "go"]
+mise = [
+    "kubectl",
+    "go",
+    "terraform",
+    { package = "node", options = { version = "lts" } },
+]
 
 cargo = ["difftastic"]

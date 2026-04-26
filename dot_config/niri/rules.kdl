@@ -1,0 +1,64 @@
+
+layer-rule {
+    match namespace="^quickshell$"
+    place-within-backdrop true
+}
+
+window-rule {
+    geometry-corner-radius 6
+    clip-to-geometry true
+    tiled-state true
+    draw-border-with-background false
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\."#
+    draw-border-with-background false
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+window-rule {
+    match app-id=r#"^gnome-control-center$"#
+    match app-id=r#"^pavucontrol$"#
+    match app-id=r#"^nm-connection-editor$"#
+    default-column-width { proportion 0.5; }
+    open-floating false
+}
+
+window-rule {
+	match app-id="Alacritty"
+	default-column-width { proportion 0.33333; }
+}
+
+window-rule {
+  match app-id="firefox"
+  match app-id="code"
+
+  // This doesn't actually work, unfortunately, not sure why, Zed always opens 0.5
+  match app-id="dev.zed.Zed"
+
+  open-maximized true
+}
+
+window-rule {
+    match app-id="^steam_app_"
+    match app-id="cs2"
+    open-fullscreen true
+    open-on-output "DP-3"
+}
+
+window-rule {
+	match app-id="spotify"
+	open-maximized true
+}
+
+window-rule {
+    match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
+    default-floating-position x=0 y=0 relative-to="bottom-right"
+}
+
+window-rule {
+    match app-id=r#"org.quickshell$"#
+    open-floating true
+}

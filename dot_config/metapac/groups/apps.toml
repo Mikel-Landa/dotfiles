@@ -1,1 +1,1 @@
-arch = ["visual-studio-code-bin"]
+arch = ["visual-studio-code-bin", "zed"]

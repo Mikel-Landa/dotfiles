@@ -1,0 +1,9 @@
+{
+	"emojiLauncher": {
+		"enabled": true
+	},
+	"commandRunner": {
+		"enabled": true,
+		"terminal": "alacritty"
+	}
+}
