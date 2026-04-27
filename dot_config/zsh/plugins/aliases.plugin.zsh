@@ -55,6 +55,9 @@ alias t='tmux'
 #TERRAFORM
 alias tf='terraform'
 
+#DOCKER
+alias dc='docker compose'
+
 # navigation
 cx() { cd "$@" && l; }
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }

@@ -82,6 +82,11 @@ use = ["forgit.plugin.zsh"]
 apply = ["defer"]
 hooks.pre = "export forgit_checkout_commit=fgco"
 
+# [plugins.zsh-vi-mode]
+# github = "jeffreytse/zsh-vi-mode"
+# use = ["{{name}}.zsh"]
+# apply = ["defer"]
+
 # [plugins.zsh-kubectl-prompt]
 # github = "superbrothers/zsh-kubectl-prompt"
 # use = ["kubectl.zsh"]

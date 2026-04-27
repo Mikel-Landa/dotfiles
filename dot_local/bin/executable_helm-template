@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+chart=$1
+name=$(basename $chart)
+namespace=${2:-default}
+out=${3:-.out}
+args=""
+[[ -f "$chart/values.test.yaml" ]] && args="-f $chart/values.test.yaml"
+helm template $name  -n $namespace $chart $args | kubectl-slice --template '{{.kind | lower}}/{{.metadata.name}}.yaml' --output-dir $out
