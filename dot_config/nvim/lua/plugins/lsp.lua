@@ -103,7 +103,7 @@ return {
           -- Inlay hints (Neovim 0.10+)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client:supports_method("textDocument/inlayHint") then
-            vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+            vim.lsp.inlay_hint.enable(false, { bufnr = event.buf })
             map("<leader>uh", function()
               vim.lsp.inlay_hint.enable(
                 not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }),

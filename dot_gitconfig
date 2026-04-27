@@ -57,8 +57,11 @@
 [include]
     path = ~/.gitconfig-personal
 
-[includeIf "gitdir:~/repos/"]
+[include]
     path = ~/.gitconfig-work
+
+[includeIf "gitdir:~/personal/"]
+    path = ~/.gitconfig-personal
 
 [rebase]
 	autoSquash = true

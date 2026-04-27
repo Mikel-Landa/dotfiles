@@ -19,7 +19,12 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
     priority = 1000,
-    opts = { flavour = "mocha" },
+    opts = {
+      flavour = "mocha",
+      integrations = {
+        gitsigns = true,
+      }
+    },
     config = function(_, opts)
       require("catppuccin").setup(opts)
       vim.cmd.colorscheme("catppuccin")
@@ -32,19 +37,19 @@ return {
         vim.api.nvim_set_hl(0, name, { undercurl = true, sp = fg })
       end
       set_hl("DiagnosticUnderlineError", p.red)
-      set_hl("DiagnosticUnderlineWarn",  p.yellow)
-      set_hl("DiagnosticUnderlineInfo",  p.sky)
-      set_hl("DiagnosticUnderlineHint",  p.teal)
+      set_hl("DiagnosticUnderlineWarn", p.yellow)
+      set_hl("DiagnosticUnderlineInfo", p.sky)
+      set_hl("DiagnosticUnderlineHint", p.teal)
     end,
   },
 
   -- Statusline
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin" },
     opts = {
       options = {
-        theme = "catppuccin",
+        theme = "catppuccin-nvim",
         globalstatus = true,
         component_separators = "|",
         section_separators = "",
