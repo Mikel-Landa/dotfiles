@@ -87,16 +87,15 @@ return {
             vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
           end
 
-          local tb = require("telescope.builtin")
-          map("gd", tb.lsp_definitions, "Go to definition")
-          map("gr", tb.lsp_references, "References")
-          map("gi", tb.lsp_implementations, "Go to implementation")
-          map("gy", tb.lsp_type_definitions, "Type definition")
+          map("gd", function() Snacks.picker.lsp_definitions() end, "Go to definition")
+          map("gr", function() Snacks.picker.lsp_references() end, "References")
+          map("gi", function() Snacks.picker.lsp_implementations() end, "Go to implementation")
+          map("gy", function() Snacks.picker.lsp_type_definitions() end, "Type definition")
           map("K", vim.lsp.buf.hover, "Hover docs")
           map("<leader>ca", vim.lsp.buf.code_action, "Code action")
           map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
-          map("<leader>ls", tb.lsp_document_symbols, "Document symbols")
-          map("<leader>lS", tb.lsp_workspace_symbols, "Workspace symbols")
+          map("<leader>ls", function() Snacks.picker.lsp_symbols() end, "Document symbols")
+          map("<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, "Workspace symbols")
 
           -- Inlay hints (Neovim 0.10+)
           local client = vim.lsp.get_client_by_id(event.data.client_id)

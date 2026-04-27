@@ -63,7 +63,7 @@ return {
 }
 ```
 
-**Versioning**: track the plugin's default branch (no `version`/`branch` field). Pin only when the plugin author publishes semver tags AND breaks things between majors (e.g. `neo-tree.nvim` → `branch = "v3.x"`, `nvim-surround` → `version = "*"`). `lazy-lock.json` already pins exact commits — that's your real safety net. Blanket `version = "*"` on a plugin with no tags silently degrades to "latest commit" anyway.
+**Versioning**: track the plugin's default branch (no `version`/`branch` field). Pin only when the plugin author publishes semver tags AND breaks things between majors (e.g. `nvim-surround` → `version = "*"`). `lazy-lock.json` already pins exact commits — that's your real safety net. Blanket `version = "*"` on a plugin with no tags silently degrades to "latest commit" anyway.
 
 **Lazy-loading triggers** (pick the most specific):
 
@@ -74,7 +74,7 @@ return {
 | `cmd = { "CmdName" }` | Plugins only needed via an Ex command |
 | `ft = { "lua", "python" }` | Filetype-specific plugins |
 | `keys = { ... }` | Plugins triggered only by keymaps (lazy.nvim auto-creates the stub) |
-| `lazy = false` | **Avoid** — only colorscheme + treesitter need it |
+| `lazy = false` | **Avoid** — only colorscheme, treesitter, and snacks.nvim (provides core APIs: `vim.notify`, `vim.ui.input`, statuscolumn) need it |
 
 Don't use `BufEnter`/`BufWinEnter` — they fire on every buffer switch and tank perf. `BufReadPre`+`BufNewFile` is the canonical "file is open" pair.
 
@@ -105,9 +105,9 @@ vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short descriptio
 
 | Prefix | Domain |
 |---|---|
-| `<leader>f` | Find (Telescope) |
+| `<leader>f` | Find (snacks.picker) |
 | `<leader>b` | Buffers |
-| `<leader>g` / `<leader>h` | Git / hunks |
+| `<leader>g` | Git / hunks (gitsigns + snacks.picker) |
 | `<leader>l` | LSP (symbols, etc.) |
 | `<leader>d` | Diagnostics (`<leader>dd` = float) |
 | `<leader>x` | Trouble panel (diagnostics/symbols/refs) |
