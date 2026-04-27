@@ -51,6 +51,6 @@
   "model": "opus",
   "statusLine": {
     "type": "command",
-    "command": "bash /home/mikel/.claude/statusline.sh"
+    "command": "bash /home/mikel/.claude/scripts/statusline.sh"
   }
 }

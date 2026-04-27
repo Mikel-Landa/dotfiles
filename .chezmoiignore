@@ -1,3 +1,3 @@
 install.sh
 **/.claude/*
-!.claude/{settings.json,skills}
+!.claude/{settings.json,skills,scripts,hooks}
