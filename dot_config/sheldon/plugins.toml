@@ -52,7 +52,7 @@ local = "~/.config/zsh/plugins"
 
 [plugins.local-1]
 local = "~/.config/zsh/plugins"
-use = ["{aliases*,gpg-agent,keybindings}.plugin.zsh"]
+use = ["{aliases,gpg-agent,keybindings}.plugin.zsh"]
 apply = ["defer"]
 
 [plugins.zsh-you-should-use]

@@ -40,13 +40,12 @@ local servers = {
 return {
   {
     "williamboman/mason.nvim",
-    cmd = "Mason",
     build = ":MasonUpdate",
     opts = { ui = { border = "rounded" } },
   },
   {
     "williamboman/mason-lspconfig.nvim",
-    dependencies = { "williamboman/mason.nvim" },
+    dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
       ensure_installed = vim.tbl_keys(servers),
       automatic_enable = true,
@@ -56,7 +55,6 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
       "saghen/blink.cmp",
       "b0o/SchemaStore.nvim",
       -- Displays LSP progress in bottom right

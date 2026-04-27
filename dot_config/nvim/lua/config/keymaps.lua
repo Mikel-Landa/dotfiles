@@ -42,6 +42,13 @@ map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format" })
 
+-- Save
+map({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+
+-- System clipboard (explicit sync, nvim clipboard stays separate)
+map({ "n", "v" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
+map("n", "<C-S-V>", '"+p', { desc = "Paste from system clipboard" })
+
 -- Diagnostics
 map("n", "<leader>dd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 map("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Prev diagnostic" })

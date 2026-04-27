@@ -31,5 +31,4 @@ opt.swapfile = false
 opt.backup = false
 opt.updatetime = 250  -- also drives CursorHold delay (diagnostic float hover)
 
--- Clipboard: sync with system clipboard
-opt.clipboard = "unnamedplus"
+-- Clipboard: keep nvim clipboard separate from system (use keymaps for explicit sync)
