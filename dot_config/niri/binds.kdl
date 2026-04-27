@@ -68,7 +68,7 @@ binds {
 
     // === Window Management ===
     Mod+Q repeat=false { close-window; }
-    Mod+F repeat=false { maximize-column; }
+    Mod+F repeat=false { expand-column-to-available-width; }
     Mod+Shift+F { fullscreen-window; }
     Mod+Shift+T { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
