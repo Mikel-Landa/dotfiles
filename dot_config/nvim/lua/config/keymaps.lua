@@ -10,6 +10,23 @@ map("n", "<C-Down>", "<cmd>resize -2<cr>", { silent = true, desc = "Resize down"
 map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { silent = true, desc = "Resize left" })
 map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { silent = true, desc = "Resize right" })
 
+-- Window prefix: <leader>w replaces <C-w> (all default window subkeys still work)
+map("n", "<leader>w", "<C-w>", { remap = true, desc = "Windows" })
+map("n", "<leader>-", "<C-w>s", { desc = "Split window below", remap = true })
+map("n", "<leader>|", "<C-w>v", { desc = "Split window right", remap = true })
+map("n", "<leader>w-", "<C-w>s", { desc = "Split window below", remap = true })
+map("n", "<leader>w|", "<C-w>v", { desc = "Split window right", remap = true })
+map("n", "<leader>wd", "<C-w>c", { desc = "Delete window", remap = true })
+
+-- Tabs
+map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>",     { desc = "New tab" })
+map("n", "<leader><tab>]",     "<cmd>tabnext<cr>",    { desc = "Next tab" })
+map("n", "<leader><tab>[",     "<cmd>tabprevious<cr>",{ desc = "Prev tab" })
+map("n", "<leader><tab>d",     "<cmd>tabclose<cr>",   { desc = "Close tab" })
+map("n", "<leader><tab>o",     "<cmd>tabonly<cr>",    { desc = "Close other tabs" })
+map("n", "<leader><tab>f",     "<cmd>tabfirst<cr>",   { desc = "First tab" })
+map("n", "<leader><tab>l",     "<cmd>tablast<cr>",    { desc = "Last tab" })
+
 -- Move lines in visual mode
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
@@ -33,10 +50,12 @@ map("n", "<leader>fk", function() Snacks.picker.keymaps() end, { desc = "Keymaps
 map("n", "<leader>f/", function() Snacks.picker.lines() end, { desc = "Lines (current buffer)" })
 map("n", "<leader>fd", function() Snacks.picker.diagnostics() end, { desc = "Diagnostics" })
 
--- Buffer navigation
-map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
-map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
-map("n", "<leader>bd", "<cmd>bdelete<cr>", { desc = "Delete buffer" })
+-- Buffer navigation (cycle keys [b/]b/<S-h>/<S-l> registered by bufferline plugin)
+map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to other buffer" })
+map("n", "<leader>`",  "<cmd>e #<cr>", { desc = "Switch to other buffer" })
+map("n", "<leader>bd", function() Snacks.bufdelete() end,         { desc = "Delete buffer" })
+map("n", "<leader>bD", "<cmd>bdelete<cr>",                         { desc = "Delete buffer + window" })
+map("n", "<leader>bo", function() Snacks.bufdelete.other() end,    { desc = "Delete other buffers" })
 
 -- Format
 map({ "n", "v" }, "<leader>cf", function()

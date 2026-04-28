@@ -7,10 +7,10 @@ return {
       "TmuxNavigateUp", "TmuxNavigateRight",
     },
     keys = {
-      { "<C-h>", "<cmd>TmuxNavigateLeft<cr>" },
-      { "<C-j>", "<cmd>TmuxNavigateDown<cr>" },
-      { "<C-k>", "<cmd>TmuxNavigateUp<cr>" },
-      { "<C-l>", "<cmd>TmuxNavigateRight<cr>" },
+      { "<C-h>", "<cmd>TmuxNavigateLeft<cr>",  mode = { "n", "i", "t" } },
+      { "<C-j>", "<cmd>TmuxNavigateDown<cr>",  mode = { "n", "i", "t" } },
+      { "<C-k>", "<cmd>TmuxNavigateUp<cr>",    mode = { "n", "i", "t" } },
+      { "<C-l>", "<cmd>TmuxNavigateRight<cr>", mode = { "n", "i", "t" } },
     },
   },
 
@@ -86,6 +86,20 @@ return {
             exclude = { ".git", ".DS_Store", "node_modules" },
             follow_file = true,
             auto_close = false,
+            win = {
+              list = {
+                keys = {
+                  ["<c-j>"] = false,
+                  ["<c-k>"] = false,
+                },
+              },
+              input = {
+                keys = {
+                  ["<c-j>"] = false,
+                  ["<c-k>"] = false,
+                },
+              },
+            },
           },
         },
       },
@@ -94,6 +108,7 @@ return {
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
       lazygit = { enabled = true },
+      bufdelete = { enabled = true },
     },
     keys = {
       -- Explorer
@@ -199,6 +214,8 @@ return {
         { "<leader>r", group = "rename/refactor" },
         { "<leader>s", group = "search/noice" },
         { "<leader>sn", group = "noice" },
+        { "<leader>w", group = "windows", proxy = "<C-w>" },
+        { "<leader><tab>", group = "tabs" },
       },
     },
   },
@@ -247,5 +264,56 @@ return {
       { "<c-f>", function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end, silent = true, expr = true, desc = "Scroll forward", mode = { "i", "n", "s" } },
       { "<c-b>", function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end, silent = true, expr = true, desc = "Scroll backward", mode = { "i", "n", "s" } },
     },
+  },
+
+  -- Bufferline (LazyVim-style)
+  {
+    "akinsho/bufferline.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>",                desc = "Toggle pin" },
+      { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>",     desc = "Delete non-pinned buffers" },
+      { "<leader>br", "<Cmd>BufferLineCloseRight<CR>",               desc = "Delete buffers to the right" },
+      { "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>",                desc = "Delete buffers to the left" },
+      { "<S-h>",      "<cmd>BufferLineCyclePrev<cr>",                desc = "Prev buffer" },
+      { "<S-l>",      "<cmd>BufferLineCycleNext<cr>",                desc = "Next buffer" },
+      { "[b",         "<cmd>BufferLineCyclePrev<cr>",                desc = "Prev buffer" },
+      { "]b",         "<cmd>BufferLineCycleNext<cr>",                desc = "Next buffer" },
+      { "[B",         "<cmd>BufferLineMovePrev<cr>",                 desc = "Move buffer prev" },
+      { "]B",         "<cmd>BufferLineMoveNext<cr>",                 desc = "Move buffer next" },
+    },
+    opts = {
+      options = {
+        close_command = function(n) Snacks.bufdelete(n) end,
+        right_mouse_command = function(n) Snacks.bufdelete(n) end,
+        diagnostics = "nvim_lsp",
+        always_show_bufferline = false,
+        diagnostics_indicator = function(_, _, diag)
+          local ret = (diag.error and ("E" .. diag.error .. " ") or "")
+            .. (diag.warning and ("W" .. diag.warning) or "")
+          return vim.trim(ret)
+        end,
+        offsets = {
+          {
+            filetype = "snacks_layout_box",
+            text = "Explorer",
+            highlight = "Directory",
+            text_align = "left",
+          },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("bufferline").setup(opts)
+      -- Refresh bufferline when buffer states change (fix for delete/rename)
+      vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
+        callback = function()
+          vim.schedule(function()
+            pcall(nvim_bufferline)
+          end)
+        end,
+      })
+    end,
   },
 }

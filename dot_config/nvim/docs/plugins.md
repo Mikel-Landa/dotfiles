@@ -20,6 +20,9 @@ After pressing leader, wait briefly to see grouped popup of all leader-prefixed 
 ### lukas-reineke/indent-blankline.nvim — Indent guides
 Vertical lines on indented blocks. Passive.
 
+### akinsho/bufferline.nvim — Buffer tabs
+Top bar showing open buffers as tab-like entries. LSP diagnostics shown per buffer. Snacks explorer offset reserves the explorer column. See [Buffers](keymaps.md#buffers) for full keymaps. Highlights: `<S-h>`/`<S-l>` cycle, `<leader>bp` pin, `<leader>br/bl` delete to one side.
+
 ### j-hui/fidget.nvim — LSP progress notifications
 Spinner in bottom-right while LSP servers index/load.
 

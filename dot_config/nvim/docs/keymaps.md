@@ -16,6 +16,8 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>c` | Code (action, format) |
 | `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
+| `<leader>w` | Windows (proxy of `<C-w>`) |
+| `<leader><tab>` | Tabs |
 
 Press leader and pause — which-key shows the menu.
 
@@ -39,9 +41,17 @@ Press leader and pause — which-key shows the menu.
 
 | Key | Action |
 |---|---|
-| `[b` | Prev buffer |
-| `]b` | Next buffer |
-| `<leader>bd` | Delete buffer |
+| `[b` / `]b` | Prev / next buffer (bufferline cycle) |
+| `<S-h>` / `<S-l>` | Prev / next buffer (bufferline cycle) |
+| `[B` / `]B` | Move buffer left / right in bufferline |
+| `<leader>bb` / `` <leader>` `` | Switch to other buffer (alt-buffer) |
+| `<leader>bd` | Delete buffer (keep window) |
+| `<leader>bD` | Delete buffer + window |
+| `<leader>bo` | Delete other buffers |
+| `<leader>bp` | Toggle pin |
+| `<leader>bP` | Delete non-pinned buffers |
+| `<leader>br` | Delete buffers to the right |
+| `<leader>bl` | Delete buffers to the left |
 
 ## File explorer
 
@@ -158,6 +168,27 @@ Format on save runs automatically.
 | `<C-Down>` | Resize down |
 | `<C-Left>` | Resize left |
 | `<C-Right>` | Resize right |
+| `<leader>w` | Window prefix (replaces `<C-w>`; all default subkeys work) |
+| `<leader>-` / `<leader>w-` | Split below |
+| `<leader>\|` / `<leader>w\|` | Split right |
+| `<leader>ws` / `<leader>wv` | Split horizontal / vertical (vim default) |
+| `<leader>wd` / `<leader>wq` / `<leader>wc` | Close window |
+| `<leader>wo` | Only window (close others) |
+| `<leader>w=` | Equalize sizes |
+| `<leader>wh/j/k/l` | Move to pane (alt to `<C-h/j/k/l>`) |
+| `<leader>wT` | Move window to new tab |
+
+## Tabs
+
+| Key | Action |
+|---|---|
+| `<leader><tab><tab>` | New tab |
+| `<leader><tab>]` / `<leader><tab>[` | Next / prev tab |
+| `<leader><tab>f` / `<leader><tab>l` | First / last tab |
+| `<leader><tab>d` | Close tab |
+| `<leader><tab>o` | Close other tabs |
+| `gt` / `gT` | Next / prev tab (vim default) |
+| `<N>gt` | Go to tab N |
 
 ## Misc edits
 
