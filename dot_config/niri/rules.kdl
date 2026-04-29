@@ -49,8 +49,11 @@ window-rule {
 }
 
 window-rule {
-	match app-id="spotify"
-	open-maximized true
+	match app-id="Spotify"
+	open-floating true
+	default-column-width { proportion 0.6; }
+	default-window-height { proportion 0.7; }
+	default-floating-position x=0 y=0 relative-to="top"
 }
 
 window-rule {
@@ -61,4 +64,31 @@ window-rule {
 window-rule {
     match app-id=r#"org.quickshell$"#
     open-floating true
+}
+
+// Dropdown terminal (toggled via nscratch).
+window-rule {
+    match app-id="^dropdown-term$"
+    open-floating true
+    default-column-width { proportion 0.6; }
+    default-window-height { proportion 0.5; }
+    default-floating-position x=0 y=0 relative-to="top"
+}
+
+// === Privacy: redact sensitive windows from xdg-desktop-portal screencasts.
+// Replaced with solid black; not effective vs. third-party screenshot tools.
+window-rule {
+    match app-id=r#"^(Bitwarden|1Password|bitwarden|org\.keepassxc\.KeePassXC)$"#
+    block-out-from "screencast"
+}
+
+window-rule {
+    match app-id="firefox" title=r#"(?i)(bitwarden|1password|password|otp)"#
+    block-out-from "screencast"
+}
+
+// DMS lock UI surface.
+window-rule {
+    match app-id=r#"^quickshell$"# title=r#"(?i)lock"#
+    block-out-from "screencast"
 }

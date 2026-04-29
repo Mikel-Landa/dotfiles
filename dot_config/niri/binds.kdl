@@ -66,6 +66,14 @@ binds {
        spawn "dms" "ipc" "call" "brightness" "decrement" "5" "";
     }
 
+    // === Scratchpads (niri-scratchpad-rs) ===
+    Mod+Apostrophe repeat=false hotkey-overlay-title="Toggle Dropdown Term" {
+        spawn "niri-scratchpad" "target" "--spawn" "alacritty --class dropdown-term" "--as-float" "--animations" "appid" "dropdown-term";
+    }
+    Mod+Shift+Apostrophe repeat=false hotkey-overlay-title="Toggle Spotify Scratchpad" {
+        spawn "niri-scratchpad" "target" "--spawn" "spotify-launcher" "--as-float" "--animations" "appid" "Spotify";
+    }
+
     // === Window Management ===
     Mod+Q repeat=false { close-window; }
     Mod+F repeat=false { expand-column-to-available-width; }
