@@ -32,10 +32,10 @@ map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
 -- Keep cursor centered when jumping
-map("n", "<C-d>", "<C-d>zz")
-map("n", "<C-u>", "<C-u>zz")
-map("n", "n", "nzzzv")
-map("n", "N", "Nzzzv")
+map("n", "<C-d>", "<C-d>zz", { desc = "Scroll down (centered)" })
+map("n", "<C-u>", "<C-u>zz", { desc = "Scroll up (centered)" })
+map("n", "n", "nzzzv", { desc = "Next search result (centered)" })
+map("n", "N", "Nzzzv", { desc = "Prev search result (centered)" })
 
 -- Don't yank on paste in visual mode
 map("v", "p", '"_dP', { desc = "Paste without yank" })

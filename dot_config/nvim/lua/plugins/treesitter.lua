@@ -31,24 +31,24 @@ return {
 
       -- Select text objects
       local select_maps = {
-        ["af"] = "@function.outer",
-        ["if"] = "@function.inner",
-        ["ac"] = "@class.outer",
-        ["ic"] = "@class.inner",
-        ["aa"] = "@parameter.outer",
-        ["ia"] = "@parameter.inner",
+        ["af"] = { "@function.outer", "Outer function" },
+        ["if"] = { "@function.inner", "Inner function" },
+        ["ac"] = { "@class.outer",    "Outer class" },
+        ["ic"] = { "@class.inner",    "Inner class" },
+        ["aa"] = { "@parameter.outer","Outer argument" },
+        ["ia"] = { "@parameter.inner","Inner argument" },
       }
-      for key, obj in pairs(select_maps) do
+      for key, val in pairs(select_maps) do
         vim.keymap.set({ "x", "o" }, key, function()
-          sel.select_textobject(obj, "textobjects")
-        end)
+          sel.select_textobject(val[1], "textobjects")
+        end, { desc = val[2] })
       end
 
       -- Move between text objects
-      vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer", "textobjects") end)
-      vim.keymap.set("n", "]c", function() move.goto_next_start("@class.outer", "textobjects") end)
-      vim.keymap.set("n", "[f", function() move.goto_previous_start("@function.outer", "textobjects") end)
-      vim.keymap.set("n", "[c", function() move.goto_previous_start("@class.outer", "textobjects") end)
+      vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function" })
+      vim.keymap.set("n", "]C", function() move.goto_next_start("@class.outer", "textobjects") end,    { desc = "Next class" })
+      vim.keymap.set("n", "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function" })
+      vim.keymap.set("n", "[C", function() move.goto_previous_start("@class.outer", "textobjects") end,    { desc = "Prev class" })
     end,
   },
 }
