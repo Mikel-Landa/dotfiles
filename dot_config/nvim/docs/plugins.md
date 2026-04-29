@@ -17,9 +17,6 @@ Shows mode, branch, diff, diagnostics, file path, encoding, filetype, progress, 
 ### folke/which-key.nvim — Keybinding hints
 After pressing leader, wait briefly to see grouped popup of all leader-prefixed keys.
 
-### lukas-reineke/indent-blankline.nvim — Indent guides
-Vertical lines on indented blocks. Passive.
-
 ### akinsho/bufferline.nvim — Buffer tabs
 Top bar showing open buffers as tab-like entries. LSP diagnostics shown per buffer. Snacks explorer offset reserves the explorer column. See [Buffers](keymaps.md#buffers) for full keymaps. Highlights: `<S-h>`/`<S-l>` cycle, `<leader>bp` pin, `<leader>br/bl` delete to one side.
 
@@ -36,8 +33,11 @@ Move between Neovim splits and tmux panes seamlessly.
 | `<C-k>` | Up |
 | `<C-l>` | Right |
 
-### folke/snacks.nvim — Explorer
-Toggle with `<leader>e`. Inside the tree:
+### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent guides)
+
+Replaces telescope, neo-tree, indent-blankline. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides come from `snacks.indent`. Lazygit module is disabled — use `<leader>gg` (diffview) for in-editor git, or run `lazygit` in a terminal.
+
+Toggle the explorer with `<leader>e`. Inside the tree:
 
 | Key | Action |
 |---|---|
@@ -57,16 +57,25 @@ Toggle with `<leader>e`. Inside the tree:
 
 ## Search & navigation
 
-### nvim-telescope/telescope.nvim — Fuzzy finder
+### folke/snacks.nvim — Picker (fuzzy finder)
 
-| Key | Action |
-|---|---|
-| `<leader>ff` | Find files |
-| `<leader>fg` | Live grep across project |
-| `<leader>fb` | Open buffers |
-| `<leader>fh` | Help tags |
+Replaces telescope. Driven by `<leader>f*` keys (find), `<leader>g{f,l,L,B}` (git pickers), and LSP keymaps. See [Find](keymaps.md#find) and [LSP](keymaps.md#lsp) for the full list.
 
 Inside picker: `<C-n>`/`<C-p>` next/prev, `<CR>` open, `<C-x>` horizontal split, `<C-v>` vertical split, `<C-t>` tab, `<Esc>` close.
+
+### folke/flash.nvim — Jump-to-anywhere motion
+
+Type `s` then 2 chars; pick the labeled match to jump. Works as motion in operator-pending / visual.
+
+| Key | Mode | Action |
+|---|---|---|
+| `s` | n, x, o | Flash jump (2-char search + label) |
+| `S` | n, x, o | Flash Treesitter (jump to syntax node) |
+| `r` | o | Remote Flash (operate at remote location, e.g. `yr` = yank remote) |
+| `R` | o, x | Treesitter Search |
+| `<C-s>` | c | Toggle Flash inside `/` `?` search |
+
+Inside the prompt: type chars to narrow, then the label letter to jump. `<Esc>` cancels.
 
 ### folke/trouble.nvim — Diagnostics / refs panel
 
@@ -170,17 +179,44 @@ Formatters by filetype: stylua (lua), ruff (python), prettierd → prettier (js/
 
 ## Git
 
+### sindrets/diffview.nvim — Tabbed diff & file history viewer
+
+Open a tabpage with side-by-side diffs across the working tree, ranges, or commits. File panel on the left lists changed files; navigate with `j`/`k`, `<CR>` opens diff.
+
+| Key | Action |
+|---|---|
+| `<leader>gvo` | Open diffview (working tree vs index) |
+| `<leader>gvc` | Close diffview |
+| `<leader>gvh` | File history (whole repo) |
+| `<leader>gvf` | File history (current file) |
+| `<leader>gvt` | Toggle files panel |
+| `<leader>gvr` | Refresh |
+
+Inside diff/history view:
+
+| Key | Action |
+|---|---|
+| `<Tab>` / `<S-Tab>` | Next / prev file |
+| `gf` | Open file in new split |
+| `<C-w>gf` | Open in new tab |
+| `[x` / `]x` | Prev / next merge conflict |
+| `<leader>co/ct/cb/ca` | Choose ours / theirs / base / all (merge conflict) |
+| `dx` | Delete conflict region |
+| `g?` | Help |
+
+Commands accept revisions: `:DiffviewOpen HEAD~3` (against 3 commits ago), `:DiffviewOpen main..feature` (range), `:DiffviewFileHistory %` (current file), `:DiffviewFileHistory path/` (subtree).
+
 ### lewis6991/gitsigns.nvim — Git in gutter
 
-Signs in signcolumn show added/changed/deleted lines.
+Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md#git-hunks-gitsigns) for the full keymap list. Highlights:
 
 | Key | Action |
 |---|---|
 | `]h` / `[h` | Next / prev hunk |
-| `<leader>hs` | Stage hunk |
-| `<leader>hr` | Reset hunk |
-| `<leader>hp` | Preview hunk |
-| `<leader>hb` | Blame line |
+| `<leader>gs` / `<leader>gr` | Stage / reset hunk |
+| `<leader>gp` | Preview hunk |
+| `<leader>gb` | Blame line (full) |
+| `ih` (o, x) | Inner-hunk text object |
 
 ---
 

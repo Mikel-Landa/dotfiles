@@ -108,16 +108,22 @@ vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short descriptio
 | `<leader>f` | Find (snacks.picker) |
 | `<leader>b` | Buffers |
 | `<leader>g` | Git / hunks (gitsigns + snacks.picker) |
+| `<leader>gt` | Git toggles (inline blame, deleted, word diff) |
+| `<leader>gv` | Diffview |
 | `<leader>l` | LSP (symbols, etc.) |
 | `<leader>d` | Diagnostics (`<leader>dd` = float) |
 | `<leader>x` | Trouble panel (diagnostics/symbols/refs) |
-| `<leader>u` | UI toggles (`<leader>uh` = inlay hints) |
-| `<leader>c` | Code (action) |
+| `<leader>u` | UI toggles (`<leader>uh` = inlay hints, `<leader>un` = dismiss notif) |
+| `<leader>c` | Code (action, format) |
 | `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
-| `<leader>fm` | Format |
+| `<leader>sn` | Noice (messages/cmdline) |
+| `<leader>w` | Windows (proxy of `<C-w>`) |
+| `<leader><tab>` | Tabs |
 
-Group labels live in `which-key.nvim` spec inside `lua/plugins/ui.lua` — keep in sync when adding a new prefix.
+Group labels live in `which-key.nvim` spec inside `lua/plugins/which-key.lua` — keep in sync when adding a new prefix.
+
+After touching keymaps run `nvim --headless -l scripts/check-keymaps.lua` from the config root — it diffs `vim.keymap.set` / `keys = {…}` declarations against `docs/keymaps.md` and exits 1 on drift.
 
 Rules:
 - Don't shadow core Vim motions (`w`, `b`, `e`, `gg`, `G`, `f`, `t`, etc.)

@@ -16,6 +16,7 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>c` | Code (action, format) |
 | `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
+| `<leader>sn` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
 | `<leader><tab>` | Tabs |
 
@@ -57,7 +58,7 @@ Press leader and pause — which-key shows the menu.
 
 | Key | Action |
 |---|---|
-| `<leader>e` | Toggle Neo-tree |
+| `<leader>e` | Toggle file tree (snacks.explorer) |
 
 ## Git hunks (gitsigns)
 
@@ -98,12 +99,17 @@ Press leader and pause — which-key shows the menu.
 | `<leader>gL` | Git log (current file) |
 | `<leader>gB` | Git branches |
 
-### Lazygit
+### Diffview
 
 | Key | Action |
 |---|---|
-| `<leader>gg` | Lazygit (floating) |
-| `<leader>gG` | Lazygit log (cwd) |
+| `<leader>gg` | Toggle diffview |
+| `<leader>gvo` | Diffview open |
+| `<leader>gvc` | Diffview close |
+| `<leader>gvh` | File history (repo) |
+| `<leader>gvf` | File history (current file) |
+| `<leader>gvt` | Toggle files panel |
+| `<leader>gvr` | Refresh |
 
 ### Toggles
 
@@ -141,6 +147,30 @@ Press leader and pause — which-key shows the menu.
 | `<leader>dd` | Float at cursor |
 | `]d` / `[d` | Next / prev diagnostic |
 
+## Quickfix / loclist
+
+Navigation (unimpaired-style):
+
+| Key | Action |
+|---|---|
+| `]q` / `[q` | Next / prev quickfix entry |
+| `]Q` / `[Q` | Last / first quickfix entry |
+| `]<C-q>` / `[<C-q>` | Next / prev quickfix file |
+| `]l` / `[l` | Next / prev loclist entry |
+| `]L` / `[L` | Last / first loclist entry |
+| `]<C-l>` / `[<C-l>` | Next / prev loclist file |
+
+Manage:
+
+| Key | Action |
+|---|---|
+| `<leader>qo` / `<leader>qc` | Open / close quickfix |
+| `<leader>qx` | Clear quickfix |
+| `<leader>q[` / `<leader>q]` | Older / newer quickfix list |
+| `<leader>lo` / `<leader>lc` | Open / close loclist |
+
+Bulk edit across qf entries: `:cdo s/foo/bar/g | update`. See [Quickfix](quickfix.md) for the full reference.
+
 ## Trouble panel
 
 | Key | Action |
@@ -158,6 +188,24 @@ Press leader and pause — which-key shows the menu.
 | `<leader>cf` | Format buffer (or selection in visual) |
 
 Format on save runs automatically.
+
+## Noice (messages / cmdline)
+
+| Key | Mode | Action |
+|---|---|---|
+| `<leader>snl` | n | Last message |
+| `<leader>snh` | n | Message history |
+| `<leader>sna` | n | All messages |
+| `<leader>snd` | n | Dismiss all |
+| `<S-Enter>` | c | Redirect cmdline output |
+| `<C-f>` / `<C-b>` | n, i, s | Scroll forward/back inside LSP hover/signature |
+
+## UI toggles
+
+| Key | Action |
+|---|---|
+| `<leader>un` | Dismiss notifications (snacks.notifier) |
+| `<leader>uh` | Toggle inlay hints |
 
 ## Window / pane navigation
 
@@ -200,6 +248,9 @@ Format on save runs automatically.
 | `<C-d>` | normal | Half-page down (cursor centered) |
 | `<C-u>` | normal | Half-page up (cursor centered) |
 | `n` / `N` | normal | Next / prev search match (centered, unfolded) |
+| `<C-s>` | n, i, v | Save file |
+| `<leader>y` | n, v | Yank to system clipboard |
+| `<C-S-V>` | n | Paste from system clipboard |
 
 ## Treesitter text objects
 
@@ -210,6 +261,16 @@ Format on save runs automatically.
 | `aa` / `ia` | x, o | Parameter outer / inner |
 | `]f` / `[f` | n | Next / prev function |
 | `]c` / `[c` | n | Next / prev class |
+
+## Flash (flash.nvim)
+
+| Key | Mode | Action |
+|---|---|---|
+| `s` | n, x, o | Flash jump |
+| `S` | n, x, o | Flash Treesitter |
+| `r` | o | Remote Flash |
+| `R` | o, x | Treesitter Search |
+| `<C-s>` | c | Toggle Flash in `/` search |
 
 ## Surround (nvim-surround)
 
