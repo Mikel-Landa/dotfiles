@@ -1,3 +1,7 @@
 install.sh
 **/.claude/*
 !.claude/{settings.json,skills,scripts,hooks}
+{{ if not .work -}}
+dot_config/metapac/groups/work.toml
+.chezmoiscripts/run_once_10_work.sh.tmpl
+{{- end }}

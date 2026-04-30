@@ -39,6 +39,12 @@ local servers = {
 
 return {
   {
+    "j-hui/fidget.nvim",
+    event = "LspAttach",
+    opts = {},
+  },
+
+  {
     "williamboman/mason.nvim",
     build = ":MasonUpdate",
     opts = { ui = { border = "rounded" } },
@@ -57,10 +63,18 @@ return {
       "williamboman/mason.nvim",
       "saghen/blink.cmp",
       "b0o/SchemaStore.nvim",
-      -- Displays LSP progress in bottom right
-      { "j-hui/fidget.nvim", opts = {} },
     },
     config = function()
+      -- Diagnostic display: underlines on, virtual_text off (float on CursorHold replaces it),
+      -- signs in gutter, sorted by severity. Set here so it applies only when LSP loads.
+      vim.diagnostic.config({
+        underline = true,
+        virtual_text = false,
+        signs = true,
+        severity_sort = true,
+        float = { border = "rounded", source = "if_many" },
+      })
+
       -- Inject SchemaStore schemas into json/yaml servers
       servers.jsonls = vim.tbl_deep_extend("force", servers.jsonls, {
         settings = {

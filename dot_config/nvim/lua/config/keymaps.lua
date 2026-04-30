@@ -49,6 +49,7 @@ map("n", "<leader>fr", function() Snacks.picker.recent() end, { desc = "Recent f
 map("n", "<leader>fk", function() Snacks.picker.keymaps() end, { desc = "Keymaps" })
 map("n", "<leader>f/", function() Snacks.picker.lines() end, { desc = "Lines (current buffer)" })
 map("n", "<leader>fd", function() Snacks.picker.diagnostics() end, { desc = "Diagnostics" })
+map("n", "<leader>fc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, { desc = "Config files" })
 
 -- Buffer navigation (cycle keys [b/]b/<S-h>/<S-l> registered by bufferline plugin)
 map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to other buffer" })

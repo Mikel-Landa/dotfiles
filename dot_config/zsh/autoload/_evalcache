@@ -36,8 +36,12 @@ function _evalcache () {
     if type "${name}" > /dev/null; then
       echo "evalcache: ${name} initialization not cached, caching output of: $*" >&2
       mkdir -p "$ZSH_EVALCACHE_DIR"
-      eval ${(q)@} > "$cacheFile"
-      source "$cacheFile"
+      if eval ${(q)@} > "$cacheFile" && [ -s "$cacheFile" ]; then
+        source "$cacheFile"
+      else
+        echo "evalcache: ERROR: ${name} produced empty/failed output; removing cache" >&2
+        rm -f "$cacheFile"
+      fi
     else
       echo "evalcache: ERROR: ${name} is not installed or in PATH" >&2
     fi

@@ -49,8 +49,8 @@ autocmd("FileType", {
             local col = vim.api.nvim_win_get_position(w)[2]
             local ok = (dir == "h" and col < cur_col) or (dir == "l" and col > cur_col)
             if ok and (target_col == nil
-                or (dir == "h" and col > target_col)
-                or (dir == "l" and col < target_col)) then
+                  or (dir == "h" and col > target_col)
+                  or (dir == "l" and col < target_col)) then
               target, target_col = w, col
             end
           end
@@ -88,14 +88,4 @@ autocmd("CursorHold", {
     end
     vim.diagnostic.open_float(nil, { focus = false, scope = "cursor", border = "rounded" })
   end,
-})
-
--- Diagnostic display: underlines on (default), virtual_text off (float replaces it),
--- signs in gutter, sorted by severity.
-vim.diagnostic.config({
-  underline = true,
-  virtual_text = false,
-  signs = true,
-  severity_sort = true,
-  float = { border = "rounded", source = "if_many" },
 })

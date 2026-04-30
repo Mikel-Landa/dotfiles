@@ -41,7 +41,14 @@ return {
       scope = { enabled = true },
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
-      indent = { enabled = true },
+      indent = {
+        enabled = true,
+        filter = function(buf)
+          local ft = vim.bo[buf].filetype
+          local indent_fts = { python = true, yaml = true, yml = true }
+          return indent_fts[ft] == true
+        end,
+      },
       bufdelete = { enabled = true },
     },
     keys = {

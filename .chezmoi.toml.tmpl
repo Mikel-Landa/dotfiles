@@ -4,6 +4,10 @@ encryption = "age"
     recipient = "age1t6d6xlasxkzhe0k0hqapwtwun20unvgdsx8ht7hvxw0su6zegfeqdpc5eg"
 
 {{- $email := promptStringOnce . "email" "Personal Email address"}}
+{{- $realName := promptStringOnce . "realName" "Real name (for git/GPG)"}}
+{{- $work := promptBoolOnce . "work" "Is this a work machine?"}}
 
 [data]
     email = {{ $email | quote }}
+    realName = {{ $realName | quote }}
+    work = {{ $work }}

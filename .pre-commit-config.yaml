@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-nvim-keymaps
+        name: Verify nvim keymaps doc is in sync
+        language: system
+        entry: bash -c 'cd dot_config/nvim && nvim --headless -l scripts/check-keymaps.lua'
+        files: '^dot_config/nvim/(lua/.*\.lua|docs/keymaps\.md|scripts/check-keymaps\.lua)$'
+        pass_filenames: false

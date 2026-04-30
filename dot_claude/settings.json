@@ -2,6 +2,7 @@
   "permissions": {
     "defaultMode": "default"
   },
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -25,6 +26,10 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/scripts/statusline.sh"
+  },
   "enabledPlugins": {
     "andrej-karpathy-skills@karpathy-skills": true,
     "caveman@caveman": true,
@@ -47,10 +52,5 @@
   },
   "theme": "dark",
   "editorMode": "normal",
-  "showTurnDuration": true,
-  "model": "opus",
-  "statusLine": {
-    "type": "command",
-    "command": "bash /home/mikel/.claude/scripts/statusline.sh"
-  }
+  "showTurnDuration": true
 }
