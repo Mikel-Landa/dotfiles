@@ -5,7 +5,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // === Application Launchers ===
-    Mod+Return repeat=false hotkey-overlay-title="Open Terminal" { spawn "alacritty"; }
+    Mod+Return repeat=false hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
     Mod+B repeat=false hotkey-overlay-title="Open Firefox" { spawn "firefox"; }
     Mod+Space repeat=false hotkey-overlay-title="Application Launcher" {
         spawn "dms" "ipc" "call" "spotlight" "toggle";
@@ -68,7 +68,7 @@ binds {
 
     // === Scratchpads (niri-scratchpad-rs) ===
     Mod+Apostrophe repeat=false hotkey-overlay-title="Toggle Dropdown Term" {
-        spawn "niri-scratchpad" "target" "--spawn" "alacritty --class dropdown-term" "--as-float" "--animations" "appid" "dropdown-term";
+        spawn "niri-scratchpad" "target" "--spawn" "kitty --class dropdown-term" "--as-float" "--animations" "appid" "dropdown-term";
     }
     Mod+Shift+Apostrophe repeat=false hotkey-overlay-title="Toggle Spotify Scratchpad" {
         spawn "niri-scratchpad" "target" "--spawn" "spotify-launcher" "--as-float" "--animations" "appid" "Spotify";
@@ -76,8 +76,8 @@ binds {
 
     // === Window Management ===
     Mod+Q repeat=false { close-window; }
-    Mod+F repeat=false { expand-column-to-available-width; }
-    Mod+Shift+F { fullscreen-window; }
+    Mod+Shift+F repeat=false { expand-column-to-available-width; }
+    Mod+F { fullscreen-window; }
     Mod+Shift+T { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
     Mod+W { toggle-column-tabbed-display; }

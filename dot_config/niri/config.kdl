@@ -16,7 +16,7 @@ environment {
   QT_QPA_PLATFORMTHEME_QT6 "gtk3"
 
   EDITOR "zeditor"
-  TERMINAL "alacritty"
+  TERMINAL "kitty"
 }
 
 layout {
