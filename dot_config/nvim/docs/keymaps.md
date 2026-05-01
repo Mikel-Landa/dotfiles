@@ -6,12 +6,14 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 
 | Prefix | Domain |
 |---|---|
+| `<leader>a` | AI / Claude Code |
 | `<leader>f` | Find (snacks.picker) |
 | `<leader>b` | Buffers |
 | `<leader>g` | Git / hunks |
 | `<leader>l` | LSP (symbols) |
 | `<leader>d` | Diagnostics |
 | `<leader>x` | Trouble panel |
+| `<leader>q` | Quickfix |
 | `<leader>u` | UI toggles |
 | `<leader>c` | Code (action, format) |
 | `<leader>r` | Rename / refactor |
@@ -39,6 +41,22 @@ Press leader and pause — which-key shows the menu.
 | `<leader>f/` | Lines (current buffer) |
 | `<leader>fd` | Diagnostics |
 | `<leader>fn` | Notification history |
+| `<leader>fc` | Config files (`$XDG_CONFIG_HOME/nvim`) |
+
+## AI / Claude Code (`<leader>a`)
+
+| Key | Mode | Action |
+|---|---|---|
+| `<leader>ac` | n | Toggle Claude Code terminal |
+| `<leader>af` | n | Focus Claude window |
+| `<leader>ar` | n | Resume previous session |
+| `<leader>aC` | n | Continue most recent session |
+| `<leader>am` | n | Select Claude model |
+| `<leader>ab` | n | Add current buffer to context |
+| `<leader>as` | v | Send selection to Claude |
+| `<leader>as` | n | Add file under cursor (in tree explorers) |
+| `<leader>aa` | n | Accept proposed diff |
+| `<leader>ad` | n | Deny proposed diff |
 
 ## Buffers
 
@@ -251,6 +269,7 @@ Format on save runs automatically.
 | Key | Mode | Action |
 |---|---|---|
 | `J` | normal | Join lines (cursor position preserved) |
+| `<leader>j` | normal | Toggle split / join block (treesj) |
 | `<leader>D` | n, v | Delete without yank (black-hole register) |
 | `<leader>pa` | n | Copy absolute file path to system clipboard |
 | `p` | visual | Paste without yanking the replaced text |
@@ -319,7 +338,8 @@ Format on save runs automatically.
 |---|---|
 | `<C-n>` / `<C-p>` | Next / prev candidate |
 | `<CR>` | Confirm |
-| `<Tab>` | Snippet jump / select |
+| `<Tab>` | Snippet jump / select; otherwise tab out of brackets/quotes (tabout.nvim) |
+| `<S-Tab>` | Tab out backwards (tabout.nvim) |
 | `<C-Space>` | Trigger menu |
 | `<C-e>` | Cancel |
 

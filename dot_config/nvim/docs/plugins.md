@@ -33,6 +33,9 @@ Move between Neovim splits and tmux panes seamlessly.
 | `<C-k>` | Up |
 | `<C-l>` | Right |
 
+### sphamba/smear-cursor.nvim — Animated cursor trail
+Smooth motion smear when cursor jumps. Auto-disables in cmdline (no smear while typing `:`).
+
 ### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent, terminal)
 
 Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (diffview) for in-editor git, or run `lazygit` in the floating terminal (`<leader>ut`).
@@ -131,6 +134,22 @@ Seven modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (
 
 **mini.icons** — File and filetype icons (replaces nvim-web-devicons; API-compatible).
 
+### Wansmer/treesj — Toggle split / join blocks
+
+Treesitter-aware split/join for arrays, function args, objects, etc.
+
+| Key | Action |
+|---|---|
+| `<leader>j` | Toggle split / join block under cursor |
+
+### abecodes/tabout.nvim — Jump out of brackets / quotes with Tab
+
+In insert mode, `<Tab>` jumps past the next closing bracket / quote / pair (treesitter-aware). `<S-Tab>` jumps backwards. Coexists with `mini.pairs` autoclose and `blink.cmp` snippet jumps.
+
+### NvChad/nvim-colorizer.lua — Inline color preview
+
+Highlights hex / rgb / hsl / named / Tailwind class colors with their actual color in the buffer.
+
 ### nvim-treesitter — Syntax highlighting & text objects
 
 Highlighting is automatic. Text objects (require treesitter-textobjects):
@@ -154,7 +173,7 @@ Move between nodes:
 
 ### neovim/nvim-lspconfig + mason.nvim — Language servers
 
-Servers auto-install on first use: lua, python, typescript, rust, go, c/c++, json, yaml, html, css, bash. Manage with `:Mason`.
+Servers auto-install on first use: lua, python, typescript, rust, go, c/c++, json, yaml, html, css, bash, toml (tombi). Manage with `:Mason`.
 
 LSP keymaps (active when an LSP attaches):
 
@@ -246,6 +265,22 @@ Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md
 | `ih` (o, x) | Inner-hunk text object |
 
 ---
+
+---
+
+## AI
+
+### coder/claudecode.nvim — Claude Code IDE bridge
+
+WebSocket MCP integration with the `claude` CLI. Loads on first `<leader>a*` key or `:ClaudeCode*` command. See [AI / Claude Code](keymaps.md#ai--claude-code-leadera) for the full keymap list. Highlights:
+
+| Key | Action |
+|---|---|
+| `<leader>ac` | Toggle terminal |
+| `<leader>af` | Focus window |
+| `<leader>ab` | Add current buffer |
+| `<leader>as` (v) | Send selection |
+| `<leader>aa` / `<leader>ad` | Accept / deny diff |
 
 ---
 
