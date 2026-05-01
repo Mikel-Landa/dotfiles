@@ -1,4 +1,4 @@
-enabled_backends = ["cargo", "mise", "go"]
+enabled_backends = ["cargo", "mise", "go", "pipx"]
 
 [hostname_enabled_backends]
 work-ifs = ["apt"]

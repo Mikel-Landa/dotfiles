@@ -1,1 +1,3 @@
-arch = ["visual-studio-code-bin", "zed"]
+arch = {
+  packages = ["visual-studio-code-bin", "zed", "spotify-launcher", "google-chrome"]
+}

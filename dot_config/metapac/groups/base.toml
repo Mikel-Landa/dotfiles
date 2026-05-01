@@ -1,4 +1,5 @@
-arch = [
+arch = {
+  packages = [
     "base",
     "base-devel",
     "linux",
@@ -14,13 +15,18 @@ arch = [
     "wget",
     "gcc",
     "openssl",
-    "python-evdev",         # for niri's tab cycling script
-    "keyd",                 # swap caps and esc
+    "python",
+    "python-pip",
+    "python-pipx",
+    "python-evdev",
+    "keyd",
     "cliphist",
     "nm-connection-editor",
-]
+  ]
+}
 
-apt = [
+apt = {
+  packages = [
     "build-essential",
     "network-manager",
     "zip",
@@ -34,13 +40,27 @@ apt = [
     "wget",
     "gcc",
     "libssl-dev",
-]
+    "python3-dev",
+    "python3-pip",
+    "pipx",
+    "python3-venv",
+    "python3-virtualenv",
+  ]
+}
 
-mise = [
+pipx = {
+  packages = ["pre-commit"]
+}
+
+mise = {
+  packages = [
     "kubectl",
     "go",
     "terraform",
-    { package = "node", options = { version = "lts" } },
-]
+    { name = "node", options = { version = "lts" } },
+  ]
+}
 
-cargo = ["difftastic"]
+cargo = {
+  packages = ["difftastic"]
+}

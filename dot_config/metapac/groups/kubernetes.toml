@@ -1,1 +1,3 @@
-go = [ "github.com/stern/stern"]
+go = {
+  packages = ["github.com/stern/stern"]
+}

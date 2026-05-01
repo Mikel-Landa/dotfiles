@@ -1,4 +1,6 @@
-arch = [
+arch = {
+  packages = [
+    "kitty",
     "zsh",
     "zsh-autosuggestions",
     "zsh-syntax-highlighting",
@@ -7,9 +9,11 @@ arch = [
     "tmux",
     "go-yq",
     "jq",
-]
+  ]
+}
 
-apt = [
+apt = {
+  packages = [
     "zsh",
     "zsh-autosuggestions",
     "zsh-syntax-highlighting",
@@ -18,10 +22,17 @@ apt = [
     "tmux",
     "yq",
     "jq",
-]
+  ]
+}
 
-cargo = ["bat", "zoxide", "nu", "sheldon", "tree-sitter-cli", "fd-find", "eza"]
+cargo = {
+  packages = ["bat", "zoxide", "nu", "sheldon", "tree-sitter-cli", "fd-find", "eza"]
+}
 
-mise = ["fzf"]
+mise = {
+  packages = ["fzf"]
+}
 
-go = ["github.com/jesseduffield/lazygit"]
+go = {
+  packages = ["github.com/jesseduffield/lazygit"]
+}

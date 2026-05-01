@@ -1,3 +1,7 @@
-arch = ["sshuttle"]
+arch = {
+  packages = ["sshuttle"]
+}
 
-apt = ["sshuttle"]
+apt = {
+  packages = ["sshuttle"]
+}
