@@ -3,6 +3,3 @@ spawn-sh-at-startup "wl-paste --watch cliphist store &"
 // Stash workspace daemon — must run for niri-scratchpad target/create to work.
 spawn-at-startup "niri-scratchpad" "daemon"
 
-// Snapshot window layout every 5 min; restored on next launch.
-// Skip list at ~/.config/nirinit/config.toml.
-spawn-at-startup "nirinit" "--save-interval" "300"

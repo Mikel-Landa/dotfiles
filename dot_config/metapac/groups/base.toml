@@ -22,6 +22,7 @@ arch = {
     "keyd",
     "cliphist",
     "nm-connection-editor",
+    { name = "arch-audit", hooks = { after_sync = ["systemctl", "--user", "enable", "--now", "cve-check.timer"] } },
   ]
 }
 

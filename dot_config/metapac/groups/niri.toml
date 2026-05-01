@@ -1,3 +1,3 @@
 arch = {
-  packages = ["niri-scratchpad-rs-git", "nirinit", "matugen"]
+  packages = ["niri-scratchpad-rs-git", "matugen"]
 }

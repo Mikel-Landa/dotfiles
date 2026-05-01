@@ -38,9 +38,27 @@ Configured in `config.toml`:
 - `cachyos` hostname: also `arch` (paru)
 - `work-ifs` hostname: also `apt`
 
+## Metapac Config Reference
+
+Full docs: https://github.com/Mikel-Landa/metapac/tree/metapac-go
+
+**Packages** — string or object form:
+```toml
+"package-name"
+{ name = "package-name", hooks = { after_sync = ["cmd", "arg"] } }
+{ name = "package-name", options = { version = "1.0" } }
+```
+
+**Hooks** — run during `metapac sync`, per-package. Events: `before_install`, `after_install`, `before_sync`, `after_sync`. Main use case: enable systemd services alongside their package.
+
+**Backends** — `arch` (paru), `apt`, `cargo`, `mise`, `go`, `pipx`. Configured per-hostname in `config.toml`.
+
+**Group files** — each backend section has a `packages` array. Mix strings and objects freely.
+
 ## Rules
 
-1. Never add system/distro-specific packages to committed group files — use `system.toml`
-2. Prefer `cargo`/`mise`/`go` backends for tools that should be portable
-3. When a tool exists in `system.toml` AND should be on other machines, move it to the right committed group
-4. `apt` entries required in `base.toml` and `terminal.toml` for work machine compatibility
+1. **Edit files here in chezmoi (`dot_config/metapac/`), never directly in `~/.config/metapac/` — chezmoi apply overwrites it.**
+2. Never add system/distro-specific packages to committed group files — use `system.toml`
+3. Prefer `cargo`/`mise`/`go` backends for tools that should be portable
+4. When a tool exists in `system.toml` AND should be on other machines, move it to the right committed group
+5. `apt` entries required in `base.toml` and `terminal.toml` for work machine compatibility
