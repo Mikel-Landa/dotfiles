@@ -26,16 +26,16 @@ return {
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
-      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>",                desc = "Toggle pin" },
-      { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>",     desc = "Delete non-pinned buffers" },
-      { "<leader>br", "<Cmd>BufferLineCloseRight<CR>",               desc = "Delete buffers to the right" },
-      { "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>",                desc = "Delete buffers to the left" },
-      { "<S-h>",      "<cmd>BufferLineCyclePrev<cr>",                desc = "Prev buffer" },
-      { "<S-l>",      "<cmd>BufferLineCycleNext<cr>",                desc = "Next buffer" },
-      { "[b",         "<cmd>BufferLineCyclePrev<cr>",                desc = "Prev buffer" },
-      { "]b",         "<cmd>BufferLineCycleNext<cr>",                desc = "Next buffer" },
-      { "[B",         "<cmd>BufferLineMovePrev<cr>",                 desc = "Move buffer prev" },
-      { "]B",         "<cmd>BufferLineMoveNext<cr>",                 desc = "Move buffer next" },
+      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>",            desc = "Toggle pin" },
+      { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete non-pinned buffers" },
+      { "<leader>br", "<Cmd>BufferLineCloseRight<CR>",           desc = "Delete buffers to the right" },
+      { "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>",            desc = "Delete buffers to the left" },
+      { "<S-h>",      "<cmd>BufferLineCyclePrev<cr>",            desc = "Prev buffer" },
+      { "<S-l>",      "<cmd>BufferLineCycleNext<cr>",            desc = "Next buffer" },
+      { "[b",         "<cmd>BufferLineCyclePrev<cr>",            desc = "Prev buffer" },
+      { "]b",         "<cmd>BufferLineCycleNext<cr>",            desc = "Next buffer" },
+      { "[B",         "<cmd>BufferLineMovePrev<cr>",             desc = "Move buffer prev" },
+      { "]B",         "<cmd>BufferLineMoveNext<cr>",             desc = "Move buffer next" },
     },
     opts = {
       options = {
@@ -45,7 +45,7 @@ return {
         always_show_bufferline = false,
         diagnostics_indicator = function(_, _, diag)
           local ret = (diag.error and ("E" .. diag.error .. " ") or "")
-            .. (diag.warning and ("W" .. diag.warning) or "")
+              .. (diag.warning and ("W" .. diag.warning) or "")
           return vim.trim(ret)
         end,
         offsets = {
@@ -64,6 +64,7 @@ return {
       vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
         callback = function()
           vim.schedule(function()
+            ---@diagnostic disable-next-line: undefined-global
             pcall(nvim_bufferline)
           end)
         end,

@@ -18,7 +18,12 @@ return {
     version = "*",
     dependencies = { "L3MON4D3/LuaSnip" },
     opts = {
-      keymap = { preset = "default" },
+      keymap = {
+        preset      = "default",
+        ["<Tab>"]   = { "select_next", "snippet_forward", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+        ["<CR>"]    = { "accept", "fallback" },
+      },
       snippets = { preset = "luasnip" },
       sources = {
         default = { "lsp", "snippets", "path", "buffer" },

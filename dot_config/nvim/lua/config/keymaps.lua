@@ -27,9 +27,13 @@ map("n", "<leader><tab>o",     "<cmd>tabonly<cr>",    { desc = "Close other tabs
 map("n", "<leader><tab>f",     "<cmd>tabfirst<cr>",   { desc = "First tab" })
 map("n", "<leader><tab>l",     "<cmd>tablast<cr>",    { desc = "Last tab" })
 
--- Move lines in visual mode
-map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
-map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+-- Move lines
+map("n", "<A-j>", "<cmd>m .+1<cr>==",      { desc = "Move line down" })
+map("n", "<A-k>", "<cmd>m .-2<cr>==",      { desc = "Move line up" })
+map("v", "<A-j>", ":m '>+1<CR>gv=gv",     { desc = "Move selection down" })
+map("v", "<A-k>", ":m '<-2<CR>gv=gv",     { desc = "Move selection up" })
+map("v", "J",     ":m '>+1<CR>gv=gv",     { desc = "Move selection down" })
+map("v", "K",     ":m '<-2<CR>gv=gv",     { desc = "Move selection up" })
 
 -- Keep cursor centered when jumping
 map("n", "<C-d>", "<C-d>zz", { desc = "Scroll down (centered)" })

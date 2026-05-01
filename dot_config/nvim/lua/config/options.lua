@@ -30,5 +30,6 @@ opt.undofile = true
 opt.swapfile = false
 opt.backup = false
 opt.updatetime = 250  -- also drives CursorHold delay (diagnostic float hover)
+opt.timeoutlen = 300  -- reduce chord ambiguity wait (default 1000ms causes cS flash delay)
 
 -- Clipboard: keep nvim clipboard separate from system (use keymaps for explicit sync)
