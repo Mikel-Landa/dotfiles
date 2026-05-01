@@ -1,0 +1,11 @@
+[config]
+source_color_index = 0
+
+[templates.kitty]
+input_path = "~/.config/matugen/templates/kitty.conf"
+output_path = "~/.config/kitty/colors.conf"
+post_hook = "kill -SIGUSR1 $(pidof kitty) 2>/dev/null; true"
+
+[templates.nvim]
+input_path = "~/.config/matugen/templates/colors.json"
+output_path = "~/.config/matugen/colors.json"
