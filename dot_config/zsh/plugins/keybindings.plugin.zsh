@@ -79,6 +79,14 @@ if [[ -n "${terminfo[kcbt]}" ]]; then
   bindkey -M vicmd "${terminfo[kcbt]}" reverse-menu-complete
 fi
 
+# [j/k] - navigate completion menu
+bindkey -M menuselect 'j' down-history
+bindkey -M menuselect 'k' up-history
+
+# [j/k] in vicmd - history search respecting typed prefix (same as arrows)
+bindkey -M vicmd 'j' down-line-or-beginning-search
+bindkey -M vicmd 'k' up-line-or-beginning-search
+
 # [Backspace] - delete backward
 bindkey -M emacs '^?' backward-delete-char
 bindkey -M viins '^?' backward-delete-char
