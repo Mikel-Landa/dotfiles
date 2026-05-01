@@ -27,14 +27,6 @@ map("n", "<leader><tab>o",     "<cmd>tabonly<cr>",    { desc = "Close other tabs
 map("n", "<leader><tab>f",     "<cmd>tabfirst<cr>",   { desc = "First tab" })
 map("n", "<leader><tab>l",     "<cmd>tablast<cr>",    { desc = "Last tab" })
 
--- Move lines
-map("n", "<A-j>", "<cmd>m .+1<cr>==",      { desc = "Move line down" })
-map("n", "<A-k>", "<cmd>m .-2<cr>==",      { desc = "Move line up" })
-map("v", "<A-j>", ":m '>+1<CR>gv=gv",     { desc = "Move selection down" })
-map("v", "<A-k>", ":m '<-2<CR>gv=gv",     { desc = "Move selection up" })
-map("v", "J",     ":m '>+1<CR>gv=gv",     { desc = "Move selection down" })
-map("v", "K",     ":m '<-2<CR>gv=gv",     { desc = "Move selection up" })
-
 -- Keep cursor centered when jumping
 map("n", "<C-d>", "<C-d>zz", { desc = "Scroll down (centered)" })
 map("n", "<C-u>", "<C-u>zz", { desc = "Scroll up (centered)" })
@@ -73,6 +65,26 @@ map({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 -- System clipboard (explicit sync, nvim clipboard stays separate)
 map({ "n", "v" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
 map("n", "<C-S-V>", '"+p', { desc = "Paste from system clipboard" })
+
+-- Copy absolute file path to clipboard
+map("n", "<leader>pa", function()
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied: " .. path, vim.log.levels.INFO)
+end, { desc = "Copy absolute path" })
+
+-- Delete without yanking (black-hole register)
+map({ "n", "v" }, "<leader>D", '"_d', { desc = "Delete without yank" })
+
+-- Join lines keeping cursor position
+map("n", "J", "mzJ`z", { desc = "Join lines (cursor fixed)" })
+
+-- Toggle word wrap (current buffer)
+map("n", "<leader>uw", function()
+  vim.opt_local.wrap = not vim.wo.wrap
+  vim.opt_local.linebreak = vim.wo.wrap
+  vim.notify("Wrap: " .. (vim.wo.wrap and "on" or "off"), vim.log.levels.INFO)
+end, { desc = "Toggle word wrap" })
 
 -- Diagnostics
 map("n", "<leader>dd", vim.diagnostic.open_float, { desc = "Line diagnostics" })

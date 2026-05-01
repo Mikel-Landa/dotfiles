@@ -71,7 +71,11 @@ return {
       -- signs in gutter, sorted by severity. Set here so it applies only when LSP loads.
       vim.diagnostic.config({
         underline = true,
-        virtual_text = false,
+        virtual_text = {
+          spacing = 4,
+          source = "if_many",
+          prefix = "●",
+        },
         signs = true,
         severity_sort = true,
         float = { border = "rounded", source = "if_many" },
@@ -95,6 +99,14 @@ return {
         },
       })
 
+      -- Toggle diagnostics globally
+      local diag_enabled = true
+      vim.keymap.set("n", "<leader>ud", function()
+        diag_enabled = not diag_enabled
+        vim.diagnostic.enable(diag_enabled)
+        vim.notify(diag_enabled and "Diagnostics on" or "Diagnostics off", vim.log.levels.INFO)
+      end, { desc = "Toggle diagnostics" })
+
       -- Keymaps set only when LSP attaches to buffer
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp_attach_keymaps", { clear = true }),
@@ -113,7 +125,26 @@ return {
           map("<leader>ls", function() Snacks.picker.lsp_symbols() end, "Document symbols")
           map("<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, "Workspace symbols")
 
+          -- Go to definition in vertical split
+          map("<leader>lv", function()
+            vim.cmd("vsplit")
+            Snacks.picker.lsp_definitions()
+          end, "Definition in vsplit")
+
+          -- Organize imports + format (TypeScript only)
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.name == "ts_ls" then
+            vim.keymap.set("n", "<leader>oi", function()
+              vim.lsp.buf.execute_command({
+                command = "_typescript.organizeImports",
+                arguments = { vim.api.nvim_buf_get_name(0) },
+              })
+              require("conform").format({ async = true, lsp_format = "fallback" })
+            end, { buffer = event.buf, desc = "LSP: Organize imports + format" })
+          end
+
           -- Inlay hints (Neovim 0.10+)
+          ---@diagnostic disable-next-line: redefined-local
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client:supports_method("textDocument/inlayHint") then
             vim.lsp.inlay_hint.enable(false, { bufnr = event.buf })

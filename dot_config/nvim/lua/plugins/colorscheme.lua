@@ -9,10 +9,40 @@ return {
       })
       vim.cmd.colorscheme("matugen")
 
-      -- Clear backgrounds so kitty's background_opacity shows through.
-      vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
-      vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
-      vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
+      local function apply_transparent_bg()
+        local groups = {
+          "Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle",
+          "SnacksNormal", "SnacksNormalNC",
+          "SnacksPicker", "SnacksPickerInput", "SnacksPickerList", "SnacksPickerPreview",
+          "SnacksPickerBox", "SnacksPickerBorder", "SnacksPickerTitle", "SnacksPickerFooter",
+          "SnacksPickerInputBorder", "SnacksPickerInputTitle",
+          "SnacksPickerListBorder", "SnacksPickerListTitle",
+          "SnacksPickerPreviewBorder", "SnacksPickerPreviewTitle",
+          "SnacksPickerBoxBorder", "SnacksPickerBoxTitle",
+          "SnacksPickerNormalFloat",
+        }
+        for _, g in ipairs(groups) do
+          vim.api.nvim_set_hl(0, g, { bg = "NONE" })
+        end
+      end
+
+      -- Apply immediately and re-apply after all plugins have loaded.
+      apply_transparent_bg()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_transparent_bg })
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        once = true,
+        callback = apply_transparent_bg,
+      })
+
+      -- VSCode-style faint indent guides (snacks.indent). Link to NonText so
+      -- the lines stay barely visible regardless of matugen palette shifts.
+      local function apply_indent_hl()
+        vim.api.nvim_set_hl(0, "SnacksIndent", { link = "NonText", default = false })
+        vim.api.nvim_set_hl(0, "SnacksIndentScope", { link = "Comment", default = false })
+      end
+      apply_indent_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_indent_hl })
 
       -- Re-apply undercurl style so diagnostic underlines use colored undercurl,
       -- not plain underline (kitty supports Smulx undercurl natively).

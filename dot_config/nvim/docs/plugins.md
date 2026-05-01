@@ -33,9 +33,9 @@ Move between Neovim splits and tmux panes seamlessly.
 | `<C-k>` | Up |
 | `<C-l>` | Right |
 
-### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent guides)
+### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent, terminal)
 
-Replaces telescope, neo-tree, indent-blankline. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides come from `snacks.indent`. Lazygit module is disabled — use `<leader>gg` (diffview) for in-editor git, or run `lazygit` in a terminal.
+Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (diffview) for in-editor git, or run `lazygit` in the floating terminal (`<leader>ut`).
 
 Toggle the explorer with `<leader>e`. Inside the tree:
 
@@ -93,7 +93,11 @@ Inside panel: `<CR>` jump, `q` close, `r` refresh.
 
 ## Editing
 
-### kylechui/nvim-surround — Surround text
+### echasnovski/mini.nvim — Editing micro-plugins
+
+Seven modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (icons), native line-move keymaps.
+
+**mini.surround** — Surround text (replaces nvim-surround, same keymaps):
 
 | Key | Action |
 |---|---|
@@ -101,8 +105,31 @@ Inside panel: `<CR>` jump, `q` close, `r` refresh.
 | `ds{char}` | Delete surround |
 | `cs{old}{new}` | Change surround |
 | `S{char}` (visual) | Surround selection |
+| `gsf` / `gsF` | Find surround right / left |
+| `gsh` | Highlight surround |
 
-Examples: `ysiw)` → `(word)`. `cs"'` → `"foo"` becomes `'foo'`. `ds(` → drop parens.
+**mini.comment** — Toggle comments (same keymaps as Comment.nvim):
+
+| Key | Action |
+|---|---|
+| `gcc` | Toggle line comment |
+| `gc{motion}` | Toggle comment over motion |
+| `gc` (visual) | Toggle comment on selection |
+
+**mini.move** — Move lines and selections:
+
+| Key | Mode | Action |
+|---|---|---|
+| `<A-j>` / `<A-k>` | n, v | Move line / selection down / up |
+| `<A-h>` / `<A-l>` | n, v | Move line / selection left / right (indent) |
+
+**mini.pairs** — Auto-close `()`, `[]`, `{}`, `""`, `''`.
+
+**mini.cursorword** — Underlines all occurrences of word under cursor.
+
+**mini.trailspace** — Highlights trailing whitespace; trims it on save.
+
+**mini.icons** — File and filetype icons (replaces nvim-web-devicons; API-compatible).
 
 ### nvim-treesitter — Syntax highlighting & text objects
 
@@ -217,6 +244,28 @@ Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md
 | `<leader>gp` | Preview hunk |
 | `<leader>gb` | Blame line (full) |
 | `ih` (o, x) | Inner-hunk text object |
+
+---
+
+---
+
+## Notes
+
+### obsidian-nvim/obsidian.nvim — Markdown notes
+
+Loads on any `.md` file. Vault: `~/Notes` (adjust path in `lua/plugins/obsidian.lua`). Picker backed by snacks.
+
+| Key | Action |
+|---|---|
+| `<leader>on` | New note |
+| `<leader>oo` | Open in Obsidian app |
+| `<leader>of` | Find note (quick switch) |
+| `<leader>og` | Search / grep notes |
+| `<leader>ob` | Backlinks for current note |
+| `<leader>ot` | Browse by tags |
+| `<leader>ol` | Links in current note |
+| `<leader>od` | Daily notes |
+| `<leader>oI` | Paste image from clipboard |
 
 ---
 

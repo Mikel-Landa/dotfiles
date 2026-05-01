@@ -22,6 +22,8 @@ return {
         { "<leader>sn", group = "noice" },
         { "<leader>w", group = "windows", proxy = "<C-w>" },
         { "<leader><tab>", group = "tabs" },
+        { "<leader>o", group = "obsidian/notes" },
+        { "<leader>p", group = "path" },
       },
     },
   },

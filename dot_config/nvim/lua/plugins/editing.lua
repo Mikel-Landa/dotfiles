@@ -1,11 +1,5 @@
 return {
   {
-    "numToStr/Comment.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
-
-  {
     "Wansmer/treesj",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     keys = {
@@ -37,13 +31,6 @@ return {
       act_as_tab = true,
       completion = false,
     },
-  },
-
-  {
-    "kylechui/nvim-surround",
-    version = "*",
-    event = "VeryLazy",
-    opts = {},
   },
 
   -- {

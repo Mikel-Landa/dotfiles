@@ -16,6 +16,8 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>c` | Code (action, format) |
 | `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
+| `<leader>o` | Obsidian / notes |
+| `<leader>p` | Path |
 | `<leader>sn` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
 | `<leader><tab>` | Tabs |
@@ -138,6 +140,8 @@ Press leader and pause — which-key shows the menu.
 | `<leader>rn` | Rename symbol |
 | `<leader>ls` | Document symbols |
 | `<leader>lS` | Workspace symbols |
+| `<leader>lv` | Definition in vertical split |
+| `<leader>oi` | Organize imports + format (TypeScript only) |
 | `<leader>uh` | Toggle inlay hints |
 
 ## Diagnostics
@@ -204,8 +208,12 @@ Format on save runs automatically.
 
 | Key | Action |
 |---|---|
+| `<leader>ut` | Toggle floating terminal |
+| `<leader>ud` | Toggle diagnostics on/off |
 | `<leader>un` | Dismiss notifications (snacks.notifier) |
 | `<leader>uh` | Toggle inlay hints |
+| `<leader>ui` | Toggle indent guides (current buffer) |
+| `<leader>uw` | Toggle word wrap (current buffer) |
 
 ## Window / pane navigation
 
@@ -242,8 +250,9 @@ Format on save runs automatically.
 
 | Key | Mode | Action |
 |---|---|---|
-| `J` | visual | Move selection down |
-| `K` | visual | Move selection up |
+| `J` | normal | Join lines (cursor position preserved) |
+| `<leader>D` | n, v | Delete without yank (black-hole register) |
+| `<leader>pa` | n | Copy absolute file path to system clipboard |
 | `p` | visual | Paste without yanking the replaced text |
 | `<C-d>` | normal | Half-page down (cursor centered) |
 | `<C-u>` | normal | Half-page up (cursor centered) |
@@ -272,7 +281,7 @@ Format on save runs automatically.
 | `R` | o, x | Treesitter Search |
 | `<C-s>` | c | Toggle Flash in `/` search |
 
-## Surround (nvim-surround)
+## Surround (mini.surround)
 
 | Key | Action |
 |---|---|
@@ -280,6 +289,29 @@ Format on save runs automatically.
 | `ds{char}` | Delete surround |
 | `cs{old}{new}` | Change surround |
 | `S{char}` (visual) | Surround selection |
+| `gsf` / `gsF` | Find surround right / left |
+| `gsh` | Highlight surround |
+
+## Move lines (mini.move)
+
+| Key | Mode | Action |
+|---|---|---|
+| `<A-j>` / `<A-k>` | n, v | Move line / selection down / up |
+| `<A-h>` / `<A-l>` | n, v | Move line / selection left / right |
+
+## Obsidian / notes (`<leader>o`, markdown files)
+
+| Key | Action |
+|---|---|
+| `<leader>on` | New note |
+| `<leader>oo` | Open in Obsidian app |
+| `<leader>of` | Find note |
+| `<leader>og` | Grep notes |
+| `<leader>ob` | Backlinks |
+| `<leader>ot` | Tags |
+| `<leader>ol` | Links in current note |
+| `<leader>od` | Daily notes |
+| `<leader>oI` | Paste image |
 
 ## Completion (blink.cmp, in insert mode)
 

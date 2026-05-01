@@ -33,3 +33,20 @@ opt.updatetime = 250  -- also drives CursorHold delay (diagnostic float hover)
 opt.timeoutlen = 300  -- reduce chord ambiguity wait (default 1000ms causes cS flash delay)
 
 -- Clipboard: keep nvim clipboard separate from system (use keymaps for explicit sync)
+
+-- Column guide + UI polish
+opt.colorcolumn = "100"
+opt.fillchars = { eob = " " }
+opt.pumheight = 10
+opt.pumblend = 10
+opt.ttimeoutlen = 50
+opt.showmatch = true
+opt.autoread = true
+opt.iskeyword:append("-")
+opt.diffopt:append("linematch:60")
+
+-- Treesitter-based folding (foldlevel 99 = all folds open by default)
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldlevel = 99
+opt.foldlevelstart = 99

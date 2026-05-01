@@ -77,6 +77,28 @@ autocmd("VimResized", {
   callback = function() vim.cmd("tabdo wincmd =") end,
 })
 
+-- Terminal buffers: hide line numbers and sign column
+autocmd("TermOpen", {
+  group = augroup("terminal_opts", { clear = true }),
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = "no"
+  end,
+})
+
+-- Terminal: auto-delete buffer on clean exit (status 0)
+autocmd("TermClose", {
+  group = augroup("terminal_autoclose", { clear = true }),
+  callback = function(event)
+    if vim.v.event.status == 0 then
+      vim.schedule(function()
+        pcall(vim.api.nvim_buf_delete, event.buf, { force = false })
+      end)
+    end
+  end,
+})
+
 -- VSCode-style: auto-show diagnostic float when cursor hovers a problem.
 -- Fires after `updatetime` ms idle. Skip if a float already open (avoids
 -- stealing focus from hover docs / completion popups).
