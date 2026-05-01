@@ -17,6 +17,7 @@ if ! command -v metapac >/dev/null 2>&1; then
     mkdir -p ~/personal ~/bin
     git clone git@github.com:Mikel-Landa/metapac.git ~/personal/metapac
     cd ~/personal/metapac
+    git checkout metapac-go
     cargo build --release
     mv target/release/metapac ~/bin
 fi
