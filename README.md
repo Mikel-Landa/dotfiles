@@ -1,20 +1,44 @@
 # Dotfiles
 
 Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
+Targeting CachyOS (Arch) and Ubuntu. Compositor: [Niri](https://github.com/YaLTeR/niri).
 
-## Installation
+## Install
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Mikel-Landa
 ```
 
-## Git Configuration
+## What's included
 
-This dotfiles setup uses separate git configurations for personal and work repositories:
+| Config | Tool |
+|--------|------|
+| `dot_config/nvim/` | Neovim — Lazy.nvim, LSP via Mason, blink.cmp, matugen colorscheme |
+| `dot_config/niri/` | Niri — Wayland compositor config, keybinds, autostart |
+| `dot_config/kitty/` | Kitty — terminal emulator |
+| `dot_config/matugen/` | Matugen — wallpaper-adaptive color generation for kitty + nvim |
+| `dot_config/sheldon/` | Sheldon — zsh plugin manager (cached source) |
+| `dot_config/metapac/` | Metapac — declarative package management |
+| `dot_config/zsh/` | Zsh — vi mode, p10k, autoload functions |
+| `dot_zshrc` | Zsh entrypoint |
+| `dot_tmux.conf` | Tmux config |
+| `dot_gitconfig` | Git — GPG signing, column UI, branch sorting |
 
-- **Personal**: `~/.gitconfig-personal` - Used for all repositories by default
-- **Work**: `~/.gitconfig-work` - Used for repositories under `~/repos/`
+## Package management
 
-The main `~/.gitconfig` includes both configurations conditionally:
-- Personal config is always included
-- Work config is included only for repositories in `~/repos/`
+Packages declared in `dot_config/metapac/groups/`. See [`metapac/AGENTS.md`](dot_config/metapac/AGENTS.md) for the group breakdown and rules.
+
+## Colors
+
+[Matugen](https://github.com/InioX/matugen) generates a Material You palette from the current wallpaper and writes color configs for Kitty and Neovim. To regenerate:
+
+```bash
+matugen image /path/to/wallpaper.jpg
+```
+
+## Git configuration
+
+Personal/work split via `includeIf`:
+
+- `~/.gitconfig-personal` — default for all repos
+- `~/.gitconfig-work` — applied for repos under `~/repos/`
