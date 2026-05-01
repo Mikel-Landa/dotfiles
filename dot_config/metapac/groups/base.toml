@@ -22,7 +22,18 @@ arch = {
     "keyd",
     "cliphist",
     "nm-connection-editor",
-    { name = "arch-audit", hooks = { after_sync = ["systemctl", "--user", "enable", "--now", "cve-check.timer"] } },
+    {
+      name = "arch-audit",
+      hooks = {
+        after_sync = [
+          "systemctl",
+          "--user",
+          "enable",
+          "--now",
+          "cve-check.timer"
+        ]
+      }
+    },
   ]
 }
 
@@ -49,9 +60,7 @@ apt = {
   ]
 }
 
-pipx = {
-  packages = ["pre-commit"]
-}
+pipx = { packages = ["pre-commit"] }
 
 mise = {
   packages = [
@@ -62,6 +71,4 @@ mise = {
   ]
 }
 
-cargo = {
-  packages = ["difftastic"]
-}
+cargo = { packages = ["difftastic"] }

@@ -35,8 +35,8 @@ local servers = {
   cssls = {},
   -- Bash
   bashls = {},
-  -- toml
-  taplo = {}
+  -- toml (tombi: TOML 1.1 support; taplo is unmaintained and 1.0-only)
+  tombi = {}
 }
 
 return {
