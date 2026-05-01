@@ -35,6 +35,8 @@ local servers = {
   cssls = {},
   -- Bash
   bashls = {},
+  -- toml
+  taplo = {}
 }
 
 return {
