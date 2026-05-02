@@ -32,7 +32,6 @@ window-rule {
 }
 
 window-rule {
-  match app-id="firefox"
   match app-id="code"
 
   // This doesn't actually work, unfortunately, not sure why, Zed always opens 0.5

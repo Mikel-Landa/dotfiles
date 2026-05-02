@@ -67,19 +67,21 @@ binds {
     }
 
     // === Scratchpads (niri-scratchpad-rs) ===
-    Mod+Apostrophe repeat=false hotkey-overlay-title="Toggle Dropdown Term" {
+    Mod+Grave repeat=false hotkey-overlay-title="Toggle Dropdown Term" {
         spawn "niri-scratchpad" "target" "--spawn" "kitty --class dropdown-term" "--as-float" "--animations" "appid" "dropdown-term";
     }
-    Mod+Shift+Apostrophe repeat=false hotkey-overlay-title="Toggle Spotify Scratchpad" {
+    Mod+Apostrophe repeat=false hotkey-overlay-title="Toggle Spotify Scratchpad" {
         spawn "niri-scratchpad" "target" "--spawn" "spotify-launcher" "--as-float" "--animations" "appid" "Spotify";
     }
 
     // === Window Management ===
     Mod+Q repeat=false { close-window; }
+    Mod+Z { fullscreen-window; }
+    Mod+Shift+Z { toggle-windowed-fullscreen; }
+    Mod+F { maximize-window-to-edges; }
     Mod+Shift+F repeat=false { expand-column-to-available-width; }
-    Mod+F { fullscreen-window; }
-    Mod+Shift+T { toggle-window-floating; }
-    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+T { toggle-window-floating; }
+    Mod+Shift+T { switch-focus-between-floating-and-tiling; }
     Mod+W { toggle-column-tabbed-display; }
 
     // === Focus Navigation ===
