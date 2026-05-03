@@ -71,7 +71,7 @@ hotkey-overlay {
 
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
-workspace "dev"
+workspace "browser"
 // Named workspace used by niri-scratchpad-rs as the hidden stash.
 workspace "stash" {}
 

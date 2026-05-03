@@ -3,3 +3,5 @@ spawn-sh-at-startup "wl-paste --watch cliphist store &"
 // Stash workspace daemon — must run for niri-scratchpad target/create to work.
 spawn-at-startup "niri-scratchpad" "daemon"
 
+spawn-at-startup "brave" "--class=brave-startup"
+

@@ -1,3 +1,9 @@
 arch = {
-  packages = ["visual-studio-code-bin", "zed", "spotify-launcher", "google-chrome"]
+  packages = [
+    "visual-studio-code-bin",
+    "zed",
+    "spotify-launcher",
+    "google-chrome",
+    "brave-bin"
+  ]
 }

@@ -37,6 +37,12 @@ window-rule {
 }
 
 window-rule {
+    match app-id="brave-startup"
+    open-on-workspace "browser"
+    open-maximized true
+}
+
+window-rule {
     match app-id="^steam_app_"
     match app-id="cs2"
     open-fullscreen true
@@ -78,7 +84,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id="firefox" title=r#"(?i)(bitwarden|1password|password|otp)"#
+    match app-id="brave-browser" title=r#"(?i)(bitwarden|1password|password|otp)"#
     block-out-from "screencast"
 }
 
