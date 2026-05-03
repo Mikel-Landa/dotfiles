@@ -146,6 +146,16 @@ Treesitter-aware split/join for arrays, function args, objects, etc.
 
 In insert mode, `<Tab>` jumps past the next closing bracket / quote / pair (treesitter-aware). `<S-Tab>` jumps backwards. Coexists with `mini.pairs` autoclose and `blink.cmp` snippet jumps.
 
+### nvim.undotree (built-in, Neovim 0.12+) — Undo history visualizer
+
+Enabled via `:packadd nvim.undotree` in `lua/config/options.lua`. Renders the undo tree for the current buffer in a side split.
+
+| Key | Action |
+|---|---|
+| `<leader>uu` | Open undo tree (`:Undotree`) |
+
+Inside the tree buffer: `<CR>` jumps to that undo state, `q` closes. Persistent undo (`undofile`) is enabled, so history survives restarts.
+
 ### NvChad/nvim-colorizer.lua — Inline color preview
 
 Highlights hex / rgb / hsl / named / Tailwind class colors with their actual color in the buffer.

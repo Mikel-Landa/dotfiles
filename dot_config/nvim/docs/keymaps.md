@@ -234,6 +234,7 @@ Format on save runs automatically.
 | `<leader>uh` | Toggle inlay hints |
 | `<leader>ui` | Toggle indent guides (current buffer) |
 | `<leader>uw` | Toggle word wrap (current buffer) |
+| `<leader>uu` | Open undo tree (built-in `:Undotree`) |
 
 ## Window / pane navigation
 

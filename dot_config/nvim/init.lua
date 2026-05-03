@@ -21,4 +21,13 @@ require("config.autocmds")
 require("lazy").setup("plugins", {
   change_detection = { notify = false },
   ui = { border = "rounded" },
+  performance = {
+    rtp = {
+      paths = { vim.env.VIMRUNTIME .. "/pack/dist/opt/nvim.undotree" },
+    },
+  },
 })
+
+-- Built-in opt packs (0.12+). lazy.nvim wipes packpath so :packadd can't find these;
+-- we keep nvim.undotree in rtp via performance.rtp.paths above and source its plugin file.
+vim.cmd.runtime("plugin/undotree.lua")

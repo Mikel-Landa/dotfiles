@@ -79,6 +79,9 @@ map({ "n", "v" }, "<leader>D", '"_d', { desc = "Delete without yank" })
 -- Join lines keeping cursor position
 map("n", "J", "mzJ`z", { desc = "Join lines (cursor fixed)" })
 
+-- Undo tree (built-in nvim.undotree, 0.12+)
+map("n", "<leader>uu", "<cmd>Undotree<cr>", { desc = "Open undo tree" })
+
 -- Toggle word wrap (current buffer)
 map("n", "<leader>uw", function()
   vim.opt_local.wrap = not vim.wo.wrap
