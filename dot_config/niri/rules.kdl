@@ -26,10 +26,6 @@ window-rule {
     open-floating false
 }
 
-window-rule {
-	match app-id="Alacritty"
-	default-column-width { proportion 0.33333; }
-}
 
 window-rule {
   match app-id="code"

@@ -4,6 +4,6 @@
 	},
 	"commandRunner": {
 		"enabled": true,
-		"terminal": "alacritty"
+		"terminal": "kitty"
 	}
 }
