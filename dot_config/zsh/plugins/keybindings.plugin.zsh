@@ -83,6 +83,12 @@ fi
 bindkey -M menuselect 'j' down-history
 bindkey -M menuselect 'k' up-history
 
+# [Tab] - in completion menu, move to next entry (mirror of Shift-Tab)
+bindkey -M menuselect '^I' menu-complete
+if [[ -n "${terminfo[kcbt]}" ]]; then
+  bindkey -M menuselect "${terminfo[kcbt]}" reverse-menu-complete
+fi
+
 # [j/k] in vicmd - history search respecting typed prefix (same as arrows)
 bindkey -M vicmd 'j' down-line-or-beginning-search
 bindkey -M vicmd 'k' up-line-or-beginning-search
