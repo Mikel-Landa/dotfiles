@@ -1,4 +1,11 @@
 return {
+  -- Auto-detect indent (shiftwidth/tabstop/expandtab) per buffer
+  {
+    "NMAC427/guess-indent.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {},
+  },
+
   {
     "Wansmer/treesj",
     dependencies = { "nvim-treesitter/nvim-treesitter" },

@@ -150,6 +150,10 @@ In insert mode, `<Tab>` jumps past the next closing bracket / quote / pair (tree
 
 Highlights hex / rgb / hsl / named / Tailwind class colors with their actual color in the buffer.
 
+### NMAC427/guess-indent.nvim — Auto-detect indentation
+
+Inspects a buffer on open and sets `shiftwidth` / `tabstop` / `expandtab` to match the file's existing style. Zero config; runs once per buffer. Overrides the global 2-space default when the file uses tabs or 4-space indent. `:GuessIndent` re-runs detection manually.
+
 ### folke/todo-comments.nvim — TODO/FIXME marker highlighting
 
 Highlights `TODO:`, `FIXME:`, `HACK:`, `WARN:`, `PERF:`, `NOTE:`, `TEST:` keywords in comments. Loads on file open; integrates with snacks.picker and Trouble.
