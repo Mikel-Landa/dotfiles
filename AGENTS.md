@@ -9,6 +9,7 @@ Check if the target folder contains its own `AGENTS.md` and follow it. Folder-le
 Known AGENTS.md locations:
 - `dot_config/metapac/AGENTS.md` — package management rules
 - `dot_config/nvim/AGENTS.md` — neovim config rules
+- `dot_config/surfingkeys/AGENTS.md` — SurfingKeys browser config rules
 
 ## Maintaining This File
 
