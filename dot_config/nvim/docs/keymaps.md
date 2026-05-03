@@ -354,6 +354,12 @@ Format on save runs automatically.
 | `<leader>ft` | TODO list (snacks.picker) |
 | `<leader>xt` | TODO list (Trouble) |
 
+## Terminal mode
+
+| Key | Action |
+|---|---|
+| `<Esc><Esc>` | Exit terminal mode (return to normal) |
+
 ## Filetype helper buffers
 
 In `help`, `man`, `qf`, `lspinfo`, `checkhealth` buffers: press `q` to close.

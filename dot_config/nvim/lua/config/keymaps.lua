@@ -62,6 +62,9 @@ end, { desc = "Format" })
 -- Save
 map({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 
+-- Exit terminal mode (more discoverable than <C-\><C-n>)
+map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
 -- System clipboard (explicit sync, nvim clipboard stays separate)
 map({ "n", "v" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
 map("n", "<C-S-V>", '"+p', { desc = "Paste from system clipboard" })
