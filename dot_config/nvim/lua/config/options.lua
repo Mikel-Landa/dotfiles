@@ -14,6 +14,7 @@ opt.smartindent = true
 opt.ignorecase = true
 opt.smartcase = true
 opt.hlsearch = false
+opt.inccommand = "split"  -- live preview :s substitutions in split window
 
 -- UI
 opt.termguicolors = true
@@ -36,6 +37,9 @@ opt.timeoutlen = 300  -- reduce chord ambiguity wait (default 1000ms causes cS f
 
 -- Column guide + UI polish
 opt.colorcolumn = "100"
+opt.list = true  -- render hidden whitespace
+opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+opt.confirm = true  -- dialog instead of error on :q with unsaved changes
 opt.fillchars = { eob = " " }
 opt.pumheight = 10
 opt.pumblend = 10
