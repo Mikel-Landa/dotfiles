@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
   "hooks": {
     "SessionStart": [
@@ -51,5 +51,6 @@
   },
   "theme": "dark",
   "editorMode": "normal",
-  "showTurnDuration": true
+  "showTurnDuration": true,
+  "skipAutoPermissionPrompt": true
 }
