@@ -70,6 +70,7 @@ hooks.pre = "autoload -U colors && colors"
 github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
 apply = ["defer"]
+hooks.pre = "export ZSH_AUTOSUGGEST_MANUAL_REBIND=1"
 
 [plugins.fast-syntax-highlighting]
 github = "zdharma-continuum/fast-syntax-highlighting"
