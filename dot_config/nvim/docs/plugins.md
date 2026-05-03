@@ -150,6 +150,16 @@ In insert mode, `<Tab>` jumps past the next closing bracket / quote / pair (tree
 
 Highlights hex / rgb / hsl / named / Tailwind class colors with their actual color in the buffer.
 
+### folke/todo-comments.nvim — TODO/FIXME marker highlighting
+
+Highlights `TODO:`, `FIXME:`, `HACK:`, `WARN:`, `PERF:`, `NOTE:`, `TEST:` keywords in comments. Loads on file open; integrates with snacks.picker and Trouble.
+
+| Key | Action |
+|---|---|
+| `]t` / `[t` | Next / prev TODO marker |
+| `<leader>ft` | List TODOs (snacks.picker) |
+| `<leader>xt` | List TODOs (Trouble) |
+
 ### nvim-treesitter — Syntax highlighting & text objects
 
 Highlighting is automatic. Text objects (require treesitter-textobjects):

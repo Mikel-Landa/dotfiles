@@ -42,6 +42,7 @@ Press leader and pause — which-key shows the menu.
 | `<leader>fd` | Diagnostics |
 | `<leader>fn` | Notification history |
 | `<leader>fc` | Config files (`$XDG_CONFIG_HOME/nvim`) |
+| `<leader>ft` | TODO/FIXME comments |
 
 ## AI / Claude Code (`<leader>a`)
 
@@ -202,6 +203,7 @@ Bulk edit across qf entries: `:cdo s/foo/bar/g | update`. See [Quickfix](quickfi
 | `<leader>xs` | Symbols |
 | `<leader>xl` | LSP refs/defs |
 | `<leader>xq` | Quickfix |
+| `<leader>xt` | TODO/FIXME comments |
 
 ## Format
 
@@ -342,6 +344,14 @@ Format on save runs automatically.
 | `<S-Tab>` | Tab out backwards (tabout.nvim) |
 | `<C-Space>` | Trigger menu |
 | `<C-e>` | Cancel |
+
+## TODO comments (todo-comments.nvim)
+
+| Key | Action |
+|---|---|
+| `]t` / `[t` | Next / prev TODO marker |
+| `<leader>ft` | TODO list (snacks.picker) |
+| `<leader>xt` | TODO list (Trouble) |
 
 ## Filetype helper buffers
 
