@@ -1,17 +1,70 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  cat >&2 <<EOF
+Usage: $(basename "$0") [--blur] [NAME]
+
+NAME: wallpaper file name without path or extension. If omitted, picks a random
+file from the wallpapers folder.
+EOF
+  exit 2
+}
+
+BLUR=0
+NAME=""
+while (($#)); do
+  case "$1" in
+    --blur) BLUR=1; shift ;;
+    -h|--help) usage ;;
+    --) shift; NAME="${1:-}"; break ;;
+    -*) echo "unknown flag: $1" >&2; usage ;;
+    *) NAME="$1"; shift ;;
+  esac
+done
+
 {{ if .isWsl -}}
-WALLPAPER="/mnt/c/Users/{{ .winUser }}/AppData/Roaming/Microsoft/Windows/Themes/TranscodedWallpaper"
-BLURRED="/mnt/c/Users/{{ .winUser }}/AppData/Local/wt-bg-blur.jpg"
+WALLPAPER_DIR="/mnt/c/Users/{{ .winUser }}/Pictures/wallpapers"
+WT_BG_DIR="/mnt/c/Users/{{ .winUser }}/AppData/Local"
+WT_BG_WIN_PREFIX='C:\Users\{{ .winUser }}\AppData\Local'
+
+[[ -d "$WALLPAPER_DIR" ]] || { echo "wallpaper dir not found: $WALLPAPER_DIR" >&2; exit 1; }
+
+shopt -s nullglob nocaseglob
+if [[ -n "$NAME" ]]; then
+  matches=("$WALLPAPER_DIR/$NAME".*)
+  (( ${#matches[@]} )) || { echo "no wallpaper matching '$NAME' in $WALLPAPER_DIR" >&2; exit 1; }
+  WALLPAPER="${matches[0]}"
+else
+  candidates=("$WALLPAPER_DIR"/*.{jpg,jpeg,png,webp,bmp})
+  (( ${#candidates[@]} )) || { echo "no images in $WALLPAPER_DIR" >&2; exit 1; }
+  WALLPAPER="${candidates[RANDOM % ${#candidates[@]}]}"
+fi
+shopt -u nullglob nocaseglob
+
+# Versioned filename busts WT's per-path image cache so background reloads on each run.
+TS=$(date +%s)
+WT_BG_NAME="wt-bg-${TS}.jpg"
+WT_BG="${WT_BG_DIR}/${WT_BG_NAME}"
+
+# Drop prior wt-bg-*.jpg copies; WT releases the handle once settings.json points elsewhere.
+shopt -s nullglob
+for old in "${WT_BG_DIR}"/wt-bg-*.jpg "${WT_BG_DIR}"/wt-bg.jpg; do
+  rm -f "$old" 2>/dev/null || true
+done
+shopt -u nullglob
+
+if (( BLUR )); then
+  convert "$WALLPAPER" -blur 0x20 -quality 85 "$WT_BG"
+else
+  convert "$WALLPAPER" -quality 90 "$WT_BG"
+fi
+
+mkdir -p "${HOME}/.cache/matugen"
+printf '%s\\%s\n' "$WT_BG_WIN_PREFIX" "$WT_BG_NAME" > "${HOME}/.cache/matugen/wt-bg-path"
 {{- else -}}
 WALLPAPER="${WALLPAPER:-$HOME/.config/wallpaper}"
-{{- end }}
-
 [[ -r "$WALLPAPER" ]] || { echo "wallpaper not readable: $WALLPAPER" >&2; exit 1; }
-
-{{ if .isWsl -}}
-convert "$WALLPAPER" -blur 0x20 -quality 85 "$BLURRED"
 {{- end }}
 
 exec matugen image "$WALLPAPER"

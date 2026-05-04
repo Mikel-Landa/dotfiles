@@ -18,7 +18,12 @@ SETTINGS="${candidates[0]:-}"
 [[ -f "$SCHEME" ]]   || { echo "no scheme at $SCHEME" >&2; exit 1; }
 [[ -n "$SETTINGS" && -f "$SETTINGS" ]] || { echo "no WT settings.json found under /mnt/c/Users/${WIN_USER}" >&2; exit 1; }
 
-WALLPAPER_WIN="C:\\Users\\${WIN_USER}\\AppData\\Local\\wt-bg-blur.jpg"
+BG_PATH_FILE=${HOME}/.cache/matugen/wt-bg-path
+if [[ -s "$BG_PATH_FILE" ]]; then
+  WALLPAPER_WIN=$(<"$BG_PATH_FILE")
+else
+  WALLPAPER_WIN="C:\\Users\\${WIN_USER}\\AppData\\Local\\wt-bg.jpg"
+fi
 
 tmp=$(mktemp)
 jq --slurpfile s "$SCHEME" --arg bg "$WALLPAPER_WIN" '
@@ -26,9 +31,9 @@ jq --slurpfile s "$SCHEME" --arg bg "$WALLPAPER_WIN" '
   | .profiles.defaults.colorScheme              = "Matugen"
   | .profiles.defaults.backgroundImage          = $bg
   | .profiles.defaults.backgroundImageStretchMode = "uniformToFill"
-  | .profiles.defaults.backgroundImageOpacity   = 1.0
+  | .profiles.defaults.backgroundImageOpacity   = 0.1
   | .profiles.defaults.useAcrylic               = false
-  | del(.profiles.defaults.opacity)
+  | .profiles.defaults.opacity                  = 100
 ' "$SETTINGS" > "$tmp"
 
 mv "$tmp" "$SETTINGS"
