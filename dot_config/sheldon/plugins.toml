@@ -66,12 +66,6 @@ use = ["plugins/colored-man-pages/colored-man-pages.plugin.zsh"]
 apply = ["defer"]
 hooks.pre = "autoload -U colors && colors"
 
-[plugins.zsh-autosuggestions]
-github = "zsh-users/zsh-autosuggestions"
-use = ["{{ name }}.zsh"]
-apply = ["defer"]
-hooks.pre = "export ZSH_AUTOSUGGEST_MANUAL_REBIND=1"
-
 [plugins.fast-syntax-highlighting]
 github = "zdharma-continuum/fast-syntax-highlighting"
 apply = ["defer"]
@@ -102,3 +96,12 @@ apply = ["defer"]
 [plugins.evals]
 local = "~/.config/zsh/plugins"
 apply = ["defer"]
+
+# Must load LAST: after syntax-highlighting, compinit, and any plugin/keybinding
+# that creates or rebinds ZLE widgets. Otherwise widget wrap order breaks
+# partial-accept (ctrl-right) and clear-on-tab, causing ghost-text doubling.
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+use = ["{{ name }}.zsh"]
+apply = ["defer"]
+hooks.pre = "export ZSH_AUTOSUGGEST_MANUAL_REBIND=1"
