@@ -308,23 +308,41 @@ WebSocket MCP integration with the `claude` CLI. Loads on first `<leader>a*` key
 
 ---
 
-## Notes
+## Workflow (remote PR & issue browsers)
 
-### obsidian-nvim/obsidian.nvim — Markdown notes
-
-Loads on any `.md` file. Vault: `~/Notes` (adjust path in `lua/plugins/obsidian.lua`). Picker backed by snacks.
+`:Workflow` is a `vim.ui.select` dispatcher that opens the right plugin per provider. Direct keymaps below skip the picker.
 
 | Key | Action |
 |---|---|
-| `<leader>on` | New note |
-| `<leader>oo` | Open in Obsidian app |
-| `<leader>of` | Find note (quick switch) |
-| `<leader>og` | Search / grep notes |
-| `<leader>ob` | Backlinks for current note |
-| `<leader>ot` | Browse by tags |
-| `<leader>ol` | Links in current note |
-| `<leader>od` | Daily notes |
-| `<leader>oI` | Paste image from clipboard |
+| `<leader>oo` | Workflow picker (GitHub / Bitbucket / Jira) |
+| `<leader>op` | GitHub PR list (Octo) |
+| `<leader>oi` | GitHub issue list (Octo) |
+| `<leader>oj` | Jira issues (Atlas) |
+| `<leader>ob` | Bitbucket PRs (Atlas) |
+
+### emrearmagan/atlas.nvim — Bitbucket + Jira
+
+Bitbucket PR browser + Jira issue browser. Loads on `:AtlasJira`, `:AtlasBitbucket`, `:AtlasJqlSearch`. PR diffs open in Diffview. Tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in `lua/plugins/atlas.lua` with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
+
+| Command | Action |
+|---|---|
+| `:AtlasBitbucket` | Open Bitbucket PR picker |
+| `:AtlasJira` | Open Jira issue picker |
+| `:AtlasJqlSearch <jql>` | Run a one-off JQL search |
+| `:AtlasClearCache` | Drop disk + memory cache |
+| `:AtlasLogs` | Toggle plugin logs |
+
+### pwntester/octo.nvim — GitHub PRs & issues
+
+GitHub PR/issue browser with full inline review (comments, threads, approve/request-changes) via the `gh` CLI. Auth: `gh auth login`. Loads on `:Octo`. Picker backed by snacks. Inside an Octo buffer, `?` shows buffer-local mappings.
+
+| Command | Action |
+|---|---|
+| `:Octo pr list` | List PRs |
+| `:Octo issue list` | List issues |
+| `:Octo review start` | Start a code review |
+| `:Octo pr checkout` | Checkout the PR locally |
+| `:Octo pr create` | Open new-PR form |
 
 ---
 

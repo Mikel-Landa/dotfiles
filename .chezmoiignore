@@ -1,4 +1,6 @@
 install.sh
+.config/zsh/secrets.zsh
+.config/nvim/lazy-lock.json
 **/.claude/*
 !.claude/{settings.json,skills,scripts,hooks}
 {{ if not .work -}}

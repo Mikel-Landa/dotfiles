@@ -134,7 +134,7 @@ return {
           -- Organize imports + format (TypeScript only)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client.name == "ts_ls" then
-            vim.keymap.set("n", "<leader>oi", function()
+            vim.keymap.set("n", "<leader>co", function()
               vim.lsp.buf.execute_command({
                 command = "_typescript.organizeImports",
                 arguments = { vim.api.nvim_buf_get_name(0) },

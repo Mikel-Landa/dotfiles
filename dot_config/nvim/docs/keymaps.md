@@ -18,7 +18,7 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>c` | Code (action, format) |
 | `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
-| `<leader>o` | Obsidian / notes |
+| `<leader>o` | Workflow (remote PR/issue browsers) |
 | `<leader>p` | Path |
 | `<leader>sn` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
@@ -160,7 +160,7 @@ Press leader and pause — which-key shows the menu.
 | `<leader>ls` | Document symbols |
 | `<leader>lS` | Workspace symbols |
 | `<leader>lv` | Definition in vertical split |
-| `<leader>oi` | Organize imports + format (TypeScript only) |
+| `<leader>co` | Organize imports + format (TypeScript only) |
 | `<leader>uh` | Toggle inlay hints |
 
 ## Diagnostics
@@ -321,19 +321,17 @@ Format on save runs automatically.
 | `<A-j>` / `<A-k>` | n, v | Move line / selection down / up |
 | `<A-h>` / `<A-l>` | n, v | Move line / selection left / right |
 
-## Obsidian / notes (`<leader>o`, markdown files)
+## Workflow / remote PR & issue browsers (`<leader>o`)
+
+`:Workflow` opens a picker; direct keymaps below skip it. See [plugins.md](plugins.md#workflow-remote-pr--issue-browsers) for atlas + octo command reference.
 
 | Key | Action |
 |---|---|
-| `<leader>on` | New note |
-| `<leader>oo` | Open in Obsidian app |
-| `<leader>of` | Find note |
-| `<leader>og` | Grep notes |
-| `<leader>ob` | Backlinks |
-| `<leader>ot` | Tags |
-| `<leader>ol` | Links in current note |
-| `<leader>od` | Daily notes |
-| `<leader>oI` | Paste image |
+| `<leader>oo` | Workflow picker (GitHub / Bitbucket / Jira) |
+| `<leader>op` | GitHub PR list (Octo) |
+| `<leader>oi` | GitHub issue list (Octo) |
+| `<leader>oj` | Jira issues (Atlas) |
+| `<leader>ob` | Bitbucket PRs (Atlas) |
 
 ## Completion (blink.cmp, in insert mode)
 

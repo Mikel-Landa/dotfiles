@@ -97,6 +97,13 @@ map("n", "<leader>dd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 map("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Prev diagnostic" })
 map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next diagnostic" })
 
+-- Workflow / remote PR & issue browsers
+map("n", "<leader>oo", "<cmd>Workflow<cr>",        { desc = "Workflow picker" })
+map("n", "<leader>op", "<cmd>Octo pr list<cr>",    { desc = "GitHub PRs" })
+map("n", "<leader>oi", "<cmd>Octo issue list<cr>", { desc = "GitHub issues" })
+map("n", "<leader>oj", "<cmd>AtlasJira<cr>",       { desc = "Jira issues" })
+map("n", "<leader>ob", "<cmd>AtlasBitbucket<cr>",  { desc = "Bitbucket PRs" })
+
 -- Quickfix list (unimpaired-style nav)
 -- Bulk edit across qf entries: :cdo s/foo/bar/g | update
 map("n", "[q", "<cmd>cprevious<cr>zz",  { desc = "Prev quickfix" })

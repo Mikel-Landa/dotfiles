@@ -55,5 +55,8 @@ POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=2 #for powerlevel10k
 ## Characters included **will** be considered part of the word
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
+# Local secrets (Atlas tokens, etc.). Not managed by chezmoi.
+[[ -r ~/.config/zsh/secrets.zsh ]] && source ~/.config/zsh/secrets.zsh
+
 ##PROFILE ZSH
 # zprof
