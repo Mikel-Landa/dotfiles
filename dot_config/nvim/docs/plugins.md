@@ -332,6 +332,16 @@ Bitbucket PR browser + Jira issue browser. Loads on `:AtlasJira`, `:AtlasBitbuck
 | `:AtlasClearCache` | Drop disk + memory cache |
 | `:AtlasLogs` | Toggle plugin logs |
 
+### Bitbucket PR comments overlay (custom, `lua/config/my/diff/`)
+
+Inline PR-comment markers in Diffview sessions for Bitbucket PRs. Activates on `:DiffviewOpen <base>...<source-branch>` (or any diffview session whose modified revision matches an open Bitbucket PR head). Reuses atlas.nvim's Bitbucket API for fetch / post / delete.
+
+How it works: on `DiffviewViewOpened` and per-file `DiffviewDiffBufWinEnter`, the overlay finds an open PR matching the diff's right revision (or current branch as fallback), fetches comments + diff metadata, and places sign-column markers at commented lines on both LEFT and RIGHT diff buffers.
+
+Toggle off by setting `vim.g.use_pr_comments = false` before `require("config.my")` in `init.lua`.
+
+Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-diffview--bitbucket).
+
 ### pwntester/octo.nvim — GitHub PRs & issues
 
 GitHub PR/issue browser with full inline review (comments, threads, approve/request-changes) via the `gh` CLI. Auth: `gh auth login`. Loads on `:Octo`. Picker backed by snacks. Inside an Octo buffer, `?` shows buffer-local mappings.

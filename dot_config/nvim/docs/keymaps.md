@@ -140,6 +140,19 @@ Press leader and pause — which-key shows the menu.
 | `<leader>gtd` | Toggle deleted lines |
 | `<leader>gtw` | Toggle word diff |
 
+### PR comments overlay (Diffview + Bitbucket)
+
+Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (pending) appear in the gutter at commented lines.
+
+| Key | Mode | Action |
+|---|---|---|
+| `<leader>occ` | n, v | Add **pending** PR comment at line / selection |
+| `<leader>ocC` | n, v | Add (publish-immediately) PR comment |
+| `<leader>ocv` | n | View thread at cursor (popup, `r` reply, `d` delete, `q` close) |
+| `<leader>oca` | n | Approve PR (prompts for review body) |
+| `<leader>ocr` | n | Request changes on PR |
+| `<leader>ocR` | n | Reload PR comments (force refresh) |
+
 ### Text object
 
 | Key | Mode | Selects |

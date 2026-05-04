@@ -71,6 +71,19 @@ autocmd("FileType", {
   end,
 })
 
+-- Macros: disable noice while recording so the `recording @q` indicator is
+-- visible and cmdline_popup async rendering doesn't desync keystrokes.
+autocmd("RecordingEnter", {
+  group = augroup("noice_macro_off", { clear = true }),
+  callback = function() pcall(function() require("noice").disable() end) end,
+})
+autocmd("RecordingLeave", {
+  group = augroup("noice_macro_on", { clear = true }),
+  callback = function()
+    vim.schedule(function() pcall(function() require("noice").enable() end) end)
+  end,
+})
+
 -- Auto-resize splits when window is resized
 autocmd("VimResized", {
   group = augroup("resize_splits", { clear = true }),
