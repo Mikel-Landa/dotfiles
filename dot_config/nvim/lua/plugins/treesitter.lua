@@ -15,6 +15,23 @@ return {
         "bash", "markdown", "markdown_inline",
         "regex", "query",
       })
+
+      -- main branch does not auto-attach. Start treesitter per buffer on
+      -- FileType. If the parser is missing (still installing or unsupported
+      -- ft), pcall swallows the error so the buffer stays usable.
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("ts_start", { clear = true }),
+        callback = function(ev)
+          local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
+          if not lang then return end
+          if not pcall(vim.treesitter.language.add, lang) then return end
+          pcall(vim.treesitter.start, ev.buf, lang)
+          vim.bo[ev.buf].syntax = "ON" -- keep vim regex syntax as fallback for unhandled groups
+          vim.wo.foldmethod = "expr"
+          vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+          vim.wo.foldenable = false
+        end,
+      })
     end,
   },
   {
@@ -33,10 +50,10 @@ return {
       local select_maps = {
         ["af"] = { "@function.outer", "Outer function" },
         ["if"] = { "@function.inner", "Inner function" },
-        ["ac"] = { "@class.outer",    "Outer class" },
-        ["ic"] = { "@class.inner",    "Inner class" },
-        ["aa"] = { "@parameter.outer","Outer argument" },
-        ["ia"] = { "@parameter.inner","Inner argument" },
+        ["ac"] = { "@class.outer", "Outer class" },
+        ["ic"] = { "@class.inner", "Inner class" },
+        ["aa"] = { "@parameter.outer", "Outer argument" },
+        ["ia"] = { "@parameter.inner", "Inner argument" },
       }
       for key, val in pairs(select_maps) do
         vim.keymap.set({ "x", "o" }, key, function()
@@ -45,10 +62,14 @@ return {
       end
 
       -- Move between text objects
-      vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function" })
-      vim.keymap.set("n", "]C", function() move.goto_next_start("@class.outer", "textobjects") end,    { desc = "Next class" })
-      vim.keymap.set("n", "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function" })
-      vim.keymap.set("n", "[C", function() move.goto_previous_start("@class.outer", "textobjects") end,    { desc = "Prev class" })
+      vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer", "textobjects") end,
+        { desc = "Next function" })
+      vim.keymap.set("n", "]C", function() move.goto_next_start("@class.outer", "textobjects") end,
+        { desc = "Next class" })
+      vim.keymap.set("n", "[f", function() move.goto_previous_start("@function.outer", "textobjects") end,
+        { desc = "Prev function" })
+      vim.keymap.set("n", "[C", function() move.goto_previous_start("@class.outer", "textobjects") end,
+        { desc = "Prev class" })
     end,
   },
 }

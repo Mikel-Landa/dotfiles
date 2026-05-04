@@ -16,7 +16,7 @@ apt = {
     "zsh",
     "zsh-autosuggestions",
     "zsh-syntax-highlighting",
-    "neovim",
+    # "neovim", -- don't install, as it too out of date. Use mise for it instead
     "ripgrep",
     "tmux",
     "yq",
