@@ -5,3 +5,4 @@ _evalcache mise activate zsh
 _evalcache fzf --zsh
 _evalcache kubectl completion zsh
 _evalcache helm completion zsh
+_evalcache rustup completions zsh

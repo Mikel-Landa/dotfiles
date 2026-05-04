@@ -3,6 +3,12 @@
 ##PROFILE ZSH
 # zmodload zsh/zprof
 
+# Powerlevel10k instant prompt. Must stay near top — before anything that
+# produces output. Sources cached prompt to render before plugins finish.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # LOCALE
 export LC_ALL=en_US.UTF-8
 
@@ -42,21 +48,14 @@ export GO111MODULE=on
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=253"
 
-## PURE PROMT
-PURE_CMD_MAX_EXEC_TIME=2
-POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=2 #for powerlevel10k
-
-# # Right side prompt (for kubectl)
-# _lineup=$'\e[1A'
-# _linedown=$'\e[1B'
-# _kutl='%F{blue}$ZSH_KUBECTL_PROMPT%f'
-# RPROMPT=%{${_lineup}%}${_kutl}%{${_linedown}%}
-
 ## Characters included **will** be considered part of the word
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # Local secrets (Atlas tokens, etc.). Not managed by chezmoi.
 [[ -r ~/.config/zsh/secrets.zsh ]] && source ~/.config/zsh/secrets.zsh
+
+# Powerlevel10k user config.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 ##PROFILE ZSH
 # zprof

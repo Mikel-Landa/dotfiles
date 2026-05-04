@@ -20,9 +20,6 @@ defer = '''
 [plugins.docker-zsh-completion]
 github = "greymd/docker-zsh-completion"
 
-[plugins.rust-zsh-completions]
-github = "ryutok/rust-zsh-completions"
-
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
 
@@ -33,13 +30,9 @@ github = "zsh-users/zsh-completions"
 local = "~/.config/zsh/plugins"
 use = ["{history,path}.plugin.zsh"]
 
-[plugins.pure]
-github = "sindresorhus/pure"
-use = ["{async,pure}.zsh"]
-
-# [plugins.powerlevel10k]
-# github = "romkatv/powerlevel10k"
-# use = ["powerlevel10k.zsh-theme"]
+[plugins.powerlevel10k]
+github = "romkatv/powerlevel10k"
+use = ["powerlevel10k.zsh-theme"]
 
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
