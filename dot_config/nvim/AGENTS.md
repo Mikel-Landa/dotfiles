@@ -192,7 +192,7 @@ Kept lean by:
 - Lazy-loading aggressively (only colorscheme + treesitter eager-load).
 - One completion engine (`blink.cmp`) — never run two.
 - One file explorer, one fuzzy finder, one statusline. Resist alternatives.
-- No file-tree-on-startup, no dashboard, no animation/scrollbar/UI-reskin plugins.
+- No file-tree-on-startup, no animation/scrollbar/UI-reskin plugins.
 
 Before adding a plugin, check: does a built-in or already-installed plugin do this? Could 10 lines of Lua replace it?
 

@@ -27,8 +27,6 @@ return {
             key = "1",
             layout = "compact",
             repos = { { workspace = "ifs-pd", repo = "nexus-control-plane" } },
-            ---@param pr BitbucketPR
-            ---@param ctx table
             filter = function(pr, ctx)
               local user = ctx.user or {}
               return pr.author and pr.author.account_id == user.account_id
@@ -39,8 +37,6 @@ return {
             key = "2",
             layout = "compact",
             repos = { { workspace = "ifs-pd", repo = "nexus-control-plane" } },
-            ---@param pr BitbucketPR
-            ---@param ctx table
             filter = function(pr, ctx)
               local user = ctx.user or {}
               for _, r in ipairs(pr.reviewers or {}) do
