@@ -71,4 +71,4 @@ mise = {
   ]
 }
 
-cargo = { packages = ["difftastic"] }
+cargo = { packages = ["difftastic", "matugen"] }

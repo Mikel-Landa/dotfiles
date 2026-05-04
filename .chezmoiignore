@@ -2,6 +2,17 @@ install.sh
 **/.claude/*
 !.claude/{settings.json,skills,scripts,hooks}
 {{ if not .work -}}
-dot_config/metapac/groups/work.toml
+.config/metapac/groups/work.toml
 .chezmoiscripts/run_once_10_work.sh.tmpl
+{{- end }}
+{{ if .isWsl -}}
+.config/niri/**
+.config/DankMaterialShell/**
+.config/nirinit/**
+.config/kitty/**
+.config/matugen/templates/kitty.conf
+.config/metapac/groups/apps.toml
+.config/metapac/groups/niri.toml
+{{- else -}}
+.config/metapac/groups/wsl.toml
 {{- end }}

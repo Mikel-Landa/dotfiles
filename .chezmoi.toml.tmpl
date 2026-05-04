@@ -7,7 +7,20 @@ encryption = "age"
 {{- $realName := promptStringOnce . "realName" "Real name (for git/GPG)"}}
 {{- $work := promptBoolOnce . "work" "Is this a work machine?"}}
 
+{{- $isWsl := false -}}
+{{- if stat "/proc/sys/fs/binfmt_misc/WSLInterop" -}}
+{{-   $isWsl = true -}}
+{{- end }}
+
+{{- $winUser := "" -}}
+{{- if $isWsl -}}
+{{-   $winUserDefault := output "sh" "-c" "cd /mnt/c && cmd.exe /c 'echo %USERNAME%' 2>/dev/null" | trim -}}
+{{-   $winUser = promptStringOnce . "winUser" "Windows username" $winUserDefault -}}
+{{- end }}
+
 [data]
     email = {{ $email | quote }}
     realName = {{ $realName | quote }}
     work = {{ $work }}
+    isWsl = {{ $isWsl }}
+    winUser = {{ $winUser | quote }}

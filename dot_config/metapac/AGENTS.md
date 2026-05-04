@@ -8,10 +8,11 @@ Metapac is the single source of truth for all installed packages. When adding a 
 |------|---------|-----------|
 | `base.toml` | Core CLI utilities (git, curl, gcc, etc.) — cross-platform | yes |
 | `terminal.toml` | Terminal tools (neovim, zsh, tmux, ripgrep, etc.) — cross-platform | yes |
-| `apps.toml` | GUI applications (VSCode, Chrome, Spotify) | yes |
-| `niri.toml` | Niri compositor extras | yes |
+| `apps.toml` | GUI applications (kitty, VSCode, Chrome, Spotify) — skipped on WSL | yes |
+| `niri.toml` | Niri compositor extras — skipped on WSL | yes |
 | `kubernetes.toml` | Kubernetes tooling | yes |
 | `work.toml` | Work-only tools | yes |
+| `wsl.toml` | WSL-only tools (jq, imagemagick, matugen, xdg-open-wsl) — skipped off WSL | yes |
 | `system.toml` | **System-specific packages — gitignored, never commit** | no |
 
 ## Where to Add Packages
@@ -20,9 +21,11 @@ Metapac is the single source of truth for all installed packages. When adding a 
 - Add both `arch` and `apt` entries if the package exists on both
 - Use `cargo`/`mise`/`go` backends for cross-distro installs
 
-**GUI apps** → `apps.toml`
+**GUI apps** (incl. GUI terminal emulators) → `apps.toml`
 
 **Niri-specific** → `niri.toml`
+
+**WSL-specific** → `wsl.toml`
 
 **Work tools** → `work.toml`
 
@@ -33,8 +36,9 @@ Metapac is the single source of truth for all installed packages. When adding a 
 
 ## Backends
 
-Configured in `config.toml`:
-- Global: `cargo`, `mise`, `go`
+Configured in `config.toml.tmpl` (chezmoi-templated):
+- Global: `cargo`, `mise`, `go`, `pipx`
+- WSL machines: also `apt`
 - `cachyos` hostname: also `arch` (paru)
 - `work-ifs` hostname: also `apt`
 

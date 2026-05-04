@@ -1,6 +1,5 @@
 arch = {
   packages = [
-    "kitty",
     "zsh",
     "zsh-autosuggestions",
     "zsh-syntax-highlighting",
@@ -26,13 +25,19 @@ apt = {
 }
 
 cargo = {
-  packages = ["bat", "zoxide", "nu", "sheldon", "tree-sitter-cli", "fd-find", "eza"]
+  packages = [
+    "bat",
+    "zoxide",
+    "nu",
+    "sheldon",
+    "tree-sitter-cli",
+    "fd-find",
+    "eza",
+    "tlrc",
+    "tsql"
+  ]
 }
 
-mise = {
-  packages = ["fzf"]
-}
+mise = { packages = ["fzf"] }
 
-go = {
-  packages = ["github.com/jesseduffield/lazygit"]
-}
+go = { packages = ["github.com/jesseduffield/lazygit"] }

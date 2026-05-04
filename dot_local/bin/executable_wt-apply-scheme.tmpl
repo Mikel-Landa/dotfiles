@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{{- if not .isWsl }}
+exit 0
+{{- end }}
+
+WIN_USER={{ .winUser | quote }}
+SCHEME=${HOME}/.cache/matugen/windows-terminal-scheme.json
+
+shopt -s nullglob
+candidates=(
+  "/mnt/c/Users/${WIN_USER}/AppData/Local/Packages/Microsoft.WindowsTerminal_"*/LocalState/settings.json
+  "/mnt/c/Users/${WIN_USER}/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_"*/LocalState/settings.json
+  "/mnt/c/Users/${WIN_USER}/AppData/Local/Microsoft/Windows Terminal/settings.json"
+)
+SETTINGS="${candidates[0]:-}"
+
+[[ -f "$SCHEME" ]]   || { echo "no scheme at $SCHEME" >&2; exit 1; }
+[[ -n "$SETTINGS" && -f "$SETTINGS" ]] || { echo "no WT settings.json found under /mnt/c/Users/${WIN_USER}" >&2; exit 1; }
+
+WALLPAPER_WIN="C:\\Users\\${WIN_USER}\\AppData\\Local\\wt-bg-blur.jpg"
+
+tmp=$(mktemp)
+jq --slurpfile s "$SCHEME" --arg bg "$WALLPAPER_WIN" '
+  .schemes = ((.schemes // []) | map(select(.name != "Matugen")) + $s)
+  | .profiles.defaults.colorScheme              = "Matugen"
+  | .profiles.defaults.backgroundImage          = $bg
+  | .profiles.defaults.backgroundImageStretchMode = "uniformToFill"
+  | .profiles.defaults.backgroundImageOpacity   = 1.0
+  | .profiles.defaults.useAcrylic               = false
+  | del(.profiles.defaults.opacity)
+' "$SETTINGS" > "$tmp"
+
+mv "$tmp" "$SETTINGS"

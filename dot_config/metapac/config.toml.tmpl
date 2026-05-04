@@ -1,0 +1,11 @@
+{{- $id := .chezmoi.osRelease.id -}}
+{{- $idLike := .chezmoi.osRelease.idLike -}}
+{{- $isArch := or (eq $id "arch") (eq $idLike "arch") -}}
+{{- $isUbuntu := eq $id "ubuntu" -}}
+enabled_backends = [{{ if $isUbuntu }}"apt", {{ end }}{{ if $isArch }}"arch", {{ end }}"cargo", "mise", "go", "pipx"]
+
+[arch]
+package_manager = "paru"
+
+[cargo]
+binstall = true

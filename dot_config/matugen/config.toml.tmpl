@@ -1,10 +1,17 @@
 [config]
 source_color_index = 0
 
+{{ if .isWsl -}}
+[templates.windows-terminal]
+input_path = "~/.config/matugen/templates/windows-terminal-scheme.json"
+output_path = "~/.cache/matugen/windows-terminal-scheme.json"
+post_hook = "~/.local/bin/wt-apply-scheme"
+{{- else -}}
 [templates.kitty]
 input_path = "~/.config/matugen/templates/kitty.conf"
 output_path = "~/.config/kitty/colors.conf"
 post_hook = "kill -SIGUSR1 $(pidof kitty) 2>/dev/null; true"
+{{- end }}
 
 [templates.nvim]
 input_path = "~/.config/matugen/templates/colors.json"

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{ if .isWsl -}}
+WALLPAPER="/mnt/c/Users/{{ .winUser }}/AppData/Roaming/Microsoft/Windows/Themes/TranscodedWallpaper"
+BLURRED="/mnt/c/Users/{{ .winUser }}/AppData/Local/wt-bg-blur.jpg"
+{{- else -}}
+WALLPAPER="${WALLPAPER:-$HOME/.config/wallpaper}"
+{{- end }}
+
+[[ -r "$WALLPAPER" ]] || { echo "wallpaper not readable: $WALLPAPER" >&2; exit 1; }
+
+{{ if .isWsl -}}
+convert "$WALLPAPER" -blur 0x20 -quality 85 "$BLURRED"
+{{- end }}
+
+exec matugen image "$WALLPAPER"

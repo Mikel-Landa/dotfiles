@@ -1,5 +1,6 @@
 arch = {
   packages = [
+    "kitty",
     "visual-studio-code-bin",
     "zed",
     "spotify-launcher",

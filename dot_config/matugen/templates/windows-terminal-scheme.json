@@ -1,0 +1,23 @@
+{
+    "name": "Matugen",
+    "background": "#{{colors.surface_container_lowest.dark.hex_stripped}}",
+    "foreground": "#{{colors.on_surface.dark.hex_stripped}}",
+    "cursorColor": "#{{colors.primary.dark.hex_stripped}}",
+    "selectionBackground": "#{{colors.surface_container_highest.dark.hex_stripped}}",
+    "black": "#{{colors.surface.dark.hex_stripped}}",
+    "red": "#{{colors.error.dark.hex_stripped}}",
+    "green": "#{{colors.secondary_fixed.dark.hex_stripped}}",
+    "yellow": "#{{colors.tertiary_fixed.dark.hex_stripped}}",
+    "blue": "#{{colors.primary.dark.hex_stripped}}",
+    "purple": "#{{colors.secondary.dark.hex_stripped}}",
+    "cyan": "#{{colors.tertiary.dark.hex_stripped}}",
+    "white": "#{{colors.on_surface.dark.hex_stripped}}",
+    "brightBlack": "#{{colors.surface_container_high.dark.hex_stripped}}",
+    "brightRed": "#{{colors.on_error_container.dark.hex_stripped}}",
+    "brightGreen": "#{{colors.secondary_fixed_dim.dark.hex_stripped}}",
+    "brightYellow": "#{{colors.tertiary_fixed_dim.dark.hex_stripped}}",
+    "brightBlue": "#{{colors.primary_container.dark.hex_stripped}}",
+    "brightPurple": "#{{colors.secondary_container.dark.hex_stripped}}",
+    "brightCyan": "#{{colors.tertiary_container.dark.hex_stripped}}",
+    "brightWhite": "#{{colors.surface_bright.dark.hex_stripped}}"
+}

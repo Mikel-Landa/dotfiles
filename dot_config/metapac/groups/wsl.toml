@@ -1,0 +1,5 @@
+apt = {
+  packages = ["imagemagick"]
+}
+
+pipx = { packages = ["xdg-open-wsl"] }
