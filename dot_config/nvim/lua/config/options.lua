@@ -35,8 +35,7 @@ opt.timeoutlen = 300  -- reduce chord ambiguity wait (default 1000ms causes cS f
 
 -- Clipboard: keep nvim clipboard separate from system (use keymaps for explicit sync)
 
--- Column guide + UI polish
-opt.colorcolumn = "100"
+-- UI polish
 opt.list = true  -- render hidden whitespace
 opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 opt.confirm = true  -- dialog instead of error on :q with unsaved changes

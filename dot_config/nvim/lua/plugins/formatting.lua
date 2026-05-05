@@ -27,6 +27,13 @@ return {
         go = { "gofmt" },
         sh = { "shfmt" },
       },
+      -- Target 100-char line width (project config files override these)
+      formatters = {
+        stylua = { prepend_args = { "--column-width", "100" } },
+        ruff_format = { prepend_args = { "--line-length", "100" } },
+        prettier = { prepend_args = { "--print-width", "100" } },
+        prettierd = { prepend_args = { "--print-width", "100" } },
+      },
       -- Format on save (disable per-buffer with :ConformInfo)
       format_on_save = {
         timeout_ms = 500,

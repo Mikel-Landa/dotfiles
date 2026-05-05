@@ -1,7 +1,19 @@
 -- Completion: blink.cmp (replaces nvim-cmp + sources)
 --
 -- Snippets via LuaSnip + friendly-snippets.
--- Default keymap preset: <C-n>/<C-p> select, <CR> confirm, <Tab> snippet-jump/select.
+-- Default keymap preset: <C-n>/<C-p> select, <CR> confirm, <C-j>/<C-k> snippet-jump/select.
+
+local function newline_skip_completion(motion)
+  return function()
+    local ok, blink = pcall(require, "blink.cmp")
+    if ok and blink.is_visible() then blink.hide() end
+    local keys = vim.api.nvim_replace_termcodes("<Esc>" .. motion, true, false, true)
+    vim.api.nvim_feedkeys(keys, "n", false)
+  end
+end
+
+vim.keymap.set("i", "<C-CR>",   newline_skip_completion("o"), { desc = "Newline below (skip completion)" })
+vim.keymap.set("i", "<C-S-CR>", newline_skip_completion("O"), { desc = "Newline above (skip completion)" })
 
 return {
   {
@@ -20,8 +32,10 @@ return {
     opts = {
       keymap = {
         preset      = "default",
-        ["<Tab>"]   = { "select_next", "snippet_forward", "fallback" },
-        ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+        ["<C-j>"]   = { "select_next", "snippet_forward", "fallback" },
+        ["<C-k>"]   = { "select_prev", "snippet_backward", "fallback" },
+        ["<Tab>"]   = { "fallback" },
+        ["<S-Tab>"] = { "fallback" },
         ["<CR>"]    = { "accept", "fallback" },
       },
       snippets = { preset = "luasnip" },

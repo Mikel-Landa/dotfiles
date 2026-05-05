@@ -170,6 +170,10 @@ Enabled via `:packadd nvim.undotree` in `lua/config/options.lua`. Renders the un
 
 Inside the tree buffer: `<CR>` jumps to that undo state, `q` closes. Persistent undo (`undofile`) is enabled, so history survives restarts.
 
+### MeanderingProgrammer/render-markdown.nvim — In-buffer markdown rendering
+
+Renders markdown directly in the buffer: styled headers, fenced code-block backgrounds, bullet glyphs, checkbox icons, callouts, table borders. Loads on `markdown` filetype. Toggle with `:RenderMarkdown toggle`; `:RenderMarkdown expand` / `contract` cycles concealment level.
+
 ### NvChad/nvim-colorizer.lua — Inline color preview
 
 Highlights hex / rgb / hsl / named / Tailwind class colors with their actual color in the buffer.
@@ -235,13 +239,13 @@ Pops up automatically while typing. Sources: LSP, snippets (LuaSnip), path, buff
 | Key | Action |
 |---|---|
 | `<C-n>` / `<C-p>` | Next / prev item |
+| `<C-j>` / `<C-k>` | Next / prev item; snippet jump forward / backward |
 | `<CR>` | Confirm selection |
-| `<Tab>` | Snippet jump / select |
 | `<C-Space>` | Trigger menu |
 | `<C-e>` | Cancel |
 
 ### L3MON4D3/LuaSnip + friendly-snippets
-VSCode snippet pack auto-loaded. Trigger via blink.cmp; jump fields with `<Tab>`.
+VSCode snippet pack auto-loaded. Trigger via blink.cmp; jump fields with `<C-j>` / `<C-k>`.
 
 ---
 
@@ -256,6 +260,8 @@ Format on save runs automatically (500ms timeout, falls back to LSP). Manual:
 | `<leader>cf` | Format buffer / selection |
 
 Formatters by filetype: stylua (lua), ruff (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt, gofmt, shfmt. Install via `:Mason`.
+
+Line width target: **100 chars** for stylua / ruff_format / prettier(d). Project config files (`.stylua.toml`, `pyproject.toml`, `.prettierrc`) override.
 
 `:ConformInfo` shows status.
 
@@ -301,24 +307,6 @@ Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md
 | `<leader>gp` | Preview hunk |
 | `<leader>gb` | Blame line (full) |
 | `ih` (o, x) | Inner-hunk text object |
-
----
-
----
-
-## AI
-
-### coder/claudecode.nvim — Claude Code IDE bridge
-
-WebSocket MCP integration with the `claude` CLI. Loads on first `<leader>a*` key or `:ClaudeCode*` command. See [AI / Claude Code](keymaps.md#ai--claude-code-leadera) for the full keymap list. Highlights:
-
-| Key | Action |
-|---|---|
-| `<leader>ac` | Toggle terminal |
-| `<leader>af` | Focus window |
-| `<leader>ab` | Add current buffer |
-| `<leader>as` (v) | Send selection |
-| `<leader>aa` / `<leader>ad` | Accept / deny diff |
 
 ---
 

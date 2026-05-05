@@ -27,6 +27,13 @@ local function notify(level, msg)
 end
 
 local function safe_require(mod)
+  -- Guard against requiring diffview submodules before diffview itself
+  -- bootstraps. Submodules reference `DiffviewGlobal` at top level, so a
+  -- pre-bootstrap require errors and Lua caches the failure sentinel in
+  -- `package.loaded`, breaking later requires with "loop or previous error".
+  if mod:match("^diffview") and not (_G.DiffviewGlobal and _G.DiffviewGlobal.bootstrap_ok) then
+    return nil
+  end
   local ok, m = pcall(require, mod)
   return ok and m or nil
 end

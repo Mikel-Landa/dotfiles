@@ -22,7 +22,9 @@ return {
       picker = {
         enabled = true,
         win = {
-          input = { wo = { winhighlight = "Normal:Normal,NormalFloat:Normal,FloatBorder:FloatBorder,FloatTitle:FloatTitle" } },
+          input = {
+            wo = { winhighlight = "Normal:Normal,NormalFloat:Normal,FloatBorder:FloatBorder,FloatTitle:FloatTitle" },
+          },
           list = { wo = { winhighlight = "Normal:Normal,NormalFloat:Normal,FloatBorder:FloatBorder" } },
           preview = { wo = { winhighlight = "Normal:Normal,NormalFloat:Normal,FloatBorder:FloatBorder,FloatTitle:FloatTitle" } },
         },

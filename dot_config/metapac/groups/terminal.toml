@@ -40,4 +40,9 @@ cargo = {
 
 mise = { packages = ["fzf"] }
 
-go = { packages = ["github.com/jesseduffield/lazygit"] }
+go = {
+  packages = [
+    "github.com/jesseduffield/lazygit",
+    "github.com/cli/cli/v2/cmd/gh"
+  ]
+}
