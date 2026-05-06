@@ -215,19 +215,22 @@ Move between nodes:
 
 ### neovim/nvim-lspconfig + mason.nvim — Language servers
 
-Servers auto-install on first use: lua, python, typescript, rust, go, c/c++, json, yaml, html, css, bash, toml (tombi). Manage with `:Mason`.
+Servers auto-install on first use. Base: json, yaml, html, css, bash, toml (tombi). Per-language bundles in `lua/plugins/lang/*.lua`: lua (lua_ls + lazydev), python (pyright + ruff), typescript (vtsls), rust (rustaceanvim), go (gopls), c/c++ (clangd), markdown (marksman). Tools (formatters, linters, DAP adapters) install via `mason-tool-installer.nvim` (lists merge across lang files). Manage with `:Mason`, `:MasonToolsUpdate`.
 
 LSP keymaps (active when an LSP attaches):
 
 | Key | Action |
 |---|---|
 | `gd` | Go to definition |
-| `gr` | References |
-| `gi` | Go to implementation |
-| `gy` | Type definition |
+| `grr` | References (Neovim 0.11 default) |
+| `gri` | Go to implementation (Neovim 0.11 default) |
+| `grt` | Type definition (Neovim 0.11 default) |
+| `grn` | Rename symbol (Neovim 0.11 default) |
+| `gra` | Code action (Neovim 0.11 default) |
+| `gO` | Document symbols (Neovim 0.11 default) |
 | `K` | Hover docs |
 | `<leader>ca` | Code action |
-| `<leader>rn` | Rename symbol |
+| `<leader>lr` | Rename symbol |
 | `<leader>ls` | Document symbols |
 | `<leader>lS` | Workspace symbols |
 | `<leader>uh` | Toggle inlay hints |
@@ -258,12 +261,50 @@ Format on save runs automatically (500ms timeout, falls back to LSP). Manual:
 | Key | Action |
 |---|---|
 | `<leader>cf` | Format buffer / selection |
+| `grf` | Format file |
 
-Formatters by filetype: stylua (lua), ruff (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt, gofmt, shfmt. Install via `:Mason`.
+Formatters declared per-language in `lua/plugins/lang/*.lua` and merged into conform. Current: stylua (lua), ruff_format + ruff_organize_imports (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt (rust, lsp fallback), goimports + gofumpt (go), shfmt (sh), markdownlint-cli2 + markdown-toc (markdown, conditional). Install via `:Mason`.
 
 Line width target: **100 chars** for stylua / ruff_format / prettier(d). Project config files (`.stylua.toml`, `pyproject.toml`, `.prettierrc`) override.
 
 `:ConformInfo` shows status.
+
+---
+
+## Linting
+
+### mfussenegger/nvim-lint — On-save linters
+
+Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `markdownlint-cli2` (markdown), `shellcheck` (sh/bash). Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>xx` Trouble panel).
+
+---
+
+## Debugging (DAP)
+
+### mfussenegger/nvim-dap + nvim-dap-ui + virtual text + mason-nvim-dap
+
+Adapter binaries install via `mason-tool-installer.nvim` (`codelldb`, `delve`, `debugpy`, `js-debug-adapter`). Per-language adapters/configurations live in `lua/plugins/lang/*.lua`:
+
+| Language | Adapter | Plugin |
+|---|---|---|
+| Python | debugpy | `mfussenegger/nvim-dap-python` |
+| Go | delve | `leoluz/nvim-dap-go` |
+| Rust | codelldb | `rustaceanvim` (built-in) |
+| C / C++ | codelldb | wired in `lang/clangd.lua` |
+| JS / TS | js-debug | wired in `lang/typescript.lua` |
+
+Launch via `<leader>dc` (continue) — pre-defined configurations or `launch.json` if present in project root. UI auto-opens on session start, closes on exit.
+
+See [Debug (DAP)](keymaps.md#debug-dap) for the full keymap reference.
+
+### Language-specific plugins
+
+- **lua**: `folke/lazydev.nvim` — workspace globals for nvim/Snacks/Lazy in lua_ls.
+- **python**: `linux-cultist/venv-selector.nvim` (`<leader>cv`), `mfussenegger/nvim-dap-python`.
+- **rust**: `mrcjkb/rustaceanvim` (replaces lspconfig rust_analyzer), `Saecki/crates.nvim` (Cargo.toml).
+- **go**: `leoluz/nvim-dap-go`.
+- **c/c++**: `p00f/clangd_extensions.nvim` (cmp scoring, AST view, inlay hint tweaks).
+- **markdown**: `iamcco/markdown-preview.nvim` (browser preview, `<leader>cp`), `MeanderingProgrammer/render-markdown.nvim` (in-buffer rendering).
 
 ---
 

@@ -18,8 +18,12 @@ require("config.keymaps")
 require("config.autocmds")
 require("config.my")
 
--- Load all plugin specs from lua/plugins/*.lua
-require("lazy").setup("plugins", {
+-- Load all plugin specs from lua/plugins/*.lua and lua/plugins/lang/*.lua.
+-- lazy.nvim only auto-discovers top-level .lua + subdir init.lua, so import lang/ explicitly.
+require("lazy").setup({
+  { import = "plugins" },
+  { import = "plugins.lang" },
+}, {
   change_detection = { notify = false },
   ui = { border = "rounded" },
   performance = {

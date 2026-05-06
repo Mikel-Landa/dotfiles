@@ -10,7 +10,8 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>b` | Buffers |
 | `<leader>g` | Git / hunks |
 | `<leader>l` | LSP (symbols) |
-| `<leader>d` | Diagnostics |
+| `<leader>d` | Debug + diagnostics |
+| `<leader>dP` | Python debug (subgroup) |
 | `<leader>x` | Trouble panel |
 | `<leader>q` | Quickfix |
 | `<leader>u` | UI toggles |
@@ -144,20 +145,63 @@ Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (
 
 ## LSP (active when server attached)
 
+References / implementation / type-def / rename / code-action use Neovim 0.11 built-in defaults under the `gr` prefix.
+
 | Key | Action |
 |---|---|
-| `gd` | Definition |
-| `gr` | References |
-| `gi` | Implementation |
-| `gy` | Type definition |
+| `gd` | Definition (snacks.picker) |
+| `grr` | References (built-in) |
+| `gri` | Implementation (built-in) |
+| `grt` | Type definition (built-in) |
+| `grn` | Rename symbol (built-in) |
+| `gra` | Code action (built-in, n/x) |
+| `gO` | Document symbols (built-in) |
 | `K` | Hover docs |
+| `<C-s>` | Signature help (insert mode, built-in) |
 | `<leader>ca` | Code action |
 | `<leader>lr` | Rename symbol |
 | `<leader>ls` | Document symbols |
 | `<leader>lS` | Workspace symbols |
 | `<leader>lv` | Definition in vertical split |
-| `<leader>co` | Organize imports + format (TypeScript only) |
 | `<leader>uh` | Toggle inlay hints |
+
+### TypeScript / JavaScript (vtsls)
+
+| Key | Action |
+|---|---|
+| `gD` | Goto source definition |
+| `gR` | File references |
+| `<leader>co` | Organize imports + format |
+| `<leader>cM` | Add missing imports |
+| `<leader>cD` | Fix all diagnostics |
+| `<leader>cu` | Remove unused |
+
+### Rust (rustaceanvim)
+
+| Key | Action |
+|---|---|
+| `<leader>cR` | Rust code action |
+| `<leader>dr` | Rust debuggables (DAP) |
+
+### C / C++ (clangd)
+
+| Key | Action |
+|---|---|
+| `<leader>ch` | Switch source / header |
+
+### Python
+
+| Key | Action |
+|---|---|
+| `<leader>cv` | Select virtualenv (venv-selector) |
+| `<leader>dPt` | Debug test method |
+| `<leader>dPc` | Debug test class |
+
+### Markdown
+
+| Key | Action |
+|---|---|
+| `<leader>cp` | Toggle browser preview (markdown-preview.nvim) |
 
 ## Diagnostics
 
@@ -165,6 +209,30 @@ Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (
 |---|---|
 | `<leader>dd` | Float at cursor |
 | `]d` / `[d` | Next / prev diagnostic |
+
+## Debug (DAP)
+
+Two-letter keys under `<leader>d` (single-letter `<leader>dd` reserved for diagnostics).
+
+| Key | Action |
+|---|---|
+| `<leader>db` | Toggle breakpoint |
+| `<leader>dB` | Breakpoint w/ condition |
+| `<leader>dc` | Run / Continue |
+| `<leader>dC` | Run to cursor |
+| `<leader>di` | Step into |
+| `<leader>do` | Step out |
+| `<leader>dO` | Step over |
+| `<leader>dj` / `<leader>dk` | Down / up the call stack |
+| `<leader>dg` | Go to line (no execute) |
+| `<leader>dl` | Run last config |
+| `<leader>dp` | Pause |
+| `<leader>dr` | Toggle REPL |
+| `<leader>ds` | Session |
+| `<leader>dt` | Terminate |
+| `<leader>dw` | Widgets hover |
+| `<leader>du` | Toggle DAP UI |
+| `<leader>de` (n, v) | Eval expression / selection |
 
 ## Quickfix / loclist
 
@@ -206,6 +274,7 @@ Bulk edit across qf entries: `:cdo s/foo/bar/g | update`. See [Quickfix](quickfi
 | Key | Action |
 |---|---|
 | `<leader>cf` | Format buffer (or selection in visual) |
+| `grf` | Format file |
 
 Format on save runs automatically.
 

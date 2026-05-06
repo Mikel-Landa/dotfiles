@@ -1,34 +1,35 @@
+-- Treesitter base wiring. Lang files extend `opts.ensure_install` via opts merging.
 return {
   {
     "nvim-treesitter/nvim-treesitter",
     branch = "main",
     lazy = false,
     build = ":TSUpdate",
-    config = function()
-      require("nvim-treesitter").setup()
-      require("nvim-treesitter").install({
+    opts = {
+      -- Base parsers (language-agnostic / shell / vim / config formats).
+      -- Lang files add their own (e.g. python, rust, go) via opts merging.
+      ensure_install = {
         "bash",
-        "c",
-        "cpp",
-        "css",
-        "go",
-        "html",
-        "javascript",
-        "json",
+        "diff",
+        "git_config",
+        "gitcommit",
+        "gitignore",
         "lua",
-        "markdown",
-        "markdown_inline",
-        "python",
+        "luadoc",
         "query",
         "regex",
-        "rust",
-        "toml",
-        "tsx",
-        "typescript",
         "vim",
         "vimdoc",
-        "yaml",
-      })
+      },
+    },
+    config = function(_, opts)
+      require("nvim-treesitter").setup()
+      -- Dedupe in case multiple specs add the same parser
+      local seen, parsers = {}, {}
+      for _, p in ipairs(opts.ensure_install or {}) do
+        if not seen[p] then seen[p] = true; parsers[#parsers + 1] = p end
+      end
+      require("nvim-treesitter").install(parsers)
 
       -- main branch does not auto-attach. Start treesitter per buffer on
       -- FileType. If the parser is missing (still installing or unsupported
@@ -60,7 +61,6 @@ return {
       local sel = require("nvim-treesitter-textobjects.select")
       local move = require("nvim-treesitter-textobjects.move")
 
-      -- Select text objects
       local select_maps = {
         ["af"] = { "@function.outer", "Outer function" },
         ["if"] = { "@function.inner", "Inner function" },
@@ -75,7 +75,6 @@ return {
         end, { desc = val[2] })
       end
 
-      -- Move between text objects
       vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer", "textobjects") end,
         { desc = "Next function" })
       vim.keymap.set("n", "]C", function() move.goto_next_start("@class.outer", "textobjects") end,

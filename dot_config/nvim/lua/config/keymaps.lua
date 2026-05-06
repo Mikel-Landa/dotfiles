@@ -55,9 +55,11 @@ map("n", "<leader>bD", "<cmd>bdelete<cr>",                         { desc = "Del
 map("n", "<leader>bo", function() Snacks.bufdelete.other() end,    { desc = "Delete other buffers" })
 
 -- Format
-map({ "n", "v" }, "<leader>cf", function()
+local function format_buf()
   require("conform").format({ async = true, lsp_format = "fallback" })
-end, { desc = "Format" })
+end
+map({ "n", "v" }, "<leader>cf", format_buf, { desc = "Format" })
+map("n", "grf", format_buf, { desc = "Format file" })
 
 -- Save
 map({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })

@@ -44,6 +44,15 @@ return {
       apply_indent_hl()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_indent_hl })
 
+      -- VSCode-style git colors in snacks explorer/picker. Default snacks links
+      -- both Untracked and Ignored to NonText, making new files indistinguishable
+      -- from gitignored ones. Render untracked as green (Added) like VSCode.
+      local function apply_git_status_hl()
+        vim.api.nvim_set_hl(0, "SnacksPickerGitStatusUntracked", { link = "Added", default = false })
+      end
+      apply_git_status_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_git_status_hl })
+
       -- matugen's "ember" palette caps fn / module / property chroma so low
       -- (~0.03–0.05) that on most wallpapers `fmt.Fprintf(...)` reads as all
       -- white — no separation between module, call, and variable. Build
