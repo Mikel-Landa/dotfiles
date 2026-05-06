@@ -43,8 +43,8 @@ return {
       servers = {
         vtsls = {
           filetypes = {
-            "javascript", "javascriptreact", "javascript.jsx",
-            "typescript", "typescriptreact", "typescript.tsx",
+            "javascript", "javascriptreact",
+            "typescript", "typescriptreact",
           },
           settings = {
             complete_function_calls = true,

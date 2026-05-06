@@ -1,6 +1,24 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Filetype detection for compound types referenced by LSP server defaults
+-- (silences vim.lsp healthcheck "Unknown filetype" warnings).
+vim.filetype.add({
+  extension = {
+    mdx = "markdown.mdx",
+    gotmpl = "gotmpl",
+  },
+  filename = {
+    [".gitlab-ci.yml"] = "yaml.gitlab",
+  },
+  pattern = {
+    [".*/templates/.*%.tpl"] = "gotmpl",
+    [".*/templates/.*%.ya?ml"] = "yaml.helm-values",
+    ["docker%-compose.*%.ya?ml"] = "yaml.docker-compose",
+    ["compose.*%.ya?ml"] = "yaml.docker-compose",
+  },
+})
+
 -- Highlight on yank
 autocmd("TextYankPost", {
   group = augroup("highlight_yank", { clear = true }),

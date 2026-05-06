@@ -22,7 +22,9 @@ return {
           "SnacksPickerNormalFloat",
         }
         for _, g in ipairs(groups) do
-          vim.api.nvim_set_hl(0, g, { bg = "NONE" })
+          local hl = vim.api.nvim_get_hl(0, { name = g, link = false })
+          hl.bg = "NONE"
+          vim.api.nvim_set_hl(0, g, hl)
         end
       end
 

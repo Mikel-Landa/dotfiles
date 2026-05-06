@@ -26,6 +26,7 @@ require("lazy").setup({
 }, {
   change_detection = { notify = false },
   ui = { border = "rounded" },
+  rocks = { enabled = false },
   performance = {
     rtp = {
       paths = { vim.env.VIMRUNTIME .. "/pack/dist/opt/nvim.undotree" },

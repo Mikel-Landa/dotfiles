@@ -82,11 +82,13 @@ return {
     opts = function()
       local dap = require("dap")
       if not dap.adapters.codelldb then
+        local mason_root = vim.fn.stdpath("data") .. "/mason"
+        local codelldb_bin = mason_root .. "/packages/codelldb/extension/adapter/codelldb"
         dap.adapters.codelldb = {
           type = "server",
           port = "${port}",
           executable = {
-            command = vim.fn.exepath("codelldb"),
+            command = vim.fn.executable(codelldb_bin) == 1 and codelldb_bin or vim.fn.exepath("codelldb"),
             args = { "--port", "${port}" },
           },
         }

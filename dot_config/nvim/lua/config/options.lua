@@ -1,4 +1,11 @@
 local opt = vim.opt
+local g = vim.g
+
+-- Disable unused providers (no Ruby/Perl/Node/Python plugins in use)
+g.loaded_node_provider = 0
+g.loaded_perl_provider = 0
+g.loaded_ruby_provider = 0
+g.loaded_python3_provider = 0
 
 -- Line numbers
 opt.number = true
