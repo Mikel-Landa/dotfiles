@@ -1,36 +1,40 @@
 -- PR comments overlay on Diffview sessions.
--- Adapted from emrearmagan/dotfiles (config/my/diff/init.lua),
--- ported from codediff to diffview.
+-- Orchestrator: per-tabpage SessionState map, async refresh state machine,
+-- user commands + keymaps, autocmd wiring. Knows nothing about provider-specific
+-- comment shapes — see CONTEXT.md.
 if not vim.g.use_pr_comments then
   return
 end
 
-local comments_ui = require("config.my.diff.comments")
+local comments_ui = require("config.my.diff.comments_ui")
+local sign_plan = require("config.my.diff.sign_plan")
+local render = require("config.my.diff.render")
+local hunks = require("config.my.diff.hunks")
 
 local providers = {
-  require("config.my.diff.bitbucket-comments"),
+  require("config.my.diff.providers.bitbucket"),
 }
 
 local ns = vim.api.nvim_create_namespace("diff_pr_comments")
-local state = {
-  provider = nil,
-  pr = nil,
-  comments = {},
-  diff_files = {},
-  session_key = nil,
-  loading_key = nil,
-  placed_sign_keys = {},
-}
+
+---@class SessionState
+---@field provider table
+---@field session_key string
+---@field loading_key string|nil
+---@field pr table|nil
+---@field comments table[]
+---@field diff_files table<string, any>
+
+---@type table<integer, SessionState>
+local sessions = {}
 
 local function notify(level, msg)
   vim.notify("[PR comments] " .. tostring(msg), level)
 end
 
 local function safe_require(mod)
-  -- Guard against requiring diffview submodules before diffview itself
-  -- bootstraps. Submodules reference `DiffviewGlobal` at top level, so a
-  -- pre-bootstrap require errors and Lua caches the failure sentinel in
-  -- `package.loaded`, breaking later requires with "loop or previous error".
+  -- Diffview submodules reference `DiffviewGlobal` at top level; a pre-bootstrap
+  -- require errors and Lua caches the failure sentinel in `package.loaded`.
   if mod:match("^diffview") and not (_G.DiffviewGlobal and _G.DiffviewGlobal.bootstrap_ok) then
     return nil
   end
@@ -52,8 +56,7 @@ local function bufnr_for(file)
   return nil
 end
 
--- Construct a session-like table from the current Diffview view.
-local function current_session(tabpage)
+local function current_view_session(tabpage)
   local lib = safe_require("diffview.lib")
   if not lib then return nil end
   local view = tabpage and lib.tabpage_to_view(tabpage) or lib.get_current_view()
@@ -69,10 +72,8 @@ local function current_session(tabpage)
 
   local modified_revision = right.commit
   if (not modified_revision or modified_revision == "") and right.type then
-    -- LOCAL/STAGE/CUSTOM: skip; we only handle real commits.
     modified_revision = ""
   end
-  -- Resolve refs like `origin/feature` to a SHA so PR matching works.
   if modified_revision and modified_revision ~= "" and not modified_revision:match("^[0-9a-f]+$") then
     modified_revision = rev_to_sha(toplevel, modified_revision) or modified_revision
   end
@@ -88,184 +89,128 @@ local function current_session(tabpage)
   }
 end
 
-local function session_has_revision(session)
-  if not session then return false end
-  local rev = tostring(session.modified_revision or "")
+local function has_revision(view_session)
+  if not view_session then return false end
+  local rev = tostring(view_session.modified_revision or "")
   return rev ~= "" and rev ~= "WORKING" and rev ~= "STAGED"
 end
 
-local function session_key(session, provider_name)
-  if not session_has_revision(session) then return nil end
-  local root = tostring(session.git_root or "")
+local function build_session_key(view_session, provider_name)
+  if not has_revision(view_session) then return nil end
+  local root = tostring(view_session.git_root or "")
   if root == "" then return nil end
-  return table.concat({ provider_name or "", root, tostring(session.modified_revision) }, ":")
+  return table.concat({ provider_name or "", root, tostring(view_session.modified_revision) }, ":")
 end
 
 local function provider_for(tabpage)
-  local session = current_session(tabpage)
-  if not session then return nil, nil end
+  local view_session = current_view_session(tabpage)
+  if not view_session then return nil, nil end
   for _, mod in ipairs(providers) do
-    if mod.can_handle and mod.can_handle(session) then
-      return mod, session
+    if mod.can_handle and mod.can_handle(view_session) then
+      return mod, view_session
     end
   end
-  return nil, session
+  return nil, view_session
 end
 
 local function tabpage_from_event(event)
   return event and event.data and event.data.tabpage or vim.api.nvim_get_current_tabpage()
 end
 
-local function session_file_path(tabpage)
-  local session = current_session(tabpage)
-  if not session then return nil end
-
-  local file_path = (session.original_path ~= "" and session.original_path)
-    or (session.modified_path ~= "" and session.modified_path)
+local function rel_file_path(view_session)
+  local file_path = (view_session.original_path ~= "" and view_session.original_path)
+    or (view_session.modified_path ~= "" and view_session.modified_path)
   if not file_path then return nil end
 
-  local root = tostring(session.git_root or "")
+  local root = tostring(view_session.git_root or "")
   if root ~= "" then
     local prefix = root .. "/"
     if file_path:sub(1, #prefix) == prefix then
       file_path = file_path:sub(#prefix + 1)
     end
   end
-  return file_path, session
+  return file_path
 end
 
-local function resolve_line(comment, side)
-  if side == "LEFT" then return comment.original_line or comment.line end
-  return comment.line or comment.original_line
-end
+local function show(tabpage)
+  local s = sessions[tabpage]
+  if not s or not s.pr then return end
 
-local function count_threads(comments, file_path)
-  local counts = {}
-  for _, comment in ipairs(comments or {}) do
-    if comment.path == file_path and not comment.in_reply_to_id then
-      local side = comment.side or "RIGHT"
-      local line = resolve_line(comment, side)
-      if line then
-        local key = ("%d:%s"):format(line, side)
-        counts[key] = (counts[key] or 0) + 1
-      end
-    end
-  end
-  return counts
-end
+  local view_session = current_view_session(tabpage)
+  if not view_session then return end
+  local file_path = rel_file_path(view_session)
+  if not file_path then return end
 
-local function place_signs(bufnr, file_path, side, comments)
-  if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then return end
-
-  for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
-    if vim.api.nvim_win_is_valid(win) then
-      vim.wo[win].signcolumn = "yes:1"
-    end
-  end
-
-  local pending_count = 0
-  for _, comment in ipairs(comments or {}) do
-    if comment.pending then pending_count = pending_count + 1 end
-  end
-
-  local sign_key = table.concat({
-    tostring(bufnr), file_path, side,
-    tostring(#(comments or {})), tostring(pending_count),
-  }, ":")
-  local existing = vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, {})
-  if state.placed_sign_keys[bufnr] == sign_key and #existing > 0 then return end
-  state.placed_sign_keys[bufnr] = sign_key
-  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-
-  local threads = count_threads(comments, file_path)
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
-  local line_has_published = {}
-  local line_has_pending = {}
-
-  for _, comment in ipairs(comments or {}) do
-    if comment.path == file_path and not comment.in_reply_to_id then
-      local comment_side = comment.side or "RIGHT"
-      if comment_side == side then
-        local line = resolve_line(comment, comment_side)
-        if line then
-          if comment.pending then line_has_pending[line] = true
-          else line_has_published[line] = true end
-        end
-      end
-    end
-  end
-
-  for key in pairs(threads) do
-    local line_str, comment_side = key:match("^(%d+):(.+)$")
-    if comment_side == side then
-      local line = tonumber(line_str)
-      if line and line >= 1 and line <= line_count then
-        vim.api.nvim_buf_set_extmark(bufnr, ns, line - 1, 0, {
-          sign_text = line_has_published[line] and "" or "",
-          sign_hl_group = "DiagnosticInfo",
-          priority = 1000,
-        })
-      end
+  local sides = {
+    { side = "LEFT",  bufnr = view_session.original_bufnr },
+    { side = "RIGHT", bufnr = view_session.modified_bufnr },
+  }
+  for _, sb in ipairs(sides) do
+    if sb.bufnr then
+      local line_count = vim.api.nvim_buf_line_count(sb.bufnr)
+      local plan = sign_plan.plan(s.comments, file_path, sb.side, line_count)
+      render.apply(sb.bufnr, ns, plan)
     end
   end
 end
 
-local function show_cached(tabpage)
-  local provider, active_session = provider_for(tabpage)
-  if not provider or provider ~= state.provider
-    or session_key(active_session, provider.name) ~= state.session_key then
-    return
+local function destroy_session(tabpage)
+  local s = sessions[tabpage]
+  if not s then return end
+  -- Best-effort: clear the render memo for the buffers we last saw. The view's
+  -- buffers may already be invalid if the tab is closing; render.clear_memo is
+  -- a plain table delete and tolerates that.
+  local view_session = current_view_session(tabpage)
+  if view_session then
+    if view_session.original_bufnr then render.clear_memo(view_session.original_bufnr) end
+    if view_session.modified_bufnr then render.clear_memo(view_session.modified_bufnr) end
   end
-
-  local file_path, session = session_file_path(tabpage)
-  if not file_path or not session then return end
-  place_signs(session.original_bufnr, file_path, "LEFT", state.comments)
-  place_signs(session.modified_bufnr, file_path, "RIGHT", state.comments)
-end
-
-local function reset_for(provider, key)
-  state.provider = provider
-  state.pr = nil
-  state.comments = {}
-  state.diff_files = {}
-  state.session_key = key
-  state.placed_sign_keys = {}
+  sessions[tabpage] = nil
 end
 
 local function refresh(tabpage, opts)
   opts = opts or {}
-  local provider, session = provider_for(tabpage)
-  if not provider or not session_has_revision(session) then return end
+  tabpage = tabpage or vim.api.nvim_get_current_tabpage()
+  local provider, view_session = provider_for(tabpage)
+  if not provider or not has_revision(view_session) then return end
 
-  local key = session_key(session, provider.name)
-  if opts.force ~= true and key and state.session_key == key and state.pr then
-    show_cached(tabpage)
+  local key = build_session_key(view_session, provider.name)
+  local s = sessions[tabpage]
+  if opts.force ~= true and s and key and s.session_key == key and s.pr then
+    show(tabpage)
     return
   end
-  if key and state.loading_key == key then return end
+  if s and key and s.loading_key == key then return end
 
-  state.loading_key = key
-  reset_for(provider, key)
+  s = {
+    provider = provider,
+    session_key = key,
+    loading_key = key,
+    pr = nil,
+    comments = {},
+    diff_files = {},
+  }
+  sessions[tabpage] = s
   notify(vim.log.levels.INFO, "Loading PR comments...")
 
-  provider.find_pr(session, function(pr, pr_err)
-    if state.loading_key ~= key then return end
-    if pr_err then state.loading_key = nil; notify(vim.log.levels.WARN, pr_err); return end
-    if not pr then state.loading_key = nil; notify(vim.log.levels.WARN, "No PR found"); return end
+  provider.find_pr(view_session, function(pr, pr_err)
+    if sessions[tabpage] ~= s or s.loading_key ~= key then return end
+    if pr_err then s.loading_key = nil; notify(vim.log.levels.WARN, pr_err); return end
+    if not pr then s.loading_key = nil; notify(vim.log.levels.WARN, "No PR found"); return end
 
-    state.pr = pr
+    s.pr = pr
     local loaded = { diff = false, comments = false }
 
     local function finish()
       if not loaded.diff or not loaded.comments then return end
-      state.loading_key = nil
-      show_cached(tabpage)
-      notify(vim.log.levels.INFO, ("Loaded %d PR comments"):format(#state.comments))
+      s.loading_key = nil
+      show(tabpage)
+      notify(vim.log.levels.INFO, ("Loaded %d PR comments"):format(#s.comments))
     end
 
     provider.fetch_diff_files(pr, function(files)
-      if state.session_key == key then
-        state.diff_files = files or {}
+      if sessions[tabpage] == s and s.session_key == key then
+        s.diff_files = files or {}
         loaded.diff = true
         finish()
       end
@@ -273,85 +218,49 @@ local function refresh(tabpage, opts)
 
     provider.fetch_comments(pr, function(comments, comments_err)
       if comments_err then
-        state.loading_key = nil; state.pr = nil; state.session_key = nil
+        s.loading_key = nil; s.pr = nil; s.session_key = nil
         notify(vim.log.levels.WARN, comments_err); return
       end
-      state.comments = comments or {}
+      if sessions[tabpage] ~= s or s.session_key ~= key then return end
+      s.comments = comments or {}
       loaded.comments = true
       finish()
     end)
   end)
 end
 
-local function parse_hunks(file)
-  if not file then return {} end
-
-  -- atlas's diff_parser shape: file.hunks is a list of { header, ... }
-  if type(file.hunks) == "table" then
-    local out = {}
-    for _, hunk in ipairs(file.hunks) do
-      local header = hunk.header or hunk
-      local left_start, left_count, right_start, right_count =
-        tostring(header):match("@@ %-(%d+),?(%d*) %+(%d+),?(%d*) @@")
-      if left_start then
-        table.insert(out, {
-          left_start = tonumber(left_start),
-          left_count = tonumber(left_count) or 1,
-          right_start = tonumber(right_start),
-          right_count = tonumber(right_count) or 1,
-        })
-      end
-    end
-    if #out > 0 then return out end
-  end
-
-  -- Fallback: parse raw patch text.
-  local out = {}
-  for left_start, left_count, right_start, right_count in
-    tostring(file.patch or file.raw or "")
-      :gmatch("@@ %-(%d+),?(%d*) %+(%d+),?(%d*) @@")
-  do
-    table.insert(out, {
-      left_start = tonumber(left_start),
-      left_count = tonumber(left_count) or 1,
-      right_start = tonumber(right_start),
-      right_count = tonumber(right_count) or 1,
-    })
-  end
-  return out
-end
-
-local function lines_in_diff(file_path, start_line, end_line, side)
-  local file = state.diff_files[file_path]
+local function in_diff(tabpage, file_path, start_line, end_line, side)
+  local s = sessions[tabpage]
+  if not s then return false end
+  local file = s.diff_files[file_path]
   if not file then return false end
-
-  for _, hunk in ipairs(parse_hunks(file)) do
-    local hunk_start = side == "LEFT" and hunk.left_start or hunk.right_start
-    local hunk_count = side == "LEFT" and hunk.left_count or hunk.right_count
-    local hunk_end = hunk_start + hunk_count - 1
-    if start_line >= hunk_start and end_line <= hunk_end then return true end
-  end
-  return false
+  return hunks.contains(hunks.parse(file), start_line, end_line, side)
 end
 
 local function current_context()
-  local file_path, session = session_file_path()
-  if not file_path or not session then
+  local tabpage = vim.api.nvim_get_current_tabpage()
+  local view_session = current_view_session(tabpage)
+  if not view_session then
+    notify(vim.log.levels.WARN, "Not in a Diffview session")
+    return nil
+  end
+  local file_path = rel_file_path(view_session)
+  if not file_path then
     notify(vim.log.levels.WARN, "Not in a Diffview session")
     return nil
   end
 
   local current_buf = vim.api.nvim_get_current_buf()
   local side
-  if current_buf == session.original_bufnr then side = "LEFT"
-  elseif current_buf == session.modified_bufnr then side = "RIGHT" end
+  if current_buf == view_session.original_bufnr then side = "LEFT"
+  elseif current_buf == view_session.modified_bufnr then side = "RIGHT" end
   if not side then
     notify(vim.log.levels.WARN, "Cursor is not in a diff buffer")
     return nil
   end
 
   local line = vim.fn.line(".")
-  return { file_path = file_path, start_line = line, end_line = line, side = side }
+  return { tabpage = tabpage, file_path = file_path, start_line = line, end_line = line, side = side }
 end
 
 local function visual_context()
@@ -370,20 +279,23 @@ end
 local function get_thread_at_cursor()
   local context = current_context()
   if not context then return nil end
+  local s = sessions[context.tabpage]
+  if not s then return nil, {}, context end
 
   local root
-  for _, comment in ipairs(state.comments) do
-    if comment.path == context.file_path and not comment.in_reply_to_id then
-      local side = comment.side or "RIGHT"
-      if side == context.side and resolve_line(comment, side) == context.start_line then
-        root = comment; break
-      end
+  for _, comment in ipairs(s.comments) do
+    if comment.in_reply_to_id == nil
+      and comment.path == context.file_path
+      and comment.anchor and comment.anchor.side == context.side
+      and comment.anchor.line == context.start_line
+    then
+      root = comment; break
     end
   end
   if not root then return nil, {}, context end
 
   local replies = {}
-  for _, comment in ipairs(state.comments) do
+  for _, comment in ipairs(s.comments) do
     if comment.in_reply_to_id == root.id then table.insert(replies, comment) end
   end
   table.sort(replies, function(a, b) return tostring(a.id) < tostring(b.id) end)
@@ -391,12 +303,14 @@ local function get_thread_at_cursor()
 end
 
 local function ensure_ready()
-  local provider = provider_for()
-  if not provider or provider ~= state.provider or not state.pr then
+  local tabpage = vim.api.nvim_get_current_tabpage()
+  local provider = provider_for(tabpage)
+  local s = sessions[tabpage]
+  if not provider or not s or s.provider ~= provider or not s.pr then
     notify(vim.log.levels.WARN, "No PR data cached. Open Diffview for a PR first.")
-    return nil
+    return nil, nil
   end
-  return provider
+  return provider, s
 end
 
 local function open_comment_popup(title, context, on_submit)
@@ -409,47 +323,48 @@ local function open_comment_popup(title, context, on_submit)
 end
 
 local function add_comment(context_fn, pending)
-  local provider = ensure_ready()
+  local provider, s = ensure_ready()
   if not provider then return end
 
   local context = context_fn()
   if not context then return end
-  if not lines_in_diff(context.file_path, context.start_line, context.end_line, context.side) then
+  if not in_diff(context.tabpage, context.file_path, context.start_line, context.end_line, context.side) then
     notify(vim.log.levels.WARN, "Selected lines are outside the diff"); return
   end
 
   local title = pending and "Pending PR comment" or "PR comment"
   open_comment_popup(title, context, function(body)
-    provider.add_comment(state.pr, context, body, { pending = pending }, function(_, err)
+    provider.add_comment(s.pr, context, body, { pending = pending }, function(_, err)
       if err then notify(vim.log.levels.ERROR, err); return end
       notify(vim.log.levels.INFO, pending and "Pending comment added" or "Comment posted")
-      refresh(nil, { force = true })
+      refresh(context.tabpage, { force = true })
     end)
   end)
 end
 
 local function submit_review(event, label)
-  local provider = ensure_ready()
+  local provider, s = ensure_ready()
   if not provider then return end
   if not provider.submit_review then
     notify(vim.log.levels.WARN, "Submitting reviews is not supported for this provider"); return
   end
 
+  local tabpage = vim.api.nvim_get_current_tabpage()
   comments_ui.input({
     title = (" %s review "):format(label),
     on_empty = function() notify(vim.log.levels.WARN, "Empty review, cancelled") end,
     on_submit = function(body)
-      provider.submit_review(state.pr, event, body, function(_, err)
+      provider.submit_review(s.pr, event, body, function(_, err)
         if err then notify(vim.log.levels.ERROR, err); return end
         notify(vim.log.levels.INFO, ("%s review submitted"):format(label))
-        refresh(nil, { force = true })
+        refresh(tabpage, { force = true })
       end)
     end,
   })
 end
 
 local function view_thread()
-  local provider = ensure_ready()
+  local provider, s = ensure_ready()
   if not provider then return end
 
   local root, replies, context = get_thread_at_cursor()
@@ -462,10 +377,10 @@ local function view_thread()
     on_reply = function(_, close)
       close()
       open_comment_popup("Reply", context, function(body)
-        provider.reply(state.pr, root, body, function(_, err)
+        provider.reply(s.pr, root, body, function(_, err)
           if err then notify(vim.log.levels.ERROR, err); return end
           notify(vim.log.levels.INFO, "Reply posted")
-          refresh(nil, { force = true })
+          refresh(context.tabpage, { force = true })
         end)
       end)
     end,
@@ -475,11 +390,11 @@ local function view_thread()
       local target = selected.in_reply_to_id and "reply" or "thread"
       vim.ui.input({ prompt = ("Delete %s? [y/N]: "):format(target) }, function(input)
         if type(input) ~= "string" or not input:match("^[yY]") then return end
-        provider.delete_comment(state.pr, selected, function(_, err)
+        provider.delete_comment(s.pr, selected, function(_, err)
           if err then notify(vim.log.levels.ERROR, err); return end
           close()
           notify(vim.log.levels.INFO, selected.in_reply_to_id and "Reply deleted" or "Thread deleted")
-          refresh(nil, { force = true })
+          refresh(context.tabpage, { force = true })
         end)
       end)
     end,
@@ -510,7 +425,7 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "DiffviewDiffBufRead",
   callback = function(event)
     local tabpage = tabpage_from_event(event)
-    vim.schedule(function() show_cached(tabpage) end)
+    vim.schedule(function() show(tabpage) end)
   end,
 })
 
@@ -521,7 +436,7 @@ vim.api.nvim_create_autocmd("User", {
     local tabpage = tabpage_from_event(event)
     vim.schedule(function()
       refresh(tabpage)
-      vim.defer_fn(function() show_cached(tabpage) end, 50)
+      vim.defer_fn(function() show(tabpage) end, 50)
     end)
   end,
 })
@@ -530,6 +445,18 @@ vim.api.nvim_create_autocmd("WinEnter", {
   group = group,
   callback = function()
     local tabpage = vim.api.nvim_get_current_tabpage()
-    vim.schedule(function() show_cached(tabpage) end)
+    vim.schedule(function() show(tabpage) end)
   end,
 })
+
+vim.api.nvim_create_autocmd("TabClosed", {
+  group = group,
+  callback = function(event)
+    local tab = tonumber(event.match)
+    if tab then destroy_session(tab) end
+  end,
+})
+
+return {
+  __sessions = sessions,
+}

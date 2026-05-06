@@ -1,7 +1,5 @@
 -- Bitbucket PR comments overlay provider.
--- Adapted from emrearmagan/dotfiles (see config/my/diff/bitbucket-comments.lua),
--- ported from codediff to diffview and updated to current atlas.nvim API
--- (atlas.bitbucket.api.* instead of atlas.pulls.providers.bitbucket.api.*).
+-- Emits normalized comments per `lua/config/my/diff/CONTEXT.md` (anchor = { side, line }).
 if not vim.g.use_pr_comments then
   return {}
 end
@@ -89,7 +87,6 @@ local function pr_from_branch(session, callback)
 
   local branch = session.modified_branch
   if not branch or branch == "" then
-    -- fall back to current HEAD
     local result = vim.system({ "git", "-C", session.git_root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
     branch = result and result.code == 0 and trim(result.stdout) or ""
   end
@@ -110,7 +107,6 @@ local function wait_for_pr(session, attempt, callback)
   pr_from_revision(session, function(pr, err)
     if pr or err then callback(pr, err); return end
     if attempt >= 6 then
-      -- fall back to branch lookup
       pr_from_branch(session, callback)
       return
     end
@@ -149,7 +145,6 @@ function M.fetch_diff_files(pr, callback)
 
   pullrequests.fetch_diff(url, { force_load = true }, function(diff, _err)
     local by_path = {}
-    -- diff is parsed by atlas's diff_parser; it returns a list of file entries.
     for _, file in ipairs(diff or {}) do
       local path = file.path or file.new_path
       if path then by_path[path] = file end
@@ -164,53 +159,59 @@ local function iso_for_popup(value)
   return value:gsub("%.%d+", ""):gsub("%+00:00$", "Z")
 end
 
+-- Translate one Bitbucket comment payload into the normalized shape
+-- defined in CONTEXT.md. Anchor side is RIGHT when inline.to is set
+-- (modern line in the new revision), LEFT when only inline.from is set.
 local function normalize_comment(comment)
   local inline = comment.inline or {}
-  local line = tonumber(inline.to)
-  local original_line = tonumber(inline["from"])
-  local side = line and "RIGHT" or "LEFT"
+  local to_line = tonumber(inline.to)
+  local from_line = tonumber(inline["from"])
+  local side = to_line and "RIGHT" or "LEFT"
+  local line = to_line or from_line
+
   local author = comment.author or comment.user or {}
   local content = comment.content or {}
   local parent = comment.parent or {}
   local user = (author.nickname ~= "" and author.nickname) or author.name or author.display_name
 
   local raw = comment._raw or comment
-  return {
+  local result = {
     id = comment.id,
     _raw = raw,
     path = inline.path,
     body = comment.content_raw or content.raw or "",
-    line = line,
-    original_line = original_line,
-    side = side,
-    in_reply_to_id = comment.parent_id or parent.id,
     user = user,
     created_at = iso_for_popup(comment.created_on or (raw and raw.created_on)),
     pending = comment.pending == true or tostring(comment.state or ""):upper() == "PENDING",
+    in_reply_to_id = comment.parent_id or parent.id,
   }
+  if result.path and line then
+    result.anchor = { side = side, line = line }
+  end
+  return result
 end
 
 local function normalize_comments(comments)
   local normalized = {}
   local by_id = {}
 
+  -- First pass: thread roots (have inline path + line of their own).
   for _, comment in ipairs(comments or {}) do
     local item = normalize_comment(comment)
-    if item.path and (item.line or item.original_line) then
+    if item.path and item.anchor then
       table.insert(normalized, item)
       by_id[item.id] = item
     end
   end
 
+  -- Second pass: replies inherit anchor + path from their root.
   for _, comment in ipairs(comments or {}) do
     local item = normalize_comment(comment)
     if item.in_reply_to_id and not item.path then
-      local parent = by_id[item.in_reply_to_id]
-      if parent then
-        item.path = parent.path
-        item.line = parent.line
-        item.original_line = parent.original_line
-        item.side = parent.side
+      local parent_item = by_id[item.in_reply_to_id]
+      if parent_item then
+        item.path = parent_item.path
+        item.anchor = parent_item.anchor
         table.insert(normalized, item)
       end
     end
@@ -223,10 +224,13 @@ local function dedup(comments)
   local out = {}
   local seen = {}
   for _, comment in ipairs(comments or {}) do
-    if comment.path and (comment.line or comment.original_line) then
+    if comment.path and comment.anchor then
       local key = tostring(comment.id or "")
       if key == "" then
-        key = table.concat({ comment.path or "", comment.side or "", tostring(comment.line or ""), comment.body or "" }, ":")
+        key = table.concat({
+          comment.path or "", comment.anchor.side or "",
+          tostring(comment.anchor.line or ""), comment.body or "",
+        }, ":")
       end
       if not seen[key] then
         seen[key] = true
@@ -252,7 +256,6 @@ function M.fetch_comments(pr, callback)
   service.request("GET", paged, nil, nil, function(result, err)
     if err then callback(nil, "Failed to load comments: " .. err); return end
     local raw_values = (result or {}).values or {}
-    -- Stash _raw on each comment for later URL lookups.
     for _, c in ipairs(raw_values) do c._raw = c end
     callback(dedup(normalize_comments(raw_values)))
   end)
@@ -376,5 +379,8 @@ function M.pr_url(pr)
   local html = links.html or {}
   return tostring(html.href or pr and pr.link and pr.link.html or "")
 end
+
+-- Test seam: expose normalize_comments for fixture-driven specs.
+M._normalize_comments = normalize_comments
 
 return M
