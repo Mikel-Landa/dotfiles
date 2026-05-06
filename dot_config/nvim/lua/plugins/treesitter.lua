@@ -7,13 +7,27 @@ return {
     config = function()
       require("nvim-treesitter").setup()
       require("nvim-treesitter").install({
-        "lua", "vim", "vimdoc",
-        "python", "typescript", "javascript", "tsx",
-        "rust", "go", "c", "cpp",
-        "json", "yaml", "toml",
-        "html", "css",
-        "bash", "markdown", "markdown_inline",
-        "regex", "query",
+        "bash",
+        "c",
+        "cpp",
+        "css",
+        "go",
+        "html",
+        "javascript",
+        "json",
+        "lua",
+        "markdown",
+        "markdown_inline",
+        "python",
+        "query",
+        "regex",
+        "rust",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "yaml",
       })
 
       -- main branch does not auto-attach. Start treesitter per buffer on

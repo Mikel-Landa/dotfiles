@@ -115,7 +115,6 @@ vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short descriptio
 | `<leader>x` | Trouble panel (diagnostics/symbols/refs) |
 | `<leader>u` | UI toggles (`<leader>uh` = inlay hints, `<leader>un` = dismiss notif) |
 | `<leader>c` | Code (action, format) |
-| `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
 | `<leader>sn` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |

@@ -15,7 +15,6 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>q` | Quickfix |
 | `<leader>u` | UI toggles |
 | `<leader>c` | Code (action, format) |
-| `<leader>r` | Rename / refactor |
 | `<leader>e` | File explorer |
 | `<leader>o` | Workflow (remote PR/issue browsers) |
 | `<leader>p` | Path |
@@ -153,7 +152,7 @@ Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (
 | `gy` | Type definition |
 | `K` | Hover docs |
 | `<leader>ca` | Code action |
-| `<leader>rn` | Rename symbol |
+| `<leader>lr` | Rename symbol |
 | `<leader>ls` | Document symbols |
 | `<leader>lS` | Workspace symbols |
 | `<leader>lv` | Definition in vertical split |

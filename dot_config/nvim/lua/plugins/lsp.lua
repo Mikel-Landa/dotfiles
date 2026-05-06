@@ -121,7 +121,7 @@ return {
           map("gy", function() Snacks.picker.lsp_type_definitions() end, "Type definition")
           map("K", vim.lsp.buf.hover, "Hover docs")
           map("<leader>ca", vim.lsp.buf.code_action, "Code action")
-          map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
+          map("<leader>lr", vim.lsp.buf.rename, "Rename symbol")
           map("<leader>ls", function() Snacks.picker.lsp_symbols() end, "Document symbols")
           map("<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, "Workspace symbols")
 

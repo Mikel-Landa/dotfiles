@@ -17,7 +17,6 @@ return {
         { "<leader>q", group = "quickfix" },
         { "<leader>u", group = "ui toggles" },
         { "<leader>c", group = "code" },
-        { "<leader>r", group = "rename/refactor" },
         { "<leader>s", group = "search/noice" },
         { "<leader>sn", group = "noice" },
         { "<leader>w", group = "windows", proxy = "<C-w>" },
