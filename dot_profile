@@ -21,7 +21,12 @@ export LESS='-n -i -g -q -R -X -K -F'
 
 # Git.
 export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
-export GPG_TTY=$(tty 2>/dev/null || echo not-a-tty)
+# Skip tty fork in non-interactive shells (scripts, pipes).
+if [ -t 0 ]; then
+    export GPG_TTY=$(tty 2>/dev/null || echo not-a-tty)
+else
+    export GPG_TTY=not-a-tty
+fi
 
 # Go (explicit set so mise doesn't override).
 export GOPATH=$HOME/go

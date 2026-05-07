@@ -20,11 +20,12 @@ function _evalcache () {
     data=${data}$(typeset -f "${name}")
   fi
 
-  if builtin command -v md5 > /dev/null; then
-    cmdHash=$(echo -n "${data}" | md5)
-  elif builtin command -v md5sum > /dev/null; then
-    cmdHash=$(echo -n "${data}" | md5sum | cut -d' ' -f1)
-  fi
+  # Native zsh polynomial hash (no subprocess fork).
+  local -i _h=0 _i
+  for (( _i = 1; _i <= ${#data}; _i++ )); do
+    _h=$(( (_h * 33 + #data[_i]) & 0x7fffffff ))
+  done
+  cmdHash=${$(( [#16] _h ))##*\#}
 
   local cacheFile="$ZSH_EVALCACHE_DIR/init-${name##*/}-${cmdHash}.sh"
 

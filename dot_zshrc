@@ -26,11 +26,16 @@ _sheldon_cfg="${XDG_CONFIG_HOME:-$HOME/.config}/sheldon/plugins.toml"
 if [[ ! -s $_sheldon_cache || $_sheldon_cfg -nt $_sheldon_cache ]]; then
     mkdir -p ${_sheldon_cache:h}
     sheldon source >| $_sheldon_cache
+    zcompile -R -- $_sheldon_cache.zwc $_sheldon_cache 2>/dev/null
 fi
 source $_sheldon_cache
 unset _sheldon_cache _sheldon_cfg
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=253"
+# Async + buffer cap keep input lag flat on long lines.
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_STRATEGY=(history)
 
 ## Characters included **will** be considered part of the word
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'

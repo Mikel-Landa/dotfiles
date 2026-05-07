@@ -5,6 +5,7 @@ xzcompilehomedir() {
         $HOME/.profile
         $HOME/.zshenv
         $HOME/.zshrc
+        $HOME/.p10k.zsh
         $HOME/.config/zsh/plugins
     )
     for i in $targets
