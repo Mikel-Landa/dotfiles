@@ -74,6 +74,7 @@ return {
       },
       terminal = { enabled = true },
       bufdelete = { enabled = true },
+      gitbrowse = { enabled = true },
     },
     keys = {
       -- Explorer
@@ -83,6 +84,7 @@ return {
       { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git log" },
       { "<leader>gL", function() Snacks.picker.git_log_file() end, desc = "Git log (file)" },
       { "<leader>gB", function() Snacks.picker.git_branches() end, desc = "Git branches" },
+      { "<leader>gO", function() Snacks.gitbrowse() end, mode = { "n", "v" }, desc = "Open file in browser" },
       -- Terminal
       { "<leader>ut", function() Snacks.terminal.toggle() end, desc = "Toggle terminal" },
       -- Notifier
