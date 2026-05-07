@@ -62,19 +62,21 @@ return {
 
   {
     "rcarriga/nvim-dap-ui",
+    lazy = true,
     dependencies = { "nvim-neotest/nvim-nio" },
     opts = {},
   },
 
   {
     "theHamsta/nvim-dap-virtual-text",
-    dependencies = { "mfussenegger/nvim-dap" },
+    lazy = true,
     opts = {},
   },
 
   {
     "jay-babu/mason-nvim-dap.nvim",
-    dependencies = { "williamboman/mason.nvim", "mfussenegger/nvim-dap" },
+    lazy = true,
+    dependencies = { "williamboman/mason.nvim" },
     cmd = { "DapInstall", "DapUninstall" },
     opts = {
       -- Adapters install via mason-tool-installer (lang files). This plugin only

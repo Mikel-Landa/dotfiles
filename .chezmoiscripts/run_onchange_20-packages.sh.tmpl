@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Phase 20 — packages. Branches by OS via chezmoi template.
+# pacman -S --needed and apt install are idempotent (no-op when satisfied).
+
+set -euo pipefail
+
+{{- if eq .chezmoi.osRelease.id "arch" }}
+
+# Arch base build deps (paru/makepkg need base-devel).
+sudo pacman -S --needed --noconfirm base-devel git curl
+
+# AUR helper.
+if ! command -v paru >/dev/null 2>&1; then
+    tmp=$(mktemp -d)
+    git clone https://aur.archlinux.org/paru.git "$tmp/paru"
+    (cd "$tmp/paru" && makepkg -si --noconfirm)
+    rm -rf "$tmp"
+fi
+
+{{- else if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") }}
+
+# Ubuntu / Debian base packages. Compilers + git + GPG + TLS roots.
+sudo apt-get update -y
+sudo apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    curl \
+    git \
+    gnupg \
+    pkg-config
+
+{{- else }}
+
+echo "phase 20 (packages): unsupported OS '{{ .chezmoi.osRelease.id }}' — skipping" >&2
+
+{{- end }}

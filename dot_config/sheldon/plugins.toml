@@ -28,7 +28,7 @@ github = "zsh-users/zsh-completions"
 
 [plugins.local-0]
 local = "~/.config/zsh/plugins"
-use = ["{history,path}.plugin.zsh"]
+use = ["history.plugin.zsh"]
 
 [plugins.powerlevel10k]
 github = "romkatv/powerlevel10k"

@@ -1,42 +1,46 @@
 #
-# This is my .profile, it is what needs to be present for *every* time a
-# shell starts. This shell could be bash/zsh or other shells. Please
-# look at their respective documentation. As you may know my primary
-# shell is zsh.
-#
-# zsh: This file is sourced by ~/.zshenv
-# bash: This file is sourced at the startup of bash
+# This is my .profile, sourced by every shell:
+#   zsh: via ~/.zshenv
+#   bash (login): direct
+#   bash (interactive non-login): via ~/.bashrc
+#   sh: direct
 #
 
-# LANG=C.UTF-8
-#TZ=America/Curacao
-#TZ=Europe/Amsterdam
+# PATH helpers — must be defined before any path_push call below.
+[ -r "$HOME/.config/shell/path.sh" ] && . "$HOME/.config/shell/path.sh"
 
-VISUAL=nvim
-EDITOR=nvim
-ED=nvim
-PAGER=less
-LESS='-n -i -g -q -R -X -K -F'
+# Locale.
+export LC_ALL=en_US.UTF-8
 
-GIT_DISCOVERY_ACROSS_FILESYSTEM=0
+# Editors / pager.
+export VISUAL=nvim
+export EDITOR=nvim
+export ED=nvim
+export PAGER=less
+export LESS='-n -i -g -q -R -X -K -F'
 
-GOPATH=$HOME/go
-# Explicit set to avoid mise override
-GOBIN=$HOME/go/bin
+# Git.
+export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
+export GPG_TTY=$(tty 2>/dev/null || echo not-a-tty)
 
-# Only prepend once per shell tree (subshells inherit PATH already)
-case ":$PATH:" in
-    *":$HOME/.cargo/bin:"*) ;;
-    *) PATH=$HOME/.cargo/bin:$GOBIN:$HOME/bin:$HOME/.local/bin:$PATH:/sbin:/usr/sbin ;;
-esac
+# Go (explicit set so mise doesn't override).
+export GOPATH=$HOME/go
+export GOBIN=$HOME/go/bin
+export GO111MODULE=on
 
-export PATH VISUAL EDITOR ED \
-    PAGER LESS \
-    GOPATH GOBIN \
-    GIT_DISCOVERY_ACROSS_FILESYSTEM
+# mise.
+export MISE_DEFAULT_CONFIG_FILENAME='.mise.local.toml'
+
+# PATH. Lower-priority paths pushed to back; higher-priority pushed to front.
+path_push_back /sbin
+path_push_back /usr/sbin
+path_push "$HOME/.local/bin"
+path_push "$HOME/bin"
+path_push "$GOBIN"
+path_push "$HOME/.cargo/bin"
+# mise shims expose mise-managed tools (node, python, etc.) to non-interactive
+# shells (scripts) without needing `mise activate` to run.
+path_push "$HOME/.local/share/mise/shims"
+[ -d /opt/nvim/bin ] && path_push /opt/nvim/bin
 
 # vim: ft=sh
-
-## Enable git to ask for passphrase
-export GPG_TTY=$(tty)
-export MISE_DEFAULT_CONFIG_FILENAME='.mise.local.toml'

@@ -9,10 +9,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# LOCALE
-export LC_ALL=en_US.UTF-8
-
 # Skip rest for non-interactive shells (cron, ssh-cmd, scripts).
+# Env, PATH, and locale live in ~/.profile (sourced via ~/.zshenv).
 [[ -o interactive ]] || return
 
 setopt vi  # If EDITOR is set to vim, we have this for free
@@ -31,20 +29,6 @@ if [[ ! -s $_sheldon_cache || $_sheldon_cfg -nt $_sheldon_cache ]]; then
 fi
 source $_sheldon_cache
 unset _sheldon_cache _sheldon_cfg
-
-# $HOME/.local/bin already added by dot_profile.
-if [ -d "/opt/nvim" ]; then
-    path_push "/opt/nvim/bin"
-fi
-
-# Go env
-export GO111MODULE=on
-
-# not needed when using mise for go installs
-# export GOPATH="$HOME/.go"
-# if [ -d "$GOPATH" ]; then
-#     path_push "$GOPATH/bin"
-# fi
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=253"
 

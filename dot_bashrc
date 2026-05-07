@@ -8,6 +8,10 @@ case $- in
       *) return;;
 esac
 
+# Bash doesn't auto-source ~/.profile for interactive non-login shells, so do
+# it here. Login shells already source it via ~/.bash_profile / ~/.profile.
+[ -r "$HOME/.profile" ] && . "$HOME/.profile"
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -115,5 +119,16 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-. "$HOME/.cargo/env"
-eval "$(~/.local/bin/mise activate bash)"
+# Tool inits (zoxide, mise, fzf, kubectl, helm, rustup). Spec lives in
+# ~/.config/shell/evals.sh so zsh and bash share the list. Each line is run
+# only if its tool is installed.
+if [ -r "$HOME/.config/shell/evals.sh" ]; then
+    . "$HOME/.config/shell/evals.sh"
+    while IFS= read -r _eval_cmd; do
+        _eval_tool=${_eval_cmd%% *}
+        if command -v "$_eval_tool" >/dev/null 2>&1; then
+            eval "$($_eval_cmd 2>/dev/null)"
+        fi
+    done <<<"$(shell_evals_for bash)"
+    unset _eval_cmd _eval_tool
+fi

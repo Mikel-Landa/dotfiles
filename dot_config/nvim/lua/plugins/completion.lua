@@ -18,6 +18,7 @@ vim.keymap.set("i", "<C-S-CR>", newline_skip_completion("O"), { desc = "Newline 
 return {
   {
     "L3MON4D3/LuaSnip",
+    lazy = true,
     build = "make install_jsregexp",
     dependencies = { "rafamadriz/friendly-snippets" },
     config = function()

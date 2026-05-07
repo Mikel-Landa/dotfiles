@@ -20,6 +20,7 @@ return {
 
   {
     "williamboman/mason.nvim",
+    cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUninstallAll", "MasonLog", "MasonUpdate" },
     build = ":MasonUpdate",
     opts = { ui = { border = "rounded" } },
   },
@@ -27,7 +28,7 @@ return {
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = { "williamboman/mason.nvim" },
-    event = { "BufReadPre", "BufNewFile" },
+    event = "VeryLazy",
     opts = {
       -- Base tools (always installed). Lang files extend via opts.ensure_installed.
       ensure_installed = {
@@ -48,6 +49,7 @@ return {
 
   {
     "williamboman/mason-lspconfig.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
       -- Server installs are handled by mason-tool-installer. We enable servers
@@ -61,10 +63,11 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason.nvim",
       "saghen/blink.cmp",
-      "b0o/SchemaStore.nvim",
+      { "b0o/SchemaStore.nvim", lazy = true },
     },
     opts = {
       -- Base servers — lang files merge their servers in here.

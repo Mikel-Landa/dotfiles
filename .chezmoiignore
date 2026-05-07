@@ -6,7 +6,6 @@ install.sh
 !.claude/{settings.json,skills,scripts,hooks}
 {{ if not .work -}}
 .config/metapac/groups/work.toml
-.chezmoiscripts/run_once_10_work.sh.tmpl
 {{- end }}
 {{ if .isWsl -}}
 .config/niri/**

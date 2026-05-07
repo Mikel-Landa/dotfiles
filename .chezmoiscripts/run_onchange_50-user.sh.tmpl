@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Phase 50 — user identity. Login shell + (work-only) GPG signing key.
+# All steps idempotent: re-run is no-op when already configured.
+
+set -euo pipefail
+
+# Set zsh as login shell. Skip on WSL (chsh often unsupported / handled by /etc/wsl.conf).
+{{- if not .isWsl }}
+if command -v zsh >/dev/null 2>&1; then
+    current_shell=$(getent passwd "$USER" | cut -d: -f7)
+    target_shell=$(command -v zsh)
+    if [ "$current_shell" != "$target_shell" ]; then
+        chsh "$USER" -s "$target_shell" || echo "warning: chsh failed; set login shell manually" >&2
+    fi
+fi
+{{- end }}
+
+{{- if .work }}
+
+# Work GPG signing key + ~/.gitconfig-work. Skip entirely if gitconfig-work exists.
+GITCONFIG_WORK="$HOME/.gitconfig-work"
+if [ ! -f "$GITCONFIG_WORK" ]; then
+    echo "Enter work email address:"
+    read -r WORK_EMAIL
+    if [ -z "$WORK_EMAIL" ]; then
+        echo "Error: Work email is required" >&2
+        exit 1
+    fi
+
+    if gpg --list-secret-keys --keyid-format LONG "$WORK_EMAIL" >/dev/null 2>&1; then
+        echo "GPG key for $WORK_EMAIL already exists, using existing key"
+    else
+        echo "Generating new GPG key for $WORK_EMAIL..."
+        KEY_SPEC=$(mktemp)
+        cat > "$KEY_SPEC" <<KEYEOF
+Key-Type: RSA
+Key-Length: 4096
+Subkey-Type: RSA
+Subkey-Length: 4096
+Name-Real: {{ .realName }}
+Name-Email: $WORK_EMAIL
+Expire-Date: 0
+%no-protection
+KEYEOF
+        gpg --batch --generate-key "$KEY_SPEC"
+        rm "$KEY_SPEC"
+    fi
+
+    GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG "$WORK_EMAIL" 2>/dev/null \
+        | grep -E "^sec" \
+        | sed -n 's/.*\/\([A-Z0-9]\{16\}\).*/\1/p' \
+        | head -1)
+    if [ -z "$GPG_KEY_ID" ]; then
+        echo "Error: Failed to extract GPG key ID" >&2
+        exit 1
+    fi
+
+    cat > "$GITCONFIG_WORK" <<EOF
+[user]
+	email = $WORK_EMAIL
+	signingkey = $GPG_KEY_ID
+EOF
+    echo "Wrote $GITCONFIG_WORK (key $GPG_KEY_ID)"
+fi
+
+{{- end }}
