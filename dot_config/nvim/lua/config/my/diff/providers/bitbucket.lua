@@ -1,9 +1,5 @@
 -- Bitbucket PR comments overlay provider.
 -- Emits normalized comments per `lua/config/my/diff/CONTEXT.md` (anchor = { side, line }).
-if not vim.g.use_pr_comments then
-  return {}
-end
-
 local M = { name = "bitbucket" }
 
 local function trim(value)

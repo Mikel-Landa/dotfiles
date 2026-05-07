@@ -1,4 +1,3 @@
-vim.g.use_pr_comments = true
 package.loaded["config.my.diff.providers.bitbucket"] = nil
 local bitbucket = require("config.my.diff.providers.bitbucket")
 local normalize = bitbucket._normalize_comments

@@ -7,6 +7,14 @@ local indent_allowlist = {
   html = true, json = true, jsonc = true, toml = true,
 }
 
+local function should_show_indent(buf)
+  if not vim.api.nvim_buf_is_valid(buf) then return false end
+  if vim.bo[buf].buftype ~= "" then return false end
+  local override = vim.b[buf].snacks_indent_show
+  if override ~= nil then return override end
+  return indent_allowlist[vim.bo[buf].filetype] == true
+end
+
 return {
   {
     "folke/snacks.nvim",
@@ -64,13 +72,7 @@ return {
         scope = { char = "│", hl = "SnacksIndentScope" },
         chunk = { enabled = false },
         animate = { enabled = false },
-        filter = function(buf)
-          if not vim.api.nvim_buf_is_valid(buf) then return false end
-          if vim.bo[buf].buftype ~= "" then return false end
-          local override = vim.b[buf].snacks_indent_show
-          if override ~= nil then return override end
-          return indent_allowlist[vim.bo[buf].filetype] == true
-        end,
+        filter = should_show_indent,
       },
       terminal = { enabled = true },
       bufdelete = { enabled = true },
@@ -95,9 +97,7 @@ return {
         "<leader>ui",
         function()
           local buf = vim.api.nvim_get_current_buf()
-          local cur = vim.b[buf].snacks_indent_show
-          if cur == nil then cur = indent_allowlist[vim.bo[buf].filetype] == true end
-          vim.b[buf].snacks_indent_show = not cur
+          vim.b[buf].snacks_indent_show = not should_show_indent(buf)
           vim.cmd("redraw!")
         end,
         desc = "Toggle indent guides (buffer)",

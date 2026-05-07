@@ -381,7 +381,13 @@ Inline PR-comment markers in Diffview sessions for Bitbucket PRs. Activates on `
 
 How it works: on `DiffviewViewOpened` and per-file `DiffviewDiffBufWinEnter`, the overlay finds an open PR matching the diff's right revision (or current branch as fallback), fetches comments + diff metadata, and places sign-column markers at commented lines on both LEFT and RIGHT diff buffers.
 
-Toggle off by setting `vim.g.use_pr_comments = false` before `require("config.my")` in `init.lua`.
+Module layout (see `lua/config/my/diff/CONTEXT.md` for full vocab):
+
+- `init.lua` — wires keymaps and Diffview autocmds.
+- `registry.lua` — per-tabpage session map + async refresh state machine.
+- `diffview_session.lua` — single seam onto Diffview internals.
+- `commands.lua` — user-facing actions (`add_comment`, `view_thread`, `submit_review`, `reload`).
+- `providers/<name>.lua` — host adapter; emits the normalized comment shape.
 
 Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-diffview--bitbucket).
 

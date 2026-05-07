@@ -8,13 +8,22 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - **PR comments overlay** — the feature: surface a PR's review comments as signs in the
   signcolumn of a Diffview session, with keymaps to add/reply/resolve.
 - **Diffview session** — the (tabpage, view, layout, buffers) tuple the overlay
-  observes. Constructed by `current_session()` from `diffview.lib`.
+  observes. Read by the **Diffview session reader** from `diffview.lib`.
+- **Diffview session reader** — `diffview_session.lua`. The single seam that
+  reads Diffview internals (`view.cur_entry`, `view.adapter.ctx.toplevel`, …)
+  and shapes them into the **Diffview session** record. Isolates Diffview API
+  brittleness; mockable in tests.
+- **Session registry** — `registry.lua`. Owns the per-tabpage `sessions` map and
+  the async refresh state machine (`refresh`, `show`, `destroy`). Drives
+  provider fetches, joins dual results (diff files + comments), and enforces
+  race guards via `loading_key` + identity checks. Takes provider list and
+  Diffview session reader as dependencies — no autocmd or UI knowledge.
 - **Provider / adapter** — module under `providers/` that knows one PR host
   (Bitbucket, GitHub…). Implements `can_handle`, `find_pr`, `fetch_diff_files`,
   `fetch_comments`, `add_comment`, `reply`, `submit_review`, `delete_comment`,
   `pr_url`. Emits comments in the **normalized comment shape** below.
 - **Normalized comment** — `{ id, anchor = { side, line }, path, body, user,
-  created_at, pending, in_reply_to_id, _raw }`. The *only* shape the orchestrator
+  created_at, pending, in_reply_to_id, _raw }`. The *only* shape the registry
   and planner know. Adapters translate to/from host-specific schemas.
 - **Anchor** — `{ side: "LEFT"|"RIGHT", line: integer }`. Single source of truth
   for which file line a comment attaches to. Replaces the older
@@ -30,9 +39,18 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 
 ## Module roles
 
-- `init.lua` — orchestrator: per-tabpage session map, async refresh state machine,
-  user commands, autocmd wiring. No comment-shape knowledge beyond passing the
-  list to `sign_plan`.
+- `init.lua` — thin glue. Wires keymaps → commands and autocmds → registry.
+  No state, no logic.
+- `registry.lua` — **Session registry** (see above). Test surface: drive with
+  stub provider + stub Diffview reader; assert state transitions, race guards,
+  dual-fetch join.
+- `diffview_session.lua` — **Diffview session reader** (see above). Test surface:
+  stub `diffview.lib`; assert revision normalization, session-key build, path
+  stripping.
+- `commands.lua` — user-facing actions (`add_comment`, `view_thread`,
+  `submit_review`, `reload`) plus their context helpers (`current_context`,
+  `visual_context`, `get_thread_at_cursor`, `in_diff`, `ensure_ready`,
+  `open_comment_popup`). Imports registry + `comments_ui` + providers.
 - `sign_plan.lua` — pure planner. No vim APIs.
 - `render.lua` — buffer effects + per-buffer memo of last-applied plan.
 - `hunks.lua` — pure hunk parser + range check.
