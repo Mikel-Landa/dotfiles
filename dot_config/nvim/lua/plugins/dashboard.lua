@@ -149,7 +149,7 @@ return {
           header = header,
           center = {
             { icon = "  ", desc = "Find file       ", key = "f", action = "lua Snacks.picker.files()" },
-            { icon = "  ", desc = "Recent files    ", key = "r", action = "lua Snacks.picker.recent()" },
+            { icon = "  ", desc = "Recent files    ", key = "r", action = "lua Snacks.picker.recent({ filter = { cwd = true } })" },
             { icon = "  ", desc = "Find text       ", key = "g", action = "lua Snacks.picker.grep()" },
             { icon = "  ", desc = "New file        ", key = "n", action = "enew | startinsert" },
             { icon = "  ", desc = "Git status      ", key = "s", action = "lua Snacks.picker.git_status()" },
