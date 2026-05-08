@@ -46,3 +46,9 @@ go = {
     "github.com/cli/cli/v2/cmd/gh"
   ]
 }
+
+npm = {
+  packages = [
+    "@agentclientprotocol/claude-agent-acp",
+  ]
+}

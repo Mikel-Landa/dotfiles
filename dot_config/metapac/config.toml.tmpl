@@ -2,7 +2,7 @@
 {{- $idLike := .chezmoi.osRelease.idLike -}}
 {{- $isArch := or (eq $id "arch") (eq $idLike "arch") -}}
 {{- $isUbuntu := eq $id "ubuntu" -}}
-enabled_backends = [{{ if $isUbuntu }}"apt", {{ end }}{{ if $isArch }}"arch", {{ end }}"cargo", "mise", "go", "pipx"]
+enabled_backends = [{{ if $isUbuntu }}"apt", {{ end }}{{ if $isArch }}"arch", {{ end }}"cargo", "mise", "go", "pipx", "npm"]
 
 [arch]
 package_manager = "paru"
