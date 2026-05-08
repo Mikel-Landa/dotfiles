@@ -4,19 +4,17 @@
 local registry = require("config.my.diff.registry")
 local commands = require("config.my.diff.commands")
 local diffview_session = require("config.my.diff.diffview_session")
+local qf = require("config.my.diff.qf")
 
-registry.set_providers({
-  require("config.my.diff.providers.bitbucket"),
-})
+local atlas_client = require("config.my.diff.providers.atlas_client").new()
+local providers = {}
+if atlas_client then
+  local bitbucket = require("config.my.diff.providers.bitbucket").new(atlas_client)
+  if bitbucket then table.insert(providers, bitbucket) end
+end
+registry.set_providers(providers)
 
-vim.keymap.set("v", "<leader>occ", function() commands.add_comment_visual(true) end, { desc = "Add pending PR comment" })
-vim.keymap.set("n", "<leader>occ", function() commands.add_comment_normal(true) end, { desc = "Add pending PR comment" })
-vim.keymap.set("v", "<leader>ocC", function() commands.add_comment_visual(false) end, { desc = "Add PR comment" })
-vim.keymap.set("n", "<leader>ocC", function() commands.add_comment_normal(false) end, { desc = "Add PR comment" })
-vim.keymap.set("n", "<leader>ocv", commands.view_thread, { desc = "View PR thread" })
-vim.keymap.set("n", "<leader>oca", function() commands.submit_review("APPROVE", "Approve") end, { desc = "Approve PR review" })
-vim.keymap.set("n", "<leader>ocr", function() commands.submit_review("REQUEST_CHANGES", "Request changes") end, { desc = "Request PR changes" })
-vim.keymap.set("n", "<leader>ocR", commands.reload, { desc = "Reload PR comments" })
+vim.keymap.set("n", "<leader>oc", qf.open, { desc = "PR comments → quickfix" })
 
 local group = vim.api.nvim_create_augroup("my_diff_comments", { clear = true })
 

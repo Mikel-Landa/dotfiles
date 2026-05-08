@@ -1,5 +1,5 @@
--- octo.nvim: GitHub PR + issue browser, review flow, inline comments
--- Auth via `gh auth login` (Octo shells out to gh CLI).
+-- octo.nvim: kept for GitHub *issues* only (atlas.nvim handles GitHub PRs).
+-- Auth via `gh auth login`.
 return {
   {
     "pwntester/octo.nvim",

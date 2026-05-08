@@ -8,7 +8,6 @@ return {
         { "<leader>f", group = "find" },
         { "<leader>b", group = "buffer" },
         { "<leader>g", group = "git" },
-        { "<leader>oc", group = "PR comments" },
         { "<leader>gt", group = "git toggles" },
         { "<leader>gv", group = "diffview" },
         { "<leader>l", group = "lsp" },

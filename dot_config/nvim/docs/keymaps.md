@@ -131,12 +131,12 @@ Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (
 
 | Key | Mode | Action |
 |---|---|---|
-| `<leader>occ` | n, v | Add **pending** PR comment at line / selection |
-| `<leader>ocC` | n, v | Add (publish-immediately) PR comment |
-| `<leader>ocv` | n | View thread at cursor (popup, `r` reply, `d` delete, `q` close) |
-| `<leader>oca` | n | Approve PR (prompts for review body) |
-| `<leader>ocr` | n | Request changes on PR |
-| `<leader>ocR` | n | Reload PR comments (force refresh) |
+| `<leader>oc` | n | Load PR comments for current branch into quickfix; popup opens on entry |
+| `<Tab>` / `<S-Tab>` | n | Cycle through threads in current buffer (after `<leader>oc`) |
+
+Inside the popup: `r` reply, `e` edit (own only), `d` delete (own only), `q` close.
+
+Review actions (Approve / Request changes) are exposed as atlas-pulls custom actions — open `:AtlasPulls bitbucket`, select a PR, press `A` to invoke.
 
 ### Text object
 
@@ -392,11 +392,9 @@ Format on save runs automatically.
 
 | Key | Action |
 |---|---|
-| `<leader>oo` | Workflow picker (GitHub / Bitbucket / Jira) |
-| `<leader>op` | GitHub PR list (Octo) |
-| `<leader>oi` | GitHub issue list (Octo) |
-| `<leader>oj` | Jira issues (Atlas) |
-| `<leader>ob` | Bitbucket PRs (Atlas) |
+| `<leader>oo` | Workflow picker (PRs + issues, all providers) |
+| `<leader>op` | PRs — auto-detects GitHub/Bitbucket from `git remote`; falls back to picker |
+| `<leader>oi` | Issues — GitHub repo → Octo, else → Jira (Atlas) |
 
 ## Avante (AI assistant)
 

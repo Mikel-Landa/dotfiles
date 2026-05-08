@@ -1,16 +1,13 @@
 -- Bitbucket PR comments overlay provider.
--- Emits normalized comments per `lua/config/my/diff/CONTEXT.md` (anchor = { side, line }).
-local M = { name = "bitbucket" }
+-- Built via M.new(atlas_client). Emits normalized comments per
+-- `lua/config/my/diff/CONTEXT.md` (anchor = { side, line }).
+local links = require("config.my.diff.providers.bitbucket_links")
+
+local M = {}
 
 local function trim(value)
   if type(value) ~= "string" then return "" end
   return vim.trim(value)
-end
-
-local function safe_require(mod)
-  local ok, m = pcall(require, mod)
-  if not ok then return nil end
-  return m
 end
 
 local function parse_origin(root)
@@ -32,122 +29,10 @@ local function parse_origin(root)
   return workspace, repo
 end
 
-function M.can_handle(session)
-  return session ~= nil and parse_origin(session.git_root) ~= nil
-end
-
 local function hash_matches(left, right)
   left = tostring(left or "")
   right = tostring(right or "")
   return left ~= "" and right ~= "" and (left:sub(1, #right) == right or right:sub(1, #left) == left)
-end
-
-local function fetch_open_prs(workspace, repo, callback)
-  local service = safe_require("atlas.bitbucket.api.service")
-  local pr_normalizer = safe_require("atlas.bitbucket.api.pr_normalizer")
-  if not service or not pr_normalizer then
-    callback(nil, "atlas.nvim Bitbucket API not available")
-    return
-  end
-
-  local endpoint = ("/repositories/%s/%s/pullrequests?state=OPEN&pagelen=50"):format(workspace, repo)
-  service.request("GET", endpoint, nil, nil, function(result, err)
-    if err then callback(nil, err); return end
-    local prs = pr_normalizer.pullrequests(result, workspace, repo)
-    callback(prs, nil)
-  end)
-end
-
-local function pr_from_revision(session, callback)
-  if not session or not session.git_root then callback(nil); return end
-  local workspace, repo = parse_origin(session.git_root)
-  if not workspace or not repo then callback(nil); return end
-
-  local sha = tostring(session.modified_revision or "")
-  fetch_open_prs(workspace, repo, function(prs, err)
-    if err then callback(nil, err); return end
-    for _, pr in ipairs(prs or {}) do
-      local source_hash = (pr.source or {}).commit_hash
-      if hash_matches(source_hash, sha) then
-        callback(pr); return
-      end
-    end
-    callback(nil)
-  end)
-end
-
-local function pr_from_branch(session, callback)
-  if not session or not session.git_root then callback(nil); return end
-  local workspace, repo = parse_origin(session.git_root)
-  if not workspace or not repo then callback(nil); return end
-
-  local branch = session.modified_branch
-  if not branch or branch == "" then
-    local result = vim.system({ "git", "-C", session.git_root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
-    branch = result and result.code == 0 and trim(result.stdout) or ""
-  end
-  if branch == "" then callback(nil); return end
-
-  fetch_open_prs(workspace, repo, function(prs, err)
-    if err then callback(nil, err); return end
-    for _, pr in ipairs(prs or {}) do
-      local source_branch = (pr.source or {}).branch
-      if source_branch == branch then callback(pr); return end
-    end
-    callback(nil)
-  end)
-end
-
-local function wait_for_pr(session, attempt, callback)
-  attempt = attempt or 1
-  pr_from_revision(session, function(pr, err)
-    if pr or err then callback(pr, err); return end
-    if attempt >= 6 then
-      pr_from_branch(session, callback)
-      return
-    end
-    vim.defer_fn(function() wait_for_pr(session, attempt + 1, callback) end, 100)
-  end)
-end
-
-function M.find_pr(session, callback)
-  wait_for_pr(session, 1, function(pr, err)
-    if err then callback(nil, "Failed to find Bitbucket PR: " .. err); return end
-    if not pr then callback(nil, "No Bitbucket PR found"); return end
-    callback(pr)
-  end)
-end
-
-local function diff_url(pr)
-  local raw = pr and pr._raw or {}
-  local links = raw.links or {}
-  local diff = links.diff or {}
-  return tostring(diff.href or "")
-end
-
-local function comments_url(pr)
-  local raw = pr and pr._raw or {}
-  local links = raw.links or {}
-  local comments = links.comments or {}
-  return tostring(comments.href or "")
-end
-
-function M.fetch_diff_files(pr, callback)
-  local pullrequests = safe_require("atlas.bitbucket.api.pullrequests")
-  if not pullrequests then callback({}); return end
-
-  local url = diff_url(pr)
-  if url == "" then callback({}); return end
-
-  pullrequests.fetch_diff(url, { force_load = true }, function(diff, _err)
-    local by_path = {}
-    for _, file in ipairs(diff or {}) do
-      local path = file.path or file.new_path
-      if path then by_path[path] = file end
-      if file.old_path and file.old_path ~= "" then by_path[file.old_path] = file end
-    end
-    callback(by_path)
-  end)
 end
 
 local function iso_for_popup(value)
@@ -177,6 +62,7 @@ local function normalize_comment(comment)
     path = inline.path,
     body = comment.content_raw or content.raw or "",
     user = user,
+    user_id = author.account_id or author.uuid,
     created_at = iso_for_popup(comment.created_on or (raw and raw.created_on)),
     pending = comment.pending == true or tostring(comment.state or ""):upper() == "PENDING",
     in_reply_to_id = comment.parent_id or parent.id,
@@ -237,26 +123,6 @@ local function dedup(comments)
   return out
 end
 
-function M.fetch_comments(pr, callback)
-  local url = comments_url(pr)
-  if url == "" then
-    callback(nil, "Failed to load comments: no comments URL")
-    return
-  end
-
-  local sep = url:find("?") and "&" or "?"
-  local paged = ("%s%spagelen=100"):format(url, sep)
-  local service = safe_require("atlas.bitbucket.api.service")
-  if not service then callback(nil, "atlas.nvim service unavailable"); return end
-
-  service.request("GET", paged, nil, nil, function(result, err)
-    if err then callback(nil, "Failed to load comments: " .. err); return end
-    local raw_values = (result or {}).values or {}
-    for _, c in ipairs(raw_values) do c._raw = c end
-    callback(dedup(normalize_comments(raw_values)))
-  end)
-end
-
 local function inline_for(context)
   if context.side == "LEFT" then
     return {
@@ -272,111 +138,213 @@ local function inline_for(context)
   }
 end
 
-function M.add_comment(pr, context, body, opts, callback)
-  local url = comments_url(pr)
-  if url == "" then callback(nil, "No comments URL available"); return end
+-- Test seam: expose normalize_comments for fixture-driven specs (static).
+M._normalize_comments = normalize_comments
 
-  local comments_api = safe_require("atlas.bitbucket.api.comments")
-  if not comments_api then callback(nil, "atlas.nvim comments API unavailable"); return end
+---@param atlas_client table  see providers/atlas_client.lua
+---@return table|nil  provider table, or nil when atlas_client is missing
+function M.new(atlas_client)
+  if not atlas_client then return nil end
 
-  local inline = inline_for(context)
-  comments_api.create_comment(url, body, { inline = inline }, function(result, err)
-    if err then callback(nil, "Failed to post comment: " .. err); return end
-    callback(result)
-  end)
-end
+  local provider = { name = "bitbucket" }
 
-function M.reply(pr, root_comment, body, callback)
-  local url = comments_url(pr)
-  if url == "" then callback(nil, "No comments URL available"); return end
-
-  local comments_api = safe_require("atlas.bitbucket.api.comments")
-  if not comments_api then callback(nil, "atlas.nvim comments API unavailable"); return end
-
-  comments_api.reply_comment(url, root_comment.id, body, nil, function(result, err)
-    if err then callback(nil, "Failed to post reply: " .. err); return end
-    callback(result)
-  end)
-end
-
-function M.submit_review(pr, event, body, callback)
-  local raw = pr and pr._raw or {}
-  local links = raw.links or {}
-  local action_url, action
-
-  if event == "APPROVE" then
-    action_url = tostring((links.approve or {}).href or links.approve or "")
-    action = "approve"
-  elseif event == "REQUEST_CHANGES" then
-    action_url = tostring((links["request-changes"] or {}).href or links.request_changes or "")
-    action = "request_changes"
-  else
-    callback(nil, "Unsupported Bitbucket review event: " .. tostring(event))
-    return
+  function provider.can_handle(session)
+    return session ~= nil and parse_origin(session.git_root) ~= nil
   end
 
-  if action_url == "" then
-    callback(nil, action == "approve" and "No approve URL available" or "No request changes URL available")
-    return
-  end
+  local function pr_from_revision(session, callback)
+    if not session or not session.git_root then callback(nil); return end
+    local workspace, repo = parse_origin(session.git_root)
+    if not workspace or not repo then callback(nil); return end
 
-  local pullrequests = safe_require("atlas.bitbucket.api.pullrequests")
-  if not pullrequests then callback(nil, "atlas.nvim pullrequests API unavailable"); return end
-
-  local function submit_action()
-    local fn = action == "approve" and pullrequests.approve or pullrequests.request_changes
-    fn(action_url, function(result, err)
-      if err then
-        callback(nil, (action == "approve" and "Approve failed: " or "Request changes failed: ") .. tostring(err))
-        return
+    local sha = tostring(session.modified_revision or "")
+    atlas_client.fetch_open_prs(workspace, repo, function(prs, err)
+      if err then callback(nil, err); return end
+      for _, pr in ipairs(prs or {}) do
+        local source_hash = (pr.source or {}).commit_hash
+        if hash_matches(source_hash, sha) then
+          callback(pr); return
+        end
       end
-      callback(result or true)
+      callback(nil)
     end)
   end
 
-  if body and body ~= "" then
-    local comments_api = safe_require("atlas.bitbucket.api.comments")
-    local url = comments_url(pr)
-    if comments_api and url ~= "" then
-      comments_api.create_comment(url, body, {}, function(_, err)
-        if err then callback(nil, "Failed to post review comment: " .. tostring(err)); return end
-        submit_action()
-      end)
+  local function pr_from_branch(session, callback)
+    if not session or not session.git_root then callback(nil); return end
+    local workspace, repo = parse_origin(session.git_root)
+    if not workspace or not repo then callback(nil); return end
+
+    local branch = session.modified_branch
+    if not branch or branch == "" then
+      local result = vim.system({ "git", "-C", session.git_root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
+      branch = result and result.code == 0 and trim(result.stdout) or ""
+    end
+    if branch == "" then callback(nil); return end
+
+    atlas_client.fetch_open_prs(workspace, repo, function(prs, err)
+      if err then callback(nil, err); return end
+      for _, pr in ipairs(prs or {}) do
+        local source_branch = (pr.source or {}).branch
+        if source_branch == branch then callback(pr); return end
+      end
+      callback(nil)
+    end)
+  end
+
+  local function wait_for_pr(session, attempt, callback)
+    attempt = attempt or 1
+    pr_from_revision(session, function(pr, err)
+      if pr or err then callback(pr, err); return end
+      if attempt >= 6 then
+        pr_from_branch(session, callback)
+        return
+      end
+      vim.defer_fn(function() wait_for_pr(session, attempt + 1, callback) end, 100)
+    end)
+  end
+
+  function provider.find_pr(session, callback)
+    wait_for_pr(session, 1, function(pr, err)
+      if err then callback(nil, "Failed to find Bitbucket PR: " .. err); return end
+      if not pr then callback(nil, "No Bitbucket PR found"); return end
+      callback(pr)
+    end)
+  end
+
+  function provider.fetch_diff_files(pr, callback)
+    local url = links.diff(pr)
+    if url == "" then callback({}); return end
+
+    atlas_client.fetch_diff(url, { force_load = true }, function(diff, _err)
+      local by_path = {}
+      for _, file in ipairs(diff or {}) do
+        local path = file.path or file.new_path
+        if path then by_path[path] = file end
+        if file.old_path and file.old_path ~= "" then by_path[file.old_path] = file end
+      end
+      callback(by_path)
+    end)
+  end
+
+  function provider.fetch_comments(pr, callback)
+    local url = links.comments(pr)
+    if url == "" then
+      callback(nil, "Failed to load comments: no comments URL")
       return
     end
-  end
-  submit_action()
-end
 
-function M.delete_comment(_pr, comment, callback)
-  if not comment or not comment.id then
-    callback(nil, "No comment selected"); return
-  end
-
-  local raw = comment._raw or {}
-  local links = raw.links or {}
-  local self_url = tostring((links.self or {}).href or "")
-  if self_url == "" then
-    callback(nil, "No self URL on comment"); return
+    atlas_client.fetch_comments(url, function(values, err)
+      if err then callback(nil, "Failed to load comments: " .. err); return end
+      for _, c in ipairs(values or {}) do c._raw = c end
+      callback(dedup(normalize_comments(values)))
+    end)
   end
 
-  local comments_api = safe_require("atlas.bitbucket.api.comments")
-  if not comments_api then callback(nil, "atlas.nvim comments API unavailable"); return end
+  function provider.add_comment(pr, context, body, opts, callback)
+    local url = links.comments(pr)
+    if url == "" then callback(nil, "No comments URL available"); return end
 
-  comments_api.delete_comment(self_url, function(ok, err)
-    if not ok then callback(nil, "Failed to delete comment: " .. tostring(err or "")); return end
-    callback(true)
-  end)
+    local inline = inline_for(context)
+    atlas_client.create_comment(url, body, { inline = inline }, function(result, err)
+      if err then callback(nil, "Failed to post comment: " .. err); return end
+      callback(result)
+    end)
+  end
+
+  function provider.reply(pr, root_comment, body, callback)
+    local url = links.comments(pr)
+    if url == "" then callback(nil, "No comments URL available"); return end
+
+    atlas_client.reply_comment(url, root_comment.id, body, nil, function(result, err)
+      if err then callback(nil, "Failed to post reply: " .. err); return end
+      callback(result)
+    end)
+  end
+
+  function provider.submit_review(pr, event, body, callback)
+    local action_url, action
+    if event == "APPROVE" then
+      action_url, action = links.approve(pr), "approve"
+    elseif event == "REQUEST_CHANGES" then
+      action_url, action = links.request_changes(pr), "request_changes"
+    else
+      callback(nil, "Unsupported Bitbucket review event: " .. tostring(event))
+      return
+    end
+
+    if action_url == "" then
+      callback(nil, action == "approve" and "No approve URL available" or "No request changes URL available")
+      return
+    end
+
+    local function submit_action()
+      local fn = action == "approve" and atlas_client.approve or atlas_client.request_changes
+      fn(action_url, function(result, err)
+        if err then
+          callback(nil, (action == "approve" and "Approve failed: " or "Request changes failed: ") .. tostring(err))
+          return
+        end
+        callback(result or true)
+      end)
+    end
+
+    if body and body ~= "" then
+      local url = links.comments(pr)
+      if url ~= "" then
+        atlas_client.create_comment(url, body, {}, function(_, err)
+          if err then callback(nil, "Failed to post review comment: " .. tostring(err)); return end
+          submit_action()
+        end)
+        return
+      end
+    end
+    submit_action()
+  end
+
+  function provider.edit_comment(pr, comment, body, callback)
+    if not comment or not comment.id then
+      callback(nil, "No comment selected"); return
+    end
+
+    local edit_opts = {}
+    local raw_inline = (comment._raw or {}).inline
+    if type(raw_inline) == "table" then edit_opts.inline = raw_inline end
+
+    atlas_client.edit_comment(pr, comment.id, body, edit_opts, function(result, err)
+      if err then callback(nil, "Failed to edit comment: " .. tostring(err)); return end
+      callback(result)
+    end)
+  end
+
+  function provider.fetch_current_user(callback)
+    atlas_client.fetch_current_user(function(user, err)
+      if err then callback(nil, err); return end
+      callback(user)
+    end)
+  end
+
+  function provider.delete_comment(_pr, comment, callback)
+    if not comment or not comment.id then
+      callback(nil, "No comment selected"); return
+    end
+
+    local self_url = links.self(comment)
+    if self_url == "" then
+      callback(nil, "No self URL on comment"); return
+    end
+
+    atlas_client.delete_comment(self_url, function(_, err)
+      if err then callback(nil, "Failed to delete comment: " .. tostring(err)); return end
+      callback(true)
+    end)
+  end
+
+  function provider.pr_url(pr)
+    return links.html(pr)
+  end
+
+  return provider
 end
-
-function M.pr_url(pr)
-  local raw = pr and pr._raw or {}
-  local links = raw.links or {}
-  local html = links.html or {}
-  return tostring(html.href or pr and pr.link and pr.link.html or "")
-end
-
--- Test seam: expose normalize_comments for fixture-driven specs.
-M._normalize_comments = normalize_comments
 
 return M

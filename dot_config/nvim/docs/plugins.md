@@ -357,23 +357,29 @@ Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md
 
 | Key | Action |
 |---|---|
-| `<leader>oo` | Workflow picker (GitHub / Bitbucket / Jira) |
-| `<leader>op` | GitHub PR list (Octo) |
-| `<leader>oi` | GitHub issue list (Octo) |
-| `<leader>oj` | Jira issues (Atlas) |
-| `<leader>ob` | Bitbucket PRs (Atlas) |
+| `<leader>oo` | Workflow picker (PRs + issues, all providers) |
+| `<leader>op` | PRs — auto-detects GitHub/Bitbucket from `git remote`; falls back to picker |
+| `<leader>oi` | Issues — GitHub repo → Octo, else → Jira (Atlas) |
 
-### emrearmagan/atlas.nvim — Bitbucket + Jira
+### emrearmagan/atlas.nvim — GitHub + Bitbucket + Jira
 
-Bitbucket PR browser + Jira issue browser. Loads on `:AtlasJira`, `:AtlasBitbucket`, `:AtlasJqlSearch`. PR diffs open in Diffview. Tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in `lua/plugins/atlas.lua` with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
+GitHub & Bitbucket PR browser + Jira issue browser. Loads on `:AtlasPulls`, `:AtlasIssues`, `:AtlasJqlSearch`. PR diffs open in Diffview. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in `lua/plugins/atlas.lua` with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
 
 | Command | Action |
 |---|---|
-| `:AtlasBitbucket` | Open Bitbucket PR picker |
-| `:AtlasJira` | Open Jira issue picker |
+| `:AtlasPulls github` | Open GitHub PR picker |
+| `:AtlasPulls bitbucket` | Open Bitbucket PR picker |
+| `:AtlasIssues jira` | Open Jira issue picker |
 | `:AtlasJqlSearch <jql>` | Run a one-off JQL search |
 | `:AtlasClearCache` | Drop disk + memory cache |
 | `:AtlasLogs` | Toggle plugin logs |
+
+Custom actions in the Bitbucket PR list (open via `:AtlasPulls bitbucket`, press `A`):
+
+| Action | Effect |
+|---|---|
+| Approve PR | Prompts for optional review body, then approves |
+| Request changes | Prompts for optional review body, then requests changes |
 
 ### Bitbucket PR comments overlay (custom, `lua/config/my/diff/`)
 
@@ -391,17 +397,14 @@ Module layout (see `lua/config/my/diff/CONTEXT.md` for full vocab):
 
 Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-diffview--bitbucket).
 
-### pwntester/octo.nvim — GitHub PRs & issues
+### pwntester/octo.nvim — GitHub issues
 
-GitHub PR/issue browser with full inline review (comments, threads, approve/request-changes) via the `gh` CLI. Auth: `gh auth login`. Loads on `:Octo`. Picker backed by snacks. Inside an Octo buffer, `?` shows buffer-local mappings.
+Kept solely for GitHub *issues* (atlas.nvim handles GitHub PRs). Auth: `gh auth login`. Loads on `:Octo`. Picker backed by snacks. `?` shows buffer-local mappings inside an Octo buffer.
 
 | Command | Action |
 |---|---|
-| `:Octo pr list` | List PRs |
 | `:Octo issue list` | List issues |
-| `:Octo review start` | Start a code review |
-| `:Octo pr checkout` | Checkout the PR locally |
-| `:Octo pr create` | Open new-PR form |
+| `:Octo issue create` | Create new issue |
 
 ---
 

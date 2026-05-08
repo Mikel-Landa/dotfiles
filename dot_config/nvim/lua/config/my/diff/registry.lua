@@ -75,6 +75,16 @@ function M.destroy(tabpage)
   sessions[tabpage] = nil
 end
 
+-- Wraps a provider callback so it no-ops once the session for `tabpage` has
+-- been replaced or its session_key has changed. Race guard for stale fetches
+-- arriving after a tab switch / forced refresh.
+local function guarded(tabpage, s, key, fn)
+  return function(...)
+    if sessions[tabpage] ~= s or s.session_key ~= key then return end
+    fn(...)
+  end
+end
+
 function M.refresh(tabpage, opts)
   opts = opts or {}
   tabpage = tabpage or vim.api.nvim_get_current_tabpage()
@@ -100,8 +110,7 @@ function M.refresh(tabpage, opts)
   sessions[tabpage] = s
   notify(vim.log.levels.INFO, "Loading PR comments...")
 
-  provider.find_pr(view_session, function(pr, pr_err)
-    if sessions[tabpage] ~= s or s.loading_key ~= key then return end
+  provider.find_pr(view_session, guarded(tabpage, s, key, function(pr, pr_err)
     if pr_err then s.loading_key = nil; notify(vim.log.levels.WARN, pr_err); return end
     if not pr then s.loading_key = nil; notify(vim.log.levels.WARN, "No PR found"); return end
 
@@ -115,25 +124,22 @@ function M.refresh(tabpage, opts)
       notify(vim.log.levels.INFO, ("Loaded %d PR comments"):format(#s.comments))
     end
 
-    provider.fetch_diff_files(pr, function(files)
-      if sessions[tabpage] == s and s.session_key == key then
-        s.diff_files = files or {}
-        loaded.diff = true
-        finish()
-      end
-    end)
+    provider.fetch_diff_files(pr, guarded(tabpage, s, key, function(files)
+      s.diff_files = files or {}
+      loaded.diff = true
+      finish()
+    end))
 
-    provider.fetch_comments(pr, function(comments, comments_err)
+    provider.fetch_comments(pr, guarded(tabpage, s, key, function(comments, comments_err)
       if comments_err then
         s.loading_key = nil; s.pr = nil; s.session_key = nil
         notify(vim.log.levels.WARN, comments_err); return
       end
-      if sessions[tabpage] ~= s or s.session_key ~= key then return end
       s.comments = comments or {}
       loaded.comments = true
       finish()
-    end)
-  end)
+    end))
+  end))
 end
 
 -- Test seam: expose internal sessions map.

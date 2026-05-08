@@ -107,6 +107,10 @@ function M.input(opts)
 	vim.bo[buf].bufhidden = "wipe"
 	vim.b[buf].completion = false
 
+	if type(opts.initial_body) == "string" and opts.initial_body ~= "" then
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(opts.initial_body, "\n", { plain = true }))
+	end
+
 	local width = math.min(opts.width or 80, vim.o.columns - 4)
 	local height = math.min(opts.height or 15, vim.o.lines - 6)
 	local win = vim.api.nvim_open_win(buf, true, {
@@ -121,12 +125,28 @@ function M.input(opts)
 		title_pos = "center",
 	})
 
+	local closed = false
+	local handled = false
 	local function close()
+		if closed then
+			return
+		end
+		closed = true
 		close_win(win)
+		if not handled and opts.on_close then
+			opts.on_close()
+		end
 	end
+
+	vim.api.nvim_create_autocmd("WinClosed", {
+		pattern = tostring(win),
+		once = true,
+		callback = function() close() end,
+	})
 
 	local function submit()
 		local body = vim.fn.trim(table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n"))
+		handled = true
 		if body == "" then
 			if opts.on_empty then
 				opts.on_empty()
@@ -150,10 +170,14 @@ function M.input(opts)
 	vim.keymap.set("i", "<CR>", submit, vim.tbl_extend("force", keymap_opts, { desc = "Submit comment" }))
 	vim.keymap.set("i", "<C-s>", submit, vim.tbl_extend("force", keymap_opts, { desc = "Submit comment" }))
 
-	vim.cmd("startinsert")
+	if opts.initial_body and opts.initial_body ~= "" then
+		vim.cmd("normal! G$")
+	else
+		vim.cmd("startinsert")
+	end
 end
 
-local function render_comment(lines, line_to_comment, spans, comment, width)
+local function render_comment(lines, line_to_comment, spans, comment, width, is_mine)
 	local start = #lines + 1
 	local author = comment.user or comment.author or "unknown"
 	local author_text = "@" .. author
@@ -193,10 +217,13 @@ local function render_comment(lines, line_to_comment, spans, comment, width)
 		})
 	end
 
-	for _, line in ipairs(vim.split(comment.body or comment.content or "", "\n")) do
+	local body_text = (comment.body or comment.content or ""):gsub("\r\n", "\n"):gsub("\r", "\n")
+	for _, line in ipairs(vim.split(body_text, "\n", { plain = true })) do
 		table.insert(lines, line)
 	end
-	table.insert(lines, " (r)  󰆴 (d)")
+	local actions = " (r)"
+	if is_mine then actions = actions .. "   (e)  󰆴 (d)" end
+	table.insert(lines, actions)
 	table.insert(spans, {
 		line = #lines - 1,
 		start_col = 0,
@@ -232,7 +259,8 @@ function M.open(comments, opts)
 				hl_group = "DiffCommentsMuted",
 			})
 		end
-		render_comment(lines, line_to_comment, spans, comment, width)
+		local is_mine = type(opts.is_mine) == "function" and opts.is_mine(comment) or false
+		render_comment(lines, line_to_comment, spans, comment, width, is_mine)
 	end
 
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -246,7 +274,7 @@ function M.open(comments, opts)
 	end
 
 	local height = math.min(opts.height or 30, vim.o.lines - 6)
-	local win = vim.api.nvim_open_win(buf, true, {
+	local win_config = {
 		relative = "editor",
 		width = width,
 		height = height,
@@ -256,16 +284,32 @@ function M.open(comments, opts)
 		border = "rounded",
 		title = opts.title or " Comments ",
 		title_pos = "center",
-		footer = " r: reply  d: delete  q: close ",
+		footer = " r: reply  e: edit  d: delete  q: close ",
 		footer_pos = "center",
-	})
+	}
+	if opts.relative_to_cursor then
+		win_config.relative = "cursor"
+		win_config.row = 1
+		win_config.col = 0
+	end
+	local win = vim.api.nvim_open_win(buf, true, win_config)
 
 	vim.wo[win].wrap = true
 	vim.wo[win].linebreak = true
 
+	local closed = false
 	local function close()
+		if closed then return end
+		closed = true
 		close_win(win)
+		if opts.on_close then opts.on_close() end
 	end
+
+	vim.api.nvim_create_autocmd("WinClosed", {
+		pattern = tostring(win),
+		once = true,
+		callback = function() close() end,
+	})
 
 	local function selected_comment()
 		return line_to_comment[vim.fn.line(".")]
@@ -282,10 +326,28 @@ function M.open(comments, opts)
 	end, vim.tbl_extend("force", keymap_opts, { desc = "Reply to comment" }))
 	vim.keymap.set("n", "d", function()
 		local comment = selected_comment()
+		if not comment then return end
+		if type(opts.is_mine) == "function" and not opts.is_mine(comment) then
+			vim.notify("[PR comments] Can only delete your own comments", vim.log.levels.WARN)
+			return
+		end
 		if opts.on_delete then
 			opts.on_delete(comment, close)
 		end
 	end, vim.tbl_extend("force", keymap_opts, { desc = "Delete comment" }))
+	vim.keymap.set("n", "e", function()
+		local comment = selected_comment()
+		if not comment then return end
+		if type(opts.is_mine) == "function" and not opts.is_mine(comment) then
+			vim.notify("[PR comments] Can only edit your own comments", vim.log.levels.WARN)
+			return
+		end
+		if opts.on_edit then
+			opts.on_edit(comment, close)
+		end
+	end, vim.tbl_extend("force", keymap_opts, { desc = "Edit comment" }))
+
+	return { close = close, win = win, buf = buf }
 end
 
 return M
