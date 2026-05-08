@@ -294,7 +294,6 @@ Format on save runs automatically.
 
 | Key | Action |
 |---|---|
-| `<leader>ut` | Toggle floating terminal |
 | `<leader>ud` | Toggle diagnostics on/off |
 | `<leader>un` | Dismiss notifications (snacks.notifier) |
 | `<leader>uh` | Toggle inlay hints |
@@ -443,10 +442,11 @@ In the Avante sidebar:
 | `<leader>ft` | TODO list (snacks.picker) |
 | `<leader>xt` | TODO list (Trouble) |
 
-## Terminal mode
+## Terminal
 
 | Key | Action |
 |---|---|
+| `<leader>t` | Toggle floating terminal |
 | `<Esc><Esc>` | Exit terminal mode (return to normal) |
 
 ## Filetype helper buffers

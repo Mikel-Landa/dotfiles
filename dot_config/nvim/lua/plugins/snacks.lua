@@ -88,7 +88,7 @@ return {
       { "<leader>gB", function() Snacks.picker.git_branches() end, desc = "Git branches" },
       { "<leader>gO", function() Snacks.gitbrowse() end, mode = { "n", "v" }, desc = "Open file in browser" },
       -- Terminal
-      { "<leader>ut", function() Snacks.terminal.toggle() end, desc = "Toggle terminal" },
+      { "<leader>t", function() Snacks.terminal.toggle() end, desc = "Toggle terminal" },
       -- Notifier
       { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss notifications" },
       { "<leader>fn", function() Snacks.picker.notifications() end, desc = "Notification history" },

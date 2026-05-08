@@ -92,6 +92,36 @@ return {
         end,
         desc = "Toggle diffview",
       },
+      {
+        "<leader>gG",
+        function()
+          local lib = require("diffview.lib")
+          if lib.get_current_view() then
+            vim.cmd("DiffviewClose")
+            return
+          end
+
+          local function run(cmd)
+            local r = vim.system(cmd, { text = true }):wait()
+            return r and r.code == 0 and vim.trim(r.stdout) or nil
+          end
+
+          local base = run({ "git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD" })
+          if not base then
+            for _, candidate in ipairs({ "origin/main", "origin/master", "origin/develop", "origin/trunk" }) do
+              if run({ "git", "rev-parse", "--verify", candidate }) then
+                base = candidate; break
+              end
+            end
+          end
+          if not base then
+            vim.notify("Could not resolve origin's default branch. Run: git remote set-head origin -a", vim.log.levels.WARN)
+            return
+          end
+          vim.cmd(("DiffviewOpen %s...HEAD"):format(base))
+        end,
+        desc = "Toggle diffview vs origin default branch (PR overlay)",
+      },
       { "<leader>gvo", "<cmd>DiffviewOpen<cr>",          desc = "Diffview open" },
       { "<leader>gvc", "<cmd>DiffviewClose<cr>",         desc = "Diffview close" },
       { "<leader>gvh", "<cmd>DiffviewFileHistory<cr>",   desc = "File history (repo)" },

@@ -83,6 +83,10 @@ return {
         { desc = "Prev function" })
       vim.keymap.set("n", "[C", function() move.goto_previous_start("@class.outer", "textobjects") end,
         { desc = "Prev class" })
+      vim.keymap.set("n", "]a", function() move.goto_next_start("@parameter.inner", "textobjects") end,
+        { desc = "Next parameter" })
+      vim.keymap.set("n", "[a", function() move.goto_previous_start("@parameter.inner", "textobjects") end,
+        { desc = "Prev parameter" })
     end,
   },
 }
