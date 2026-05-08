@@ -19,6 +19,7 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>e` | File explorer |
 | `<leader>o` | Workflow (remote PR/issue browsers) |
 | `<leader>p` | Path |
+| `<leader>a` | Avante (AI assistant) |
 | `<leader>sn` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
 | `<leader><tab>` | Tabs |
@@ -397,6 +398,29 @@ Format on save runs automatically.
 | `<leader>oi` | GitHub issue list (Octo) |
 | `<leader>oj` | Jira issues (Atlas) |
 | `<leader>ob` | Bitbucket PRs (Atlas) |
+
+## Avante (AI assistant)
+
+Avante drives Claude Code via ACP (no API key — uses `claude` CLI auth). `<leader>ac` opens Cursor's CLI agent in a floating terminal as an alternative.
+
+| Key | Action |
+|---|---|
+| `<leader>aa` | Open Avante sidebar (ask) — claude-code |
+| `<leader>at` | Toggle sidebar |
+| `<leader>an` | New ask prompt |
+| `<leader>ae` | Edit selected blocks (visual mode) |
+| `<leader>ar` | Refresh sidebar |
+| `<leader>af` | Switch focus between windows |
+| `<leader>ac` | `cursor-agent` floating terminal |
+
+In the Avante sidebar:
+
+| Key | Action |
+|---|---|
+| `<CR>` | Submit prompt (normal mode) |
+| `<C-s>` | Submit prompt (insert mode) |
+| `<M-l>` | Accept inline suggestion |
+| `co` / `ct` / `cb` | Choose ours / theirs / both on conflict |
 
 ## Completion (blink.cmp, in insert mode)
 

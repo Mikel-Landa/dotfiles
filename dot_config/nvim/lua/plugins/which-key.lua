@@ -24,6 +24,7 @@ return {
         { "<leader><tab>", group = "tabs" },
         { "<leader>o", group = "workflow" },
         { "<leader>p", group = "path" },
+        { "<leader>a", group = "avante (AI)" },
       },
     },
   },

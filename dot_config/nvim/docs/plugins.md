@@ -405,6 +405,39 @@ GitHub PR/issue browser with full inline review (comments, threads, approve/requ
 
 ---
 
+## AI
+
+### yetone/avante.nvim — Cursor-style AI coding assistant (claude-code ACP)
+
+Sidebar chat + inline edits driven by **Claude Code CLI** via ACP (Agent Client Protocol) — no direct Anthropic API key needed; reuses `claude` CLI auth. Loads on `VeryLazy`. Build step compiles a Rust tokenizer (needs `make` + `cargo`, or curl/tar for prebuilt binary).
+
+Setup (one-time):
+
+1. `claude` CLI installed and authenticated (`claude` then run `/login`).
+2. ACP wrapper installed: managed via metapac (`@agentclientprotocol/claude-agent-acp` in `terminal.toml` `[npm]`). Run `metapac sync` to install. Manual fallback: `npm i -g @agentclientprotocol/claude-agent-acp`. On systems with corporate CA bundles, prepend `NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt`.
+3. Run `nvim`; first launch builds the avante tokenizer.
+
+Switch model / provider mid-session via `:AvanteSwitchProvider`.
+
+| Command | Action |
+|---|---|
+| `:AvanteAsk [question]` | Ask AI about current buffer / selection |
+| `:AvanteChat` | Open chat session |
+| `:AvanteChatNew` | Start fresh conversation |
+| `:AvanteEdit` | Modify selected code blocks |
+| `:AvanteToggle` | Show / hide sidebar |
+| `:AvanteFocus` | Switch focus between windows |
+| `:AvanteSwitchProvider` | Change AI provider |
+| `:AvanteHistory` | Browse previous conversations |
+
+Default keymaps live under `<leader>a*` — see [Avante (AI assistant)](keymaps.md#avante-ai-assistant).
+
+### Cursor agent — `cursor-agent` floating terminal
+
+Cursor's CLI agent (`cursor-agent`) is not natively wired into Avante. `<leader>ac` opens it in a snacks floating terminal in the cwd. Auth via `cursor-agent login` (subscription) or `CURSOR_API_KEY` env. Use `--model gpt-5|sonnet-4|sonnet-4-thinking` etc. inside the agent.
+
+---
+
 ## Diagnostics
 
 Float opens automatically after 250ms idle on a problem (VSCode-style). Underlines show severity color. No virtual text.
