@@ -50,6 +50,7 @@
       }
     }
   },
+  "advisorModel": "opus",
   "theme": "dark",
   "editorMode": "normal",
   "showTurnDuration": true,

@@ -3,13 +3,19 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     optional = true,
-    opts = { ensure_install = { "c", "cpp" } },
+    opts = function(_, opts)
+      opts.ensure_install = opts.ensure_install or {}
+      vim.list_extend(opts.ensure_install, { "c", "cpp" })
+    end,
   },
 
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     optional = true,
-    opts = { ensure_installed = { "clangd", "codelldb" } },
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "clangd", "codelldb" })
+    end,
   },
 
   {

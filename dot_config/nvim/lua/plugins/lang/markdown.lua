@@ -3,20 +3,24 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     optional = true,
-    opts = { ensure_install = { "markdown", "markdown_inline" } },
+    opts = function(_, opts)
+      opts.ensure_install = opts.ensure_install or {}
+      vim.list_extend(opts.ensure_install, { "markdown", "markdown_inline" })
+    end,
   },
 
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     optional = true,
-    opts = {
-      ensure_installed = {
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, {
         "marksman",
         "markdownlint-cli2",
         "markdown-toc",
         "prettierd",
-      },
-    },
+      })
+    end,
   },
 
   -- Conform: prettier (format), markdownlint-cli2 (only if mdlint diagnostics present),

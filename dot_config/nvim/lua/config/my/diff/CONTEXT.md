@@ -21,7 +21,31 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - **Provider / adapter** — module under `providers/` that knows one PR host
   (Bitbucket, GitHub…). Implements `can_handle`, `find_pr`, `fetch_diff_files`,
   `fetch_comments`, `add_comment`, `reply`, `submit_review`, `delete_comment`,
-  `pr_url`. Emits comments in the **normalized comment shape** below.
+  `pr_url`. Emits comments in the **normalized comment shape** below. Built
+  via `providers/<host>.new(deps)` so dependencies (e.g. **Atlas client**)
+  are injected; `init.lua` skips registering the provider if `new` returns nil.
+- **Atlas client** — single adapter onto `atlas.nvim`. Probed once at module
+  load via `atlas_client.new()`; returns nil if `atlas.bitbucket.api.*` is
+  unavailable, in which case `init.lua` skips registering the Bitbucket
+  provider. Methods (`fetch_open_prs`, `fetch_diff`, `create_comment`,
+  `reply_comment`, `delete_comment`, `approve`, `request_changes`) all return
+  `(result, err)` uniformly. Replaces the inline `safe_require` dance that
+  used to live across the Bitbucket provider.
+- **Bitbucket links** — pure module that extracts URLs from a PR's `_raw`
+  payload: `diff(pr)`, `comments(pr)`, `approve(pr)`, `request_changes(pr)`,
+  `html(pr)`, `self(comment)`. Owns the Bitbucket link schema (key forks like
+  `request-changes` vs `request_changes`, defensive nil-walking) so call
+  sites read as routing, not table archaeology.
+- **Thread finder** — pure module mapping `(comments, location)` to
+  `{ root, replies } | nil` where `location = { file_path, side, line }`.
+  Centralizes the thread-matching invariants (root has `in_reply_to_id ==
+  nil`, anchor matches location, replies sorted by id) currently inlined in
+  `commands.get_thread_at_cursor`. Vim cursor reads stay in `commands.lua`.
+- **Mutation runner** — helper inside `commands.lua`:
+  `run_mutation(tabpage, op, success_msg)`. Wraps every provider mutation
+  (`add_comment`, `reply`, `submit_review`, `delete_comment`) with the
+  err-or-notify-then-`registry.refresh(force=true)` contract, so adding a
+  new mutation can't silently skip the refresh.
 - **Normalized comment** — `{ id, anchor = { side, line }, path, body, user,
   created_at, pending, in_reply_to_id, _raw }`. The *only* shape the registry
   and planner know. Adapters translate to/from host-specific schemas.
@@ -56,4 +80,13 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - `hunks.lua` — pure hunk parser + range check.
 - `comments_ui.lua` — floating-window helper (input + thread popup). Shallow but
   shared across two call sites.
-- `providers/<name>.lua` — adapter, must emit normalized comments.
+- `providers/<name>.lua` — adapter, must emit normalized comments. Exposes
+  `new(deps)` factory; module-level state forbidden.
+- `providers/atlas_client.lua` — **Atlas client** (see above). Test surface:
+  inject fake atlas modules; assert `(result, err)` shape and missing-dep
+  routing.
+- `providers/bitbucket_links.lua` — **Bitbucket links** (see above). Test
+  surface: feed fixture `pr._raw` payloads, assert URL extraction and key-fork
+  handling.
+- `thread.lua` — **Thread finder** (see above). Test surface: pure, fixture
+  comments + location records.

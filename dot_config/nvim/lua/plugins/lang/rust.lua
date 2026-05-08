@@ -3,13 +3,19 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     optional = true,
-    opts = { ensure_install = { "rust", "ron" } },
+    opts = function(_, opts)
+      opts.ensure_install = opts.ensure_install or {}
+      vim.list_extend(opts.ensure_install, { "rust", "ron" })
+    end,
   },
 
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     optional = true,
-    opts = { ensure_installed = { "rust-analyzer", "codelldb" } },
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "rust-analyzer", "codelldb" })
+    end,
   },
 
   {

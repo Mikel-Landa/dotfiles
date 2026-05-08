@@ -24,14 +24,33 @@ When transcribing an extra:
 
 1. Create `lua/plugins/lang/<name>.lua` returning a list of specs.
 2. Extend the relevant base specs (each `optional = true`):
-   - `WhoIsSethDaniel/mason-tool-installer.nvim` → `opts.ensure_installed` (LSP / formatter / linter / DAP binaries — list-merge).
-   - `nvim-treesitter/nvim-treesitter` → `opts.ensure_install` (parsers).
-   - `neovim/nvim-lspconfig` → `opts.servers.<name> = { settings = …, keys = function(client, bufnr) … end }`.
-   - `stevearc/conform.nvim` → `opts.formatters_by_ft` and `opts.formatters` for tweaks.
-   - `mfussenegger/nvim-lint` → `opts.linters_by_ft`.
+   - `WhoIsSethDaniel/mason-tool-installer.nvim` → append to `opts.ensure_installed` via **function-form opts** (see below).
+   - `nvim-treesitter/nvim-treesitter` → append to `opts.ensure_install` via **function-form opts**.
+   - `neovim/nvim-lspconfig` → `opts.servers.<name> = { settings = …, keys = function(client, bufnr) … end }` (table form OK — dict-keyed).
+   - `stevearc/conform.nvim` → `opts.formatters_by_ft` and `opts.formatters` for tweaks (table form OK — dict-keyed).
+   - `mfussenegger/nvim-lint` → `opts.linters_by_ft` (table form OK — dict-keyed).
    - `mfussenegger/nvim-dap` → `opts = function() … end` (NOT `config`) that adds `dap.adapters.<name>` and appends to `dap.configurations[ft]`. lazy.nvim runs `opts` from every spec and merges, but only one `config` per plugin — using `config` here would silently overwrite other lang files' DAP setup.
 3. Add language-specific plugins (e.g. `rustaceanvim`, `crates.nvim`, `dap-go`) as additional specs in the same file.
 4. Update `docs/plugins.md` and `docs/keymaps.md`.
+
+### Function-form opts for list keys (mandatory)
+
+lazy.nvim merges spec `opts` via `vim.tbl_deep_extend("force", …)`, which **replaces** integer-indexed lists rather than concatenating them. Two table-form specs both setting `opts.ensure_installed = {…}` → only one wins, the rest silently lost. Bug surfaces as "Mason never installed my Go tools".
+
+For any list-valued opt (`ensure_installed`, `ensure_install`, …) use function form so each lang file appends:
+
+```lua
+{
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  optional = true,
+  opts = function(_, opts)
+    opts.ensure_installed = opts.ensure_installed or {}
+    vim.list_extend(opts.ensure_installed, { "gofumpt", "goimports", … })
+  end,
+},
+```
+
+Dict-keyed opts (`servers`, `formatters_by_ft`, `linters_by_ft`) are safe in table form because each lang sets a distinct key.
 
 ## Example: minimal new language
 
@@ -43,12 +62,18 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     optional = true,
-    opts = { ensure_install = { "zig" } },
+    opts = function(_, opts)
+      opts.ensure_install = opts.ensure_install or {}
+      vim.list_extend(opts.ensure_install, { "zig" })
+    end,
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     optional = true,
-    opts = { ensure_installed = { "zls" } },
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "zls" })
+    end,
   },
   {
     "neovim/nvim-lspconfig",

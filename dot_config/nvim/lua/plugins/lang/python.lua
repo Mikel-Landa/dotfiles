@@ -3,13 +3,19 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     optional = true,
-    opts = { ensure_install = { "python", "ninja", "rst" } },
+    opts = function(_, opts)
+      opts.ensure_install = opts.ensure_install or {}
+      vim.list_extend(opts.ensure_install, { "python", "ninja", "rst" })
+    end,
   },
 
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     optional = true,
-    opts = { ensure_installed = { "pyright", "ruff", "debugpy" } },
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "pyright", "ruff", "debugpy" })
+    end,
   },
 
   -- ruff also formats (via LSP `textDocument/formatting`); conform's `ruff_format`
