@@ -590,6 +590,27 @@ local function refresh_after_mutation(preserve_root_id, fallback_idx)
   end)
 end
 
+-- Tear down everything `<leader>oc` set up: state, signs, code-buffer K
+-- bindings, virt_lines, popup, and the PR Comments qf list itself. Leaves
+-- other quickfix lists untouched (only acts if the current list's title is
+-- `PR Comments`).
+function M.close()
+  state = nil
+  clear_virt()
+  if active_popup and active_popup.win and vim.api.nvim_win_is_valid(active_popup.win) then
+    active_popup.close()
+  end
+  active_popup = nil
+  refresh_all_buffers()
+  pcall(vim.api.nvim_clear_autocmds, { group = "pr_comments_qf_cursor" })
+  local list = vim.fn.getqflist({ title = 0 })
+  if list.title == QF_TITLE then
+    vim.fn.setqflist({}, "r", { title = QF_TITLE, items = {} })
+    vim.cmd("silent! cclose")
+  end
+  notify(vim.log.levels.INFO, "Cleared PR comments")
+end
+
 function M.open()
   load(function(success)
     if not success or not state then return end

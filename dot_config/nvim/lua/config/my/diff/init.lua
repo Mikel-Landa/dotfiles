@@ -15,6 +15,7 @@ end
 registry.set_providers(providers)
 
 vim.keymap.set("n", "<leader>oc", qf.open, { desc = "PR comments → quickfix" })
+vim.keymap.set("n", "<leader>oC", qf.close, { desc = "PR comments: clear (qf + signs + K)" })
 
 local group = vim.api.nvim_create_augroup("my_diff_comments", { clear = true })
 

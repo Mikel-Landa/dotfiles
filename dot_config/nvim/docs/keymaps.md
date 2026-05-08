@@ -135,6 +135,7 @@ Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (
 | Key | Mode | Action |
 |---|---|---|
 | `<leader>oc` | n | Load PR comments for current branch into quickfix |
+| `<leader>oC` | n | Clear PR comments: drop qf list, signs, and `K` peek bindings |
 | `K` | n | Code buffer: peek thread popup at cursor (falls through to LSP hover if no thread); qf list: peek selected entry's thread |
 | `]q` / `[q` | n | Native `:cnext` / `:cprev` — advances qf entry, code window auto-previews |
 
