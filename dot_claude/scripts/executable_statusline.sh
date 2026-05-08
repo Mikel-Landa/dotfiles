@@ -23,9 +23,13 @@ rl = (inp.get("rate_limits") or {}).get("five_hour") or {}
 rl_pct = int(rl.get("used_percentage") or 0)
 resets_at = rl.get("resets_at")
 if resets_at:
-    rem = max(0, int(resets_at) - int(time.time()))
+    now = int(time.time())
+    rem = max(0, int(resets_at) - now)
     h, m = divmod(rem // 60, 60)
-    refresh = f"{h}:{m:02d}"
+    import datetime
+    reset_local = datetime.datetime.fromtimestamp(int(resets_at))
+    reset_clock = f"{reset_local.hour}:{reset_local.minute:02d}"
+    refresh = f"{reset_clock} ({h}:{m:02d})"
 else:
     refresh = "--:--"
 
