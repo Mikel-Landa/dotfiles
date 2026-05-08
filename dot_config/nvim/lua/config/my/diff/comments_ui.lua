@@ -177,7 +177,7 @@ function M.input(opts)
 	end
 end
 
-local function render_comment(lines, line_to_comment, spans, comment, width, is_mine)
+local function render_comment(lines, line_to_comment, spans, comment, width, is_mine, opts)
 	local start = #lines + 1
 	local author = comment.user or comment.author or "unknown"
 	local author_text = "@" .. author
@@ -221,31 +221,25 @@ local function render_comment(lines, line_to_comment, spans, comment, width, is_
 	for _, line in ipairs(vim.split(body_text, "\n", { plain = true })) do
 		table.insert(lines, line)
 	end
-	local actions = " (r)"
-	if is_mine then actions = actions .. "   (e)  󰆴 (d)" end
-	table.insert(lines, actions)
-	table.insert(spans, {
-		line = #lines - 1,
-		start_col = 0,
-		end_col = #lines[#lines],
-		hl_group = "DiffCommentsMuted",
-	})
+
+	if not (opts and opts.no_actions) then
+		local actions = " (r)"
+		if is_mine then actions = actions .. "   (e)  󰆴 (d)" end
+		table.insert(lines, actions)
+		table.insert(spans, {
+			line = #lines - 1,
+			start_col = 0,
+			end_col = #lines[#lines],
+			hl_group = "DiffCommentsMuted",
+		})
+	end
 
 	for line = start, #lines do
 		line_to_comment[line] = comment
 	end
 end
 
-function M.open(comments, opts)
-	opts = opts or {}
-	comments = comments or {}
-	setup_highlights()
-
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.bo[buf].filetype = "markdown"
-	vim.bo[buf].bufhidden = "wipe"
-
-	local width = math.min(opts.width or 90, vim.o.columns - 4)
+local function build_thread_render(comments, opts, width)
 	local lines = {}
 	local line_to_comment = {}
 	local spans = {}
@@ -260,8 +254,62 @@ function M.open(comments, opts)
 			})
 		end
 		local is_mine = type(opts.is_mine) == "function" and opts.is_mine(comment) or false
-		render_comment(lines, line_to_comment, spans, comment, width, is_mine)
+		render_comment(lines, line_to_comment, spans, comment, width, is_mine, opts)
 	end
+	return lines, line_to_comment, spans
+end
+
+-- Build virt_lines extmark payload for `comments`. Returns array of chunk
+-- arrays, ready for nvim_buf_set_extmark{virt_lines=...}. Width auto-clamped
+-- to (`opts.width` or 90). `opts.no_actions` defaults to true here (virt_lines
+-- aren't interactive — actions live on the host entry line).
+function M.thread_virt_lines(comments, opts)
+	opts = vim.tbl_extend("keep", opts or {}, { no_actions = true })
+	setup_highlights()
+	local width = math.min(opts.width or 90, vim.o.columns - 4)
+	local lines, _, spans = build_thread_render(comments or {}, opts, width)
+
+	local spans_by_line = {}
+	for _, s in ipairs(spans) do
+		spans_by_line[s.line] = spans_by_line[s.line] or {}
+		table.insert(spans_by_line[s.line], s)
+	end
+
+	local out = {}
+	for i, line in ipairs(lines) do
+		local sp = spans_by_line[i - 1] or {}
+		table.sort(sp, function(a, b) return a.start_col < b.start_col end)
+		local chunks = {}
+		local pos = 0
+		for _, s in ipairs(sp) do
+			if s.start_col > pos then
+				table.insert(chunks, { line:sub(pos + 1, s.start_col), nil })
+			end
+			table.insert(chunks, { line:sub(s.start_col + 1, s.end_col), s.hl_group })
+			pos = s.end_col
+		end
+		if pos < #line then
+			table.insert(chunks, { line:sub(pos + 1), nil })
+		end
+		if #chunks == 0 then
+			chunks = { { line, nil } }
+		end
+		table.insert(out, chunks)
+	end
+	return out
+end
+
+function M.open(comments, opts)
+	opts = opts or {}
+	comments = comments or {}
+	setup_highlights()
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.bo[buf].filetype = "markdown"
+	vim.bo[buf].bufhidden = "wipe"
+
+	local width = math.min(opts.width or 90, vim.o.columns - 4)
+	local lines, line_to_comment, spans = build_thread_render(comments, opts, width)
 
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 	vim.bo[buf].modifiable = false

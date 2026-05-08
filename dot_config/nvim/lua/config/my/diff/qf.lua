@@ -1,8 +1,23 @@
 -- PR comments quickfix browser + sign-column overlay for the working tree.
+--
 -- Fetches comments for the current branch's PR (Bitbucket only), populates the
 -- quickfix list with one entry per thread root, and paints signs in the
--- signcolumn of any open buffer whose path matches a thread. Tab / S-Tab cycle
--- between threads in the current buffer; <leader>oct toggles the overlay.
+-- signcolumn of any open buffer whose path matches a thread.
+--
+-- Inside the qf list:
+--   * cursor on entry → thread renders inline as `virt_lines` extmarks below
+--     the entry, code window auto-previews the entry's file:line (cursor stays
+--     in qf)
+--   * `r`/`d`/`e` → reply / delete-thread / edit-root, scoped to the entry's
+--     thread root
+--   * `K`            → floating popup with full per-comment r/d/e (the old
+--     popup, kept for fine-grained edits on individual replies)
+--   * `<CR>`         → jump focus to the previewed code window
+--
+-- In a code buffer with PR threads loaded, `K` peeks the thread under cursor
+-- (or falls through to `vim.lsp.buf.hover()` when the cursor is off-thread).
+-- Inter-thread navigation uses the user's existing `]q`/`[q` (`:cnext` /
+-- `:cprev`).
 local M = {}
 
 local atlas_client_mod = require("config.my.diff.providers.atlas_client")
@@ -15,14 +30,15 @@ local SIGN_HL = "PRCommentSign"
 local SIGN_PENDING_HL = "PRCommentSignPending"
 local SIGN_ICON = "▌"
 
-local hl_ns = vim.api.nvim_create_namespace("pr_comments_qf_highlight")
 local sign_ns = vim.api.nvim_create_namespace("pr_comments_signs")
+local virt_ns = vim.api.nvim_create_namespace("pr_comments_qf_virt")
 
 ---@type { root: string, pr: table, threads_by_path: table<string, table[]>, current_user: table|nil }|nil
 local state
-local last_shown_idx
-local active_highlight
 local active_popup
+-- Tracks the extmark currently providing virt_lines under a qf entry so
+-- CursorMoved can clear it before drawing a new one.
+local active_virt = { bufnr = nil, id = nil }
 
 local function notify(level, msg)
   vim.notify("[PR comments] " .. tostring(msg), level)
@@ -129,30 +145,6 @@ local function group_by_path(roots, replies_by_root)
   return out
 end
 
-local function clear_active_highlight()
-  if not active_highlight then return end
-  if vim.api.nvim_buf_is_valid(active_highlight.bufnr) then
-    vim.api.nvim_buf_clear_namespace(active_highlight.bufnr, hl_ns, 0, -1)
-  end
-  active_highlight = nil
-end
-
-local function highlight_range(bufnr, range)
-  clear_active_highlight()
-  if not range or not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then return end
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
-  for line = range.start_line, math.min(range.end_line, line_count) do
-    vim.api.nvim_buf_set_extmark(bufnr, hl_ns, line - 1, 0, {
-      end_row = line,
-      end_col = 0,
-      hl_eol = true,
-      hl_group = "Visual",
-      priority = 200,
-    })
-  end
-  active_highlight = { bufnr = bufnr }
-end
-
 local function buf_relative_path(bufnr)
   if not state then return nil end
   local name = vim.api.nvim_buf_get_name(bufnr)
@@ -198,27 +190,33 @@ local function render_signs(bufnr)
   end
 end
 
-local function show_thread(bufnr, thread)
-  local rel = buf_relative_path(bufnr)
-  if not rel then return end
+local function thread_for_line(threads, line)
+  for _, t in ipairs(threads) do
+    if t.range.start_line <= line and line <= t.range.end_line then return t end
+  end
+  return nil
+end
 
-  pcall(vim.api.nvim_win_set_cursor, 0, { thread.range.start_line, 0 })
-  highlight_range(bufnr, thread.range)
+local function is_mine(comment)
+  if not state or not state.current_user then return false end
+  if comment.user_id and state.current_user.id and comment.user_id == state.current_user.id then
+    return true
+  end
+  if comment.user and state.current_user.username
+    and comment.user == state.current_user.username then
+    return true
+  end
+  return false
+end
 
+-- ---------------------------------------------------------------------------
+-- Floating popup ("K" / Diffview view_thread)
+-- ---------------------------------------------------------------------------
+
+local function show_popup_for_thread(thread, opts)
+  opts = opts or {}
   local thread_comments = { thread.root }
   vim.list_extend(thread_comments, thread.replies or {})
-
-  local function is_mine(comment)
-    if not state or not state.current_user then return false end
-    if comment.user_id and state.current_user.id and comment.user_id == state.current_user.id then
-      return true
-    end
-    if comment.user and state.current_user.username
-      and comment.user == state.current_user.username then
-      return true
-    end
-    return false
-  end
 
   if active_popup and active_popup.win and vim.api.nvim_win_is_valid(active_popup.win) then
     active_popup.close()
@@ -227,76 +225,189 @@ local function show_thread(bufnr, thread)
 
   vim.schedule(function()
     local handle = comments_ui.open(thread_comments, {
-      title = (" Thread: %s:%d "):format(rel, thread.range.start_line),
-      relative_to_cursor = true,
+      title = opts.title or (" Thread: %s:%d "):format(thread.root.path or "?", thread.root.anchor.line),
+      relative_to_cursor = opts.relative_to_cursor,
       is_mine = is_mine,
-      on_close = function()
-        clear_active_highlight()
-        active_popup = nil
-      end,
+      on_close = function() active_popup = nil end,
       on_reply = function(_, close)
         close()
-        require("config.my.diff.qf")._reply_to(thread)
+        M._reply_to(thread)
       end,
       on_edit = function(comment, close)
         close()
-        require("config.my.diff.qf")._edit(comment)
+        M._edit(comment)
       end,
       on_delete = function(comment, close)
-        require("config.my.diff.qf")._delete(comment, close)
+        M._delete(comment, close)
       end,
     })
     active_popup = handle
   end)
 end
 
-local function thread_for_line(threads, line)
-  for _, t in ipairs(threads) do
-    if t.range.start_line <= line and line <= t.range.end_line then return t end
+-- ---------------------------------------------------------------------------
+-- Quickfix: virt_lines + auto-preview
+-- ---------------------------------------------------------------------------
+
+local function clear_virt()
+  if active_virt.bufnr and vim.api.nvim_buf_is_valid(active_virt.bufnr) and active_virt.id then
+    pcall(vim.api.nvim_buf_del_extmark, active_virt.bufnr, virt_ns, active_virt.id)
+  end
+  active_virt = { bufnr = nil, id = nil }
+end
+
+local function render_virt_for_entry(qf_bufnr, lnum, thread)
+  clear_virt()
+  if not vim.api.nvim_buf_is_valid(qf_bufnr) or not thread then return end
+  local thread_comments = { thread.root }
+  vim.list_extend(thread_comments, thread.replies or {})
+  local virt_lines = comments_ui.thread_virt_lines(thread_comments, { width = vim.o.columns - 4 })
+  if #virt_lines == 0 then return end
+  local id = vim.api.nvim_buf_set_extmark(qf_bufnr, virt_ns, lnum - 1, 0, {
+    virt_lines = virt_lines,
+    virt_lines_above = false,
+  })
+  active_virt = { bufnr = qf_bufnr, id = id }
+end
+
+-- Returns the first non-qf, normal-buftype window in the same tabpage as
+-- `qf_winid`, or nil if none exists.
+local function preview_target_window(qf_winid)
+  local tabpage = vim.api.nvim_win_get_tabpage(qf_winid)
+  for _, w in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
+    if w ~= qf_winid then
+      local b = vim.api.nvim_win_get_buf(w)
+      if vim.bo[b].buftype == "" then return w end
+    end
   end
   return nil
 end
 
-local function next_thread(threads, line, dir)
-  if dir > 0 then
-    for _, t in ipairs(threads) do
-      if t.line > line then return t end
-    end
-    return threads[1]
-  else
-    for i = #threads, 1, -1 do
-      if threads[i].line < line then return threads[i] end
-    end
-    return threads[#threads]
+local function preview_entry(qf_winid, item)
+  if not item or not item.filename or item.filename == "" then return end
+  local target = preview_target_window(qf_winid)
+  if not target then return end
+  local fname = vim.fn.fnamemodify(item.filename, ":p")
+  local bufnr = vim.fn.bufnr(fname, true)
+  if bufnr <= 0 then return end
+  vim.fn.bufload(bufnr)
+  if vim.api.nvim_win_get_buf(target) ~= bufnr then
+    vim.api.nvim_win_set_buf(target, bufnr)
+  end
+  if item.lnum and item.lnum > 0 then
+    pcall(vim.api.nvim_win_set_cursor, target, { item.lnum, 0 })
+    vim.api.nvim_win_call(target, function() vim.cmd("normal! zz") end)
   end
 end
 
-local function jump(dir)
-  if not state then notify(vim.log.levels.WARN, "No PR comments loaded"); return end
-  local bufnr = vim.api.nvim_get_current_buf()
-  local rel = buf_relative_path(bufnr)
-  if not rel then notify(vim.log.levels.WARN, "Buffer not in PR"); return end
-  local threads = state.threads_by_path[rel]
-  if not threads or #threads == 0 then notify(vim.log.levels.WARN, "No threads in this file"); return end
-
-  local cur_line = vim.fn.line(".")
-  local target = next_thread(threads, cur_line, dir)
-  if not target then return end
-  show_thread(bufnr, target)
+local function find_qf_win()
+  for _, w in ipairs(vim.api.nvim_list_wins()) do
+    local b = vim.api.nvim_win_get_buf(w)
+    if vim.bo[b].buftype == "quickfix" then return w, b end
+  end
+  return nil, nil
 end
 
+-- Re-render virt_lines + auto-preview the entry at line `lnum` in the qf buffer.
+-- Cursor stays where it is — never switches focus.
+local function sync_to_entry(qf_winid, qf_bufnr, lnum)
+  local list = vim.fn.getqflist({ title = 0, items = 0 })
+  if list.title ~= QF_TITLE then return end
+  local item = list.items[lnum]
+  if not item then clear_virt(); return end
+  if item.user_data and type(item.user_data) == "table" and item.user_data.thread then
+    render_virt_for_entry(qf_bufnr, lnum, item.user_data.thread)
+  else
+    clear_virt()
+  end
+  preview_entry(qf_winid, item)
+end
+
+-- ---------------------------------------------------------------------------
+-- Per-entry actions inside the qf buffer
+-- ---------------------------------------------------------------------------
+
+local function entry_thread_at_cursor()
+  local list = vim.fn.getqflist({ title = 0, items = 0 })
+  if list.title ~= QF_TITLE then return nil end
+  local item = list.items[vim.fn.line(".")]
+  if not (item and item.user_data and type(item.user_data) == "table") then return nil end
+  return item.user_data.thread
+end
+
+local function bind_qf_buffer(qf_winid)
+  if not qf_winid or not vim.api.nvim_win_is_valid(qf_winid) then return end
+  local qf_bufnr = vim.api.nvim_win_get_buf(qf_winid)
+  local opts = { buffer = qf_bufnr, silent = true }
+
+  vim.keymap.set("n", "<CR>", function()
+    local target = preview_target_window(qf_winid)
+    if not target then
+      pcall(vim.cmd, "cc " .. vim.fn.line("."))
+      return
+    end
+    sync_to_entry(qf_winid, qf_bufnr, vim.fn.line("."))
+    vim.api.nvim_set_current_win(target)
+  end, vim.tbl_extend("force", opts, { desc = "Jump to previewed code" }))
+
+  vim.keymap.set("n", "K", function()
+    local t = entry_thread_at_cursor()
+    if not t then return end
+    show_popup_for_thread(t)
+  end, vim.tbl_extend("force", opts, { desc = "Peek thread (full per-comment actions)" }))
+
+  vim.keymap.set("n", "r", function()
+    local t = entry_thread_at_cursor()
+    if t then M._reply_to(t) end
+  end, vim.tbl_extend("force", opts, { desc = "Reply to thread root" }))
+
+  vim.keymap.set("n", "d", function()
+    local t = entry_thread_at_cursor()
+    if not t then return end
+    M._delete(t.root, nil, t.root.id)
+  end, vim.tbl_extend("force", opts, { desc = "Delete thread" }))
+
+  vim.keymap.set("n", "e", function()
+    local t = entry_thread_at_cursor()
+    if not t then return end
+    if not is_mine(t.root) then notify(vim.log.levels.WARN, "Can only edit your own comments"); return end
+    M._edit(t.root)
+  end, vim.tbl_extend("force", opts, { desc = "Edit thread root" }))
+
+  -- Auto-preview + virt_lines on cursor moves inside the qf buffer.
+  -- Named group with `clear = true` so repeated `<leader>oc` doesn't stack
+  -- duplicate handlers (each cursor move would otherwise fire N preview swaps).
+  local cursor_group = vim.api.nvim_create_augroup("pr_comments_qf_cursor", { clear = true })
+  vim.api.nvim_create_autocmd("CursorMoved", {
+    group = cursor_group,
+    buffer = qf_bufnr,
+    callback = function()
+      sync_to_entry(qf_winid, qf_bufnr, vim.fn.line("."))
+    end,
+  })
+end
+
+-- ---------------------------------------------------------------------------
+-- Code-buffer keymaps (K = peek-or-hover)
+-- ---------------------------------------------------------------------------
+
 local function bind_buffer(bufnr)
-  vim.keymap.set("n", "<Tab>", function() jump(1) end, {
-    buffer = bufnr, silent = true, desc = "Next PR comment thread",
-  })
-  vim.keymap.set("n", "<S-Tab>", function() jump(-1) end, {
-    buffer = bufnr, silent = true, desc = "Previous PR comment thread",
-  })
+  vim.keymap.set("n", "K", function()
+    if vim.bo[bufnr].buftype ~= "" then return vim.lsp.buf.hover() end
+    if not state then return vim.lsp.buf.hover() end
+    local rel = buf_relative_path(bufnr)
+    local threads = rel and state.threads_by_path[rel] or {}
+    local thread = thread_for_line(threads, vim.fn.line("."))
+    if thread then
+      show_popup_for_thread(thread, { relative_to_cursor = true })
+    else
+      vim.lsp.buf.hover()
+    end
+  end, { buffer = bufnr, silent = true, desc = "Peek PR thread / LSP hover" })
 end
 
 local function unbind_buffer(bufnr)
-  pcall(vim.keymap.del, "n", "<Tab>", { buffer = bufnr })
-  pcall(vim.keymap.del, "n", "<S-Tab>", { buffer = bufnr })
+  pcall(vim.keymap.del, "n", "K", { buffer = bufnr })
 end
 
 local function refresh_all_buffers()
@@ -318,29 +429,6 @@ local function refresh_all_buffers()
   end
 end
 
-local function show_thread_for_current_qf_entry()
-  local qf = vim.fn.getqflist({ title = 0, idx = 0, items = 0 })
-  if qf.title ~= QF_TITLE then return end
-  local idx = qf.idx
-  if idx == 0 or idx == last_shown_idx then return end
-  local item = qf.items[idx]
-  if not item or not item.user_data or type(item.user_data) ~= "table" then return end
-  local data = item.user_data
-  if not data.thread or not state then return end
-  last_shown_idx = idx
-
-  local bufnr = vim.api.nvim_get_current_buf()
-  if vim.bo[bufnr].buftype ~= "" then return end
-
-  local thread
-  local threads = state.threads_by_path[data.path] or {}
-  for _, t in ipairs(threads) do
-    if t.root.id == data.thread.root.id then thread = t; break end
-  end
-  if not thread then return end
-  show_thread(bufnr, thread)
-end
-
 local function setup_autocmds()
   local group = vim.api.nvim_create_augroup("pr_comments_qf", { clear = true })
 
@@ -357,20 +445,9 @@ local function setup_autocmds()
             bind_buffer(args.buf)
           end
         end
-        show_thread_for_current_qf_entry()
       end)
     end,
   })
-end
-
-local function bind_qf_buffer(qf_winid)
-  if not qf_winid or not vim.api.nvim_win_is_valid(qf_winid) then return end
-  local qf_bufnr = vim.api.nvim_win_get_buf(qf_winid)
-  vim.keymap.set("n", "<CR>", function()
-    local lnum = vim.fn.line(".")
-    pcall(vim.cmd, "cc " .. lnum)
-    show_thread_for_current_qf_entry()
-  end, { buffer = qf_bufnr, silent = true, desc = "Open entry + show thread" })
 end
 
 local function with_atlas_client(callback)
@@ -383,8 +460,17 @@ local function with_atlas_client(callback)
 end
 
 local function populate_qf(roots, replies_by_root, root_path)
+  -- Most-recent first. Falls back to id when timestamps are missing or equal
+  -- so order stays deterministic even on Bitbucket payloads without created_at.
+  local sorted = vim.list_extend({}, roots)
+  table.sort(sorted, function(a, b)
+    local ta, tb = a.created_at or "", b.created_at or ""
+    if ta ~= tb then return ta > tb end
+    return tostring(a.id) > tostring(b.id)
+  end)
+
   local items = {}
-  for _, c in ipairs(roots) do
+  for _, c in ipairs(sorted) do
     local replies = replies_by_root[c.id] or {}
     local range = range_from_raw(c) or { start_line = c.anchor.line, end_line = c.anchor.line }
     table.insert(items, {
@@ -399,7 +485,6 @@ local function populate_qf(roots, replies_by_root, root_path)
     })
   end
   vim.fn.setqflist({}, " ", { title = QF_TITLE, items = items })
-  last_shown_idx = nil
   return #items
 end
 
@@ -474,54 +559,50 @@ local function load(on_done)
   end)
 end
 
+-- After mutation, re-load + restore qf cursor onto the same root id (so the
+-- user keeps their place across reply/edit). For deletes, `preserve_root_id`
+-- is the *deleted* id — we fall through to the same line index, which now
+-- points at the next thread (entries shifted up by one).
+local function refresh_after_mutation(preserve_root_id, fallback_idx)
+  load(function(success)
+    if not success or not state then return end
+    local list = vim.fn.getqflist({ title = 0, items = 0 })
+    if list.title ~= QF_TITLE then return end
+
+    local target_idx
+    if preserve_root_id then
+      for i, item in ipairs(list.items) do
+        if item.user_data and item.user_data.thread
+          and item.user_data.thread.root.id == preserve_root_id then
+          target_idx = i; break
+        end
+      end
+    end
+    if not target_idx and fallback_idx then
+      target_idx = math.max(1, math.min(fallback_idx, #list.items))
+    end
+
+    local qf_winid, qf_bufnr = find_qf_win()
+    if qf_winid and qf_bufnr and target_idx and target_idx > 0 then
+      pcall(vim.api.nvim_win_set_cursor, qf_winid, { target_idx, 0 })
+      sync_to_entry(qf_winid, qf_bufnr, target_idx)
+    end
+  end)
+end
+
 function M.open()
   load(function(success)
     if not success or not state then return end
     local thread_count = 0
     for _, ts in pairs(state.threads_by_path) do thread_count = thread_count + #ts end
     if thread_count == 0 then notify(vim.log.levels.INFO, "No PR comments"); return end
-    clear_active_highlight()
     vim.cmd("copen")
-    bind_qf_buffer(vim.api.nvim_get_current_win())
+    local qf_winid = vim.api.nvim_get_current_win()
+    local qf_bufnr = vim.api.nvim_win_get_buf(qf_winid)
+    bind_qf_buffer(qf_winid)
+    -- Initial expand + preview for entry 1.
+    sync_to_entry(qf_winid, qf_bufnr, 1)
     notify(vim.log.levels.INFO, ("Loaded %d threads"):format(thread_count))
-  end)
-end
-
-function M.toggle()
-  if active_popup and active_popup.win and vim.api.nvim_win_is_valid(active_popup.win) then
-    active_popup.close()
-    active_popup = nil
-    return
-  end
-
-  if not state then
-    load(function(success)
-      if not success or not state then return end
-      M.toggle()
-    end)
-    return
-  end
-
-  local bufnr = vim.api.nvim_get_current_buf()
-  local rel = buf_relative_path(bufnr)
-  if not rel then notify(vim.log.levels.WARN, "Buffer not in PR"); return end
-  local threads = state.threads_by_path[rel]
-  if not threads or #threads == 0 then notify(vim.log.levels.WARN, "No threads in this file"); return end
-
-  local cur_line = vim.fn.line(".")
-  local thread = thread_for_line(threads, cur_line)
-  if not thread then notify(vim.log.levels.WARN, "No thread at cursor"); return end
-
-  show_thread(bufnr, thread)
-end
-
-local function refresh_after_mutation()
-  load(function(success)
-    if success and state then
-      local thread_count = 0
-      for _, ts in pairs(state.threads_by_path) do thread_count = thread_count + #ts end
-      notify(vim.log.levels.INFO, ("Reloaded: %d threads"):format(thread_count))
-    end
   end)
 end
 
@@ -532,6 +613,12 @@ function M._edit(comment)
     notify(vim.log.levels.WARN, "Edit not supported"); return
   end
 
+  -- Preserve cursor on this comment's *thread* — use the root id when the
+  -- comment is a root, otherwise its parent (which we don't track on the
+  -- comment itself; falling back to `id` covers the common in-qf case where
+  -- only roots are edited).
+  local preserve_id = comment.in_reply_to_id or comment.id
+
   comments_ui.input({
     title = " Edit PR comment ",
     initial_body = comment.body or "",
@@ -540,25 +627,33 @@ function M._edit(comment)
       provider.edit_comment(state.pr, comment, body, function(_, err)
         if err then notify(vim.log.levels.ERROR, err); return end
         notify(vim.log.levels.INFO, "Comment updated")
-        refresh_after_mutation()
+        refresh_after_mutation(preserve_id)
       end)
     end,
   })
 end
 
-function M._delete(comment, close)
+function M._delete(comment, close, preserve_root_id)
   if not state or not state.pr then return end
   local provider = bitbucket.new(atlas_client_mod.new())
   if not provider or not provider.delete_comment then return end
 
   local target = comment.in_reply_to_id and "reply" or "thread"
+  local fallback_idx
+  local qf_winid = find_qf_win()
+  if qf_winid then
+    fallback_idx = vim.api.nvim_win_get_cursor(qf_winid)[1]
+  end
+
   vim.ui.input({ prompt = ("Delete %s? [y/N]: "):format(target) }, function(input)
     if type(input) ~= "string" or not input:match("^[yY]") then return end
     if close then close() end
     provider.delete_comment(state.pr, comment, function(_, err)
       if err then notify(vim.log.levels.ERROR, err); return end
       notify(vim.log.levels.INFO, target == "reply" and "Reply deleted" or "Thread deleted")
-      refresh_after_mutation()
+      -- For thread delete, the root is gone — preserve_root_id won't match;
+      -- refresh_after_mutation falls back to the same idx (next entry shifts up).
+      refresh_after_mutation(preserve_root_id or comment.in_reply_to_id, fallback_idx)
     end)
   end)
 end
@@ -568,14 +663,16 @@ function M._reply_to(thread)
   local provider = bitbucket.new(atlas_client_mod.new())
   if not provider then return end
 
+  local preserve_id = thread.root.id
+
   comments_ui.input({
-    title = (" Reply: %s:%d "):format(thread.root.path or "?", thread.line),
+    title = (" Reply: %s:%d "):format(thread.root.path or "?", thread.root.anchor.line),
     on_empty = function() notify(vim.log.levels.WARN, "Empty reply, cancelled") end,
     on_submit = function(body)
       provider.reply(state.pr, thread.root, body, function(_, err)
         if err then notify(vim.log.levels.ERROR, err); return end
         notify(vim.log.levels.INFO, "Reply posted")
-        refresh_after_mutation()
+        refresh_after_mutation(preserve_id)
       end)
     end,
   })

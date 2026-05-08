@@ -36,7 +36,8 @@ Press leader and pause — which-key shows the menu.
 | `<leader>fg` | Live grep |
 | `<leader>fb` | Buffers |
 | `<leader>fh` | Help tags |
-| `<leader>fr` | Recent files |
+| `<leader>fr` | Recent files (cwd) |
+| `<leader>fR` | Recent files (all) |
 | `<leader>fk` | Keymaps |
 | `<leader>f/` | Lines (current buffer) |
 | `<leader>fd` | Diagnostics |
@@ -104,12 +105,14 @@ Press leader and pause — which-key shows the menu.
 | `<leader>gl` | Git log (repo) |
 | `<leader>gL` | Git log (current file) |
 | `<leader>gB` | Git branches |
+| `<leader>gO` | Open file in browser (n, v) |
 
 ### Diffview
 
 | Key | Action |
 |---|---|
 | `<leader>gg` | Toggle diffview |
+| `<leader>gG` | Toggle diffview vs origin default branch (PR overlay) |
 | `<leader>gvo` | Diffview open |
 | `<leader>gvc` | Diffview close |
 | `<leader>gvh` | File history (repo) |
@@ -131,10 +134,18 @@ Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (
 
 | Key | Mode | Action |
 |---|---|---|
-| `<leader>oc` | n | Load PR comments for current branch into quickfix; popup opens on entry |
-| `<Tab>` / `<S-Tab>` | n | Cycle through threads in current buffer (after `<leader>oc`) |
+| `<leader>oc` | n | Load PR comments for current branch into quickfix |
+| `K` | n | Code buffer: peek thread popup at cursor (falls through to LSP hover if no thread); qf list: peek selected entry's thread |
+| `]q` / `[q` | n | Native `:cnext` / `:cprev` — advances qf entry, code window auto-previews |
 
-Inside the popup: `r` reply, `e` edit (own only), `d` delete (own only), `q` close.
+Inside the qf list (title `PR Comments`):
+
+- cursor on entry → thread renders inline as `virt_lines` below the entry; the adjacent code window silently scrolls to the entry's `file:line` (cursor stays in qf)
+- `<CR>` → jump focus into the previewed code window
+- `r` → reply to the entry's thread root
+- `d` → delete the whole thread (confirm prompt)
+- `e` → edit the thread root body (own root only)
+- `K` → floating popup with full per-comment `r` / `e` / `d` (use this for actions on individual replies)
 
 Review actions (Approve / Request changes) are exposed as atlas-pulls custom actions — open `:AtlasPulls bitbucket`, select a PR, press `A` to invoke.
 

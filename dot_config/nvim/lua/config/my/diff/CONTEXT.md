@@ -78,8 +78,16 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - `sign_plan.lua` — pure planner. No vim APIs.
 - `render.lua` — buffer effects + per-buffer memo of last-applied plan.
 - `hunks.lua` — pure hunk parser + range check.
-- `comments_ui.lua` — floating-window helper (input + thread popup). Shallow but
-  shared across two call sites.
+- `comments_ui.lua` — UI helper with three entry points:
+  - `M.input` — floating prompt for write/edit/reply bodies.
+  - `M.open` — floating thread popup (centered or `relative_to_cursor`); per-comment
+    `r`/`e`/`d` keymaps. Used by `commands.view_thread` (Diffview) and the qf
+    `K` peek binding.
+  - `M.thread_virt_lines` — pure helper: returns a chunked virt_lines payload
+    (one inner array per virtual line) for a thread, ready to feed to
+    `nvim_buf_set_extmark{virt_lines=…}`. Used by `qf.lua` to expand the
+    selected entry inline. Action footer is suppressed by default
+    (`opts.no_actions = true`).
 - `providers/<name>.lua` — adapter, must emit normalized comments. Exposes
   `new(deps)` factory; module-level state forbidden.
 - `providers/atlas_client.lua` — **Atlas client** (see above). Test surface:
