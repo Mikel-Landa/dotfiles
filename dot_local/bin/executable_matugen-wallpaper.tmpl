@@ -67,4 +67,4 @@ WALLPAPER="${WALLPAPER:-$HOME/.config/wallpaper}"
 [[ -r "$WALLPAPER" ]] || { echo "wallpaper not readable: $WALLPAPER" >&2; exit 1; }
 {{- end }}
 
-exec matugen image "$WALLPAPER"
+exec matugen --source-color-index 0 image "$WALLPAPER"

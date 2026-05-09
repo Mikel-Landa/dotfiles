@@ -1,0 +1,16 @@
+#:schema https://github.com/joshmedeski/sesh/raw/main/sesh.schema.json
+
+blacklist = ["scratch"]
+sort_order = [
+  "config",
+  "zoxide",
+  "tmux",
+]
+
+[default_session]
+preview_command = "eza --all --git --icons --color=always {}"
+startup_command = "exec code-session"
+
+[[session]]
+name = "config"
+path = "~/.local/share/chezmoi"

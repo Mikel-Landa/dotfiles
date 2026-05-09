@@ -1,0 +1,20 @@
+npm = {
+  packages = [
+    "@agentclientprotocol/claude-agent-acp",
+  ]
+}
+
+pipx = {
+  packages = [
+    {
+      name = "graphifyy",
+      hooks = {
+        after_install = [
+          "sh",
+          "-c",
+          "graphify install && graphify cursor install"
+        ]
+      }
+    }
+  ]
+}

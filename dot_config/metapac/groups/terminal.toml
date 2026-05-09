@@ -34,21 +34,21 @@ cargo = {
     "fd-find",
     "eza",
     "tlrc",
-    "tsql"
+    "tsql",
+    "television",
   ]
 }
 
-mise = { packages = ["fzf"] }
+mise = {
+  packages = [
+    "fzf",
+  ]
+}
 
 go = {
   packages = [
     "github.com/jesseduffield/lazygit",
-    "github.com/cli/cli/v2/cmd/gh"
-  ]
-}
-
-npm = {
-  packages = [
-    "@agentclientprotocol/claude-agent-acp",
+    "github.com/cli/cli/v2/cmd/gh",
+    "github.com/joshmedeski/sesh/v2"
   ]
 }

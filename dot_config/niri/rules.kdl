@@ -43,6 +43,18 @@ window-rule {
 }
 
 window-rule {
+    match app-id="t3code"
+    open-on-workspace "ai"
+    open-maximized true
+}
+
+window-rule {
+    match app-id="kitty-term"
+    open-on-workspace "term"
+    open-maximized true
+}
+
+window-rule {
     match app-id="^steam_app_"
     match app-id="cs2"
     open-fullscreen true

@@ -15,7 +15,7 @@ environment {
   QT_QPA_PLATFORMTHEME "gtk3"
   QT_QPA_PLATFORMTHEME_QT6 "gtk3"
 
-  EDITOR "zeditor"
+  EDITOR "nvim"
   TERMINAL "kitty"
 }
 
@@ -70,6 +70,8 @@ hotkey-overlay {
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 workspace "browser"
+workspace "term"
+workspace "ai"
 // Named workspace used by niri-scratchpad-rs as the hidden stash.
 workspace "stash" {}
 

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# "code"-style tmux session: editor (nvim) + shell (2 panes).
+# Usage:
+#   code-session PATH   create/attach session named after basename(PATH)
+#   code-session        apply layout to current session, exec nvim in this pane
+set -euo pipefail
+
+apply_layout() {
+  local sess="$1" cwd="${2:-}" cflag=()
+  [ -n "$cwd" ] && cflag=(-c "$cwd")
+  tmux rename-window -t "$sess:" editor
+  tmux new-window   -d -t "$sess:"      -n shell "${cflag[@]}"
+  tmux split-window -d -h -t "$sess:shell" "${cflag[@]}"
+}
+
+if [ "$#" -eq 0 ]; then
+  sess="$(tmux display-message -p '#S')"
+  cwd="$(tmux display-message -p '#{session_path}')"
+  apply_layout "$sess" "$cwd"
+  exec nvim
+fi
+
+path="${1/#\~/$HOME}"
+name="$(basename "$path" | tr '. ' '__')"
+
+attach() {
+  if [ -n "${TMUX:-}" ]; then
+    tmux switch-client -t "$name"
+  else
+    tmux attach -t "$name"
+  fi
+}
+
+if ! tmux has-session -t="$name" 2>/dev/null; then
+  tmux new-session -d -s "$name" -c "$path"
+  apply_layout "$name" "$path"
+  tmux send-keys -t "$name:editor" 'nvim' C-m
+fi
+attach

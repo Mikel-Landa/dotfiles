@@ -48,6 +48,12 @@ local = "~/.config/zsh/plugins"
 use = ["{aliases,gpg-agent,keybindings}.plugin.zsh"]
 apply = ["defer"]
 
+# Loaded after keybindings so `bindkey -v` is in effect; binds **<TAB> to tv.
+[plugins.television]
+local = "~/.config/zsh/plugins"
+use = ["television.plugin.zsh"]
+apply = ["defer"]
+
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
 apply = ["defer"]

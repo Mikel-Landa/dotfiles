@@ -1,0 +1,19 @@
+[metadata]
+name = "code-projects"
+description = "Git projects: zoxide-frecency first, then fd-discovered, dedup."
+requirements = ["zoxide", "fd", "git"]
+
+[source]
+command = "{ zoxide query -l | grep \"^$HOME/repos/\" | while IFS= read -r d; do [ -d \"$d/.git\" ] && echo \"$d\"; done; fd -g .git -HL -t d -d 6 ~/repos --exec dirname '{}'; } | awk '!seen[$0]++'"
+display = "{split:/:-1}"
+
+[preview]
+command = "cd '{}' && git log -n 200 --pretty=medium --all --graph --color 2>/dev/null || eza --all --git --icons --color=always '{}'"
+
+[keybindings]
+enter = "actions:open"
+
+[actions.open]
+description = "Open or switch to code session for project"
+command = "code-session '{}'"
+mode = "execute"

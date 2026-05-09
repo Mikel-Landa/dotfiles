@@ -55,21 +55,18 @@
 	renames = true
 
 [include]
-    path = ~/.gitconfig-personal
+    path = ~/.config/git/config-personal
 
 [include]
-    path = ~/.gitconfig-work
+    path = ~/.config/git/config-work
 
 [includeIf "gitdir:~/personal/"]
-    path = ~/.gitconfig-personal
+    path = ~/.config/git/config-personal
 
 [rebase]
 	autoSquash = true
 	autoStash = true
 	updateRefs = true
-
-[core]
-	excludesfile = ~/.gitignore
 
 [alias]
 	root = rev-parse --show-toplevel

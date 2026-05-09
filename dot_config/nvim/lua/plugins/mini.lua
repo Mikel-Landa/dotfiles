@@ -8,9 +8,6 @@ return {
       -- Auto-close brackets and quotes
       require("mini.pairs").setup()
 
-      -- Underline all occurrences of word under cursor
-      require("mini.cursorword").setup()
-
       -- Highlight + trim trailing whitespace on save
       require("mini.trailspace").setup()
       vim.api.nvim_create_autocmd("BufWritePre", {

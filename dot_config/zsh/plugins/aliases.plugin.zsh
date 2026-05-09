@@ -60,7 +60,7 @@ alias dc='docker compose'
 
 # navigation
 cx() { cd "$@" && l; }
-fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }
+fcd() { cd "$(tv dirs)" && l; }
 _clipcopy() {
     if (( $+commands[wl-copy] )); then wl-copy
     elif (( $+commands[xclip] )); then xclip -selection clipboard
@@ -69,8 +69,8 @@ _clipcopy() {
     else cat >/dev/null
     fi
 }
-f() { find . -type f -not -path '*/.*' | fzf | _clipcopy }
-fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
+f() { tv files | _clipcopy }
+fv() { nvim "$(tv files)" }
 
 # vim: filetype=zsh syntax=zsh
 

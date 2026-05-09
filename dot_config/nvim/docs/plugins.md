@@ -8,8 +8,8 @@ Leader = `<Space>`. `gd`-style maps work in normal mode unless noted.
 
 ## UI
 
-### nvimdev/dashboard-nvim — Start screen
-Shows when `nvim` opens with no file argument (in or out of a repo). Hidden when a file is passed. Doom theme with a randomly-picked ASCII header (8 variants) and shortcuts:
+### snacks.dashboard — Start screen
+Shows when `nvim` opens with no file argument (in or out of a repo). Hidden when a file is passed. Randomly-picked ASCII header (8 variants) and shortcuts:
 
 | Key | Action |
 |---|---|
@@ -112,7 +112,7 @@ Inside panel: `<CR>` jump, `q` close, `r` refresh.
 
 ### echasnovski/mini.nvim — Editing micro-plugins
 
-Seven modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (icons), native line-move keymaps.
+Six modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (icons), native line-move keymaps.
 
 **mini.surround** — Surround text (replaces nvim-surround, same keymaps):
 
@@ -141,8 +141,6 @@ Seven modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (
 | `<A-h>` / `<A-l>` | n, v | Move line / selection left / right (indent) |
 
 **mini.pairs** — Auto-close `()`, `[]`, `{}`, `""`, `''`.
-
-**mini.cursorword** — Underlines all occurrences of word under cursor.
 
 **mini.trailspace** — Highlights trailing whitespace; trims it on save.
 

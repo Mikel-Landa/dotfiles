@@ -15,6 +15,7 @@ arch = {
     "wget",
     "gcc",
     "openssl",
+    "libyaml",
     "python",
     "python-pip",
     "python-pipx",
@@ -25,7 +26,7 @@ arch = {
     {
       name = "arch-audit",
       hooks = {
-        after_sync = [
+        after_install = [
           "systemctl",
           "--user",
           "enable",
@@ -52,6 +53,7 @@ apt = {
     "wget",
     "gcc",
     "libssl-dev",
+    "libyaml-dev",
     "python3-dev",
     "python3-pip",
     "pipx",

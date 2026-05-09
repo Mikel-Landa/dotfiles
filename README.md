@@ -21,8 +21,9 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Mikel-Landa
 | `dot_config/metapac/` | Metapac — declarative package management |
 | `dot_config/zsh/` | Zsh — vi mode, p10k, autoload functions |
 | `dot_zshrc` | Zsh entrypoint |
-| `dot_tmux.conf` | Tmux config |
-| `dot_gitconfig` | Git — GPG signing, column UI, branch sorting |
+| `dot_config/tmux/` | Tmux config |
+| `dot_config/git/` | Git — GPG signing, column UI, branch sorting |
+| `dot_config/curlrc` | Curl defaults |
 
 ## Package management
 
@@ -40,5 +41,5 @@ matugen image /path/to/wallpaper.jpg
 
 Personal/work split via `includeIf`:
 
-- `~/.gitconfig-personal` — default for all repos
-- `~/.gitconfig-work` — applied for repos under `~/repos/`
+- `~/.config/git/config-personal` — default for all repos
+- `~/.config/git/config-work` — applied for repos under `~/repos/` (local-only, not in repo)

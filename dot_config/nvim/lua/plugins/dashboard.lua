@@ -1,6 +1,6 @@
--- dashboard-nvim: start screen when nvim opens with no file argument
+-- snacks.dashboard config (extends snacks.nvim spec). Replaces nvimdev/dashboard-nvim.
 local headers = {
-  {
+  table.concat({
     "                                                                     ",
     "       ████ ██████           █████      ██                     ",
     "      ███████████             █████                             ",
@@ -11,8 +11,8 @@ local headers = {
     " ██████  █████████████████████ ████ █████ █████ ████ ██████ ",
     " ██████    █████████████████   ████ █████ █████ ████ ██████ ",
     " ██████    █████████████████   ████ █████ █████ ████ ██████ ",
-  },
-  {
+  }, "\n"),
+  table.concat({
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ",
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡖⠁⠀⠀⠀⠀⠀⠀⠈⢲⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀ ",
     "⠀⠀⠀⠀⠀⠀⠀⠀⣼⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣧⠀⠀⠀⠀⠀⠀⠀⠀ ",
@@ -28,8 +28,8 @@ local headers = {
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ",
     "⠀⠀⠀⠐⢤⣀⣀⢀⣀⣠⣴⣿⣿⠿⠋⠙⠿⣿⣿⣦⣄⣀⠀⠀⣀⡠⠂⠀⠀⠀ ",
     "⠀⠀⠀⠀⠀⠈⠉⠛⠛⠛⠛⠉⠀⠀⠀⠀⠀⠈⠉⠛⠛⠛⠛⠋⠁⠀⠀⠀⠀⠀ ",
-  },
-  {
+  }, "\n"),
+  table.concat({
     [[=================     ===============     ===============   ========  ========]],
     [[\\ . . . . . . .\\   //. . . . . . .\\   //. . . . . . .\\  \\. . .\\// . . //]],
     [[||. . ._____. . .|| ||. . ._____. . .|| ||. . ._____. . .|| || . . .\/ . . .||]],
@@ -49,14 +49,14 @@ local headers = {
     [[=='    _-'                        N E O V I M                         \/   `==]],
     [[\   _-'                                                                `-_   /]],
     [[ `''                                                                      ``' ]],
-  },
-  {
+  }, "\n"),
+  table.concat({
     [[  ／|_       ]],
     [[ (o o /      ]],
     [[  |.   ~.    ]],
     [[  じしf_,)ノ ]],
-  },
-  {
+  }, "\n"),
+  table.concat({
     "          ▀████▀▄▄              ▄█ ",
     "            █▀    ▀▀▄▄▄▄▄    ▄▄▀▀█ ",
     "    ▄        █          ▀▀▀▀▄  ▄▀  ",
@@ -66,8 +66,8 @@ local headers = {
     "   ▀▄    ▄▀ █   ▄██▄   ▄  ▄  ▀▀ █  ",
     "    █  ▄▀  █    ▀██▀    ▀▀ ▀▀  ▄▀  ",
     "   █   █  █      ▄▄           ▄▀   ",
-  },
-  {
+  }, "\n"),
+  table.concat({
     "                                                     ",
     "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
     "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
@@ -76,16 +76,16 @@ local headers = {
     "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
     "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
     "                                                     ",
-  },
-  {
+  }, "\n"),
+  table.concat({
     [[                               __                ]],
     [[  ___     ___    ___   __  __ /\_\    ___ ___    ]],
     [[ / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\  ]],
     [[/\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \ ]],
     [[\ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
     [[ \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
-  },
-  {
+  }, "\n"),
+  table.concat({
     "            :h-                                  Nhy`               ",
     "           -mh.                           h.    `Ndho               ",
     "           hmh+                          oNm.   oNdhh               ",
@@ -121,49 +121,38 @@ local headers = {
     "                        .-:mNdhh:.......--::::-`                    ",
     "                           yNh/..------..`                          ",
     "                                                                    ",
-  },
+  }, "\n"),
 }
 
--- Tint dashboard with theme accent (matugen primary hue, same as Title/Cursor).
-local function apply_dashboard_hl()
-  vim.api.nvim_set_hl(0, "DashboardHeader", { link = "Title", default = false })
-  vim.api.nvim_set_hl(0, "DashboardFooter", { link = "Comment", default = false })
-end
-vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_dashboard_hl })
-apply_dashboard_hl()
+math.randomseed(os.time())
+local header = headers[math.random(#headers)]
 
 return {
   {
-    "nvimdev/dashboard-nvim",
-    event = "VimEnter",
-    opts = function()
-      math.randomseed(os.time())
-      local header = vim.deepcopy(headers[math.random(#headers)])
-      table.insert(header, "")
-      table.insert(header, "")
-
-      return {
-        theme = "doom",
-        hide = { statusline = true, tabline = true, winbar = true },
-        config = {
+    "folke/snacks.nvim",
+    opts = function(_, opts)
+      opts.dashboard = {
+        enabled = true,
+        preset = {
           header = header,
-          center = {
-            { icon = "  ", desc = "Find file       ", key = "f", action = "lua Snacks.picker.files()" },
-            { icon = "  ", desc = "Recent files    ", key = "r", action = "lua Snacks.picker.recent({ filter = { cwd = true } })" },
-            { icon = "  ", desc = "Find text       ", key = "g", action = "lua Snacks.picker.grep()" },
-            { icon = "  ", desc = "New file        ", key = "n", action = "enew | startinsert" },
-            { icon = "  ", desc = "Git status      ", key = "s", action = "lua Snacks.picker.git_status()" },
-            { icon = "  ", desc = "Config          ", key = "c", action = "lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })" },
-            { icon = "󰒲  ", desc = "Lazy            ", key = "l", action = "Lazy" },
-            { icon = "  ", desc = "Quit            ", key = "q", action = "qa" },
+          keys = {
+            { icon = " ", key = "f", desc = "Find file",    action = ":lua Snacks.picker.files()" },
+            { icon = " ", key = "r", desc = "Recent files", action = ":lua Snacks.picker.recent({ filter = { cwd = true } })" },
+            { icon = " ", key = "g", desc = "Find text",    action = ":lua Snacks.picker.grep()" },
+            { icon = " ", key = "n", desc = "New file",     action = ":enew | startinsert" },
+            { icon = " ", key = "s", desc = "Git status",   action = ":lua Snacks.picker.git_status()" },
+            { icon = " ", key = "c", desc = "Config",       action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })" },
+            { icon = "󰒲 ", key = "l", desc = "Lazy",         action = ":Lazy" },
+            { icon = " ", key = "q", desc = "Quit",         action = ":qa" },
           },
-          footer = function()
-            local stats = require("lazy").stats()
-            local ms = math.floor(stats.startuptime * 100 + 0.5) / 100
-            return { "", "⚡ " .. stats.loaded .. "/" .. stats.count .. " plugins · " .. ms .. "ms" }
-          end,
+        },
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
+          { section = "startup" },
         },
       }
+      return opts
     end,
   },
 }

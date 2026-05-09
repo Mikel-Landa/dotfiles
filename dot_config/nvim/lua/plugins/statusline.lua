@@ -3,13 +3,16 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin" },
+    dependencies = { "echasnovski/mini.nvim", "catppuccin" },
     opts = {
       options = {
         theme = "catppuccin-nvim",
         globalstatus = true,
         component_separators = "|",
         section_separators = "",
+        disabled_filetypes = {
+          statusline = { "snacks_dashboard", "Avante", "AvanteInput", "AvanteSelectedFiles", "AvantePromptInput" },
+        },
       },
       sections = {
         lualine_a = { "mode" },
@@ -25,7 +28,7 @@ return {
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "echasnovski/mini.nvim" },
     keys = {
       { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>",            desc = "Toggle pin" },
       { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete non-pinned buffers" },

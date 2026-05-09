@@ -7,7 +7,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "folke/snacks.nvim",
-      "nvim-tree/nvim-web-devicons",
+      "echasnovski/mini.nvim",
     },
     opts = {
       enable_builtin = true,

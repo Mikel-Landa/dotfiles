@@ -5,3 +5,7 @@ spawn-at-startup "niri-scratchpad" "daemon"
 
 spawn-at-startup "brave" "--class=brave-startup"
 
+spawn-at-startup "t3"
+
+spawn-at-startup "kitty" "--class=kitty-term"
+

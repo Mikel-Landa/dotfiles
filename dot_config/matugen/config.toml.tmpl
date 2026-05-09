@@ -16,3 +16,8 @@ post_hook = "kill -SIGUSR1 $(pidof kitty) 2>/dev/null; true"
 [templates.nvim]
 input_path = "~/.config/matugen/templates/colors.json"
 output_path = "~/.config/matugen/colors.json"
+
+[templates.tmux]
+input_path = "~/.config/matugen/templates/tmux.conf"
+output_path = "~/.config/tmux/colors.conf"
+post_hook = "tmux source-file ~/.config/tmux/tmux.conf 2>/dev/null; true"
