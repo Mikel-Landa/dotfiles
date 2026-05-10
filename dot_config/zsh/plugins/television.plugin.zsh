@@ -68,9 +68,15 @@ _tv_star_complete() {
 zle -N _tv_star_complete
 
 # Capture whatever TAB was bound to first so fall-through is preserved
-# (e.g. menu-complete, or another plugin's widget).
-_tv_star_fallback=$(bindkey -M viins '^I' 2>/dev/null | awk '{print $2}')
-[[ -z $_tv_star_fallback || $_tv_star_fallback == undefined-key ]] && _tv_star_fallback=expand-or-complete
+# (e.g. menu-complete, or another plugin's widget). Guard against re-source:
+# if already bound to our own widget, the previous fallback is the truth.
+_tv_prev=$(bindkey -M viins '^I' 2>/dev/null | awk '{print $2}')
+case $_tv_prev in
+  ''|undefined-key|_tv_star_complete) ;;  # keep existing $_tv_star_fallback or default below
+  *) _tv_star_fallback=$_tv_prev ;;
+esac
+unset _tv_prev
+: ${_tv_star_fallback:=expand-or-complete}
 
 bindkey -M viins '^I' _tv_star_complete
 bindkey -M emacs '^I' _tv_star_complete
