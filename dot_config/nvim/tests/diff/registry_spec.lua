@@ -220,3 +220,33 @@ describe("registry.provider_for", function()
     assert.is_nil(picked)
   end)
 end)
+
+describe("registry.provider_for_origin_url", function()
+  it("returns the first provider whose parse_origin_url matches", function()
+    local registry = fresh_registry()
+    local p1 = { name = "p1", parse_origin_url = function() return nil end }
+    local p2 = { name = "p2", parse_origin_url = function() return "ws", "repo" end }
+    registry.set_providers({ p1, p2 })
+
+    local picked, ws, repo = registry.provider_for_origin_url("git@github.com:ws/repo.git")
+    assert.equals("p2", picked.name)
+    assert.equals("ws", ws)
+    assert.equals("repo", repo)
+  end)
+
+  it("returns nil when no provider claims the URL", function()
+    local registry = fresh_registry()
+    local p1 = { name = "p1", parse_origin_url = function() return nil end }
+    registry.set_providers({ p1 })
+    assert.is_nil(registry.provider_for_origin_url("https://example.com/x/y.git"))
+  end)
+
+  it("skips providers without parse_origin_url", function()
+    local registry = fresh_registry()
+    local p1 = { name = "p1" } -- no parse_origin_url
+    local p2 = { name = "p2", parse_origin_url = function() return "ws", "repo" end }
+    registry.set_providers({ p1, p2 })
+    local picked = registry.provider_for_origin_url("git@github.com:ws/repo.git")
+    assert.equals("p2", picked.name)
+  end)
+end)

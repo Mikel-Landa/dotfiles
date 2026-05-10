@@ -6,12 +6,20 @@ local commands = require("config.my.diff.commands")
 local diffview_session = require("config.my.diff.diffview_session")
 local qf = require("config.my.diff.qf")
 
-local atlas_client = require("config.my.diff.providers.atlas_client").new()
 local providers = {}
+
+local atlas_client = require("config.my.diff.providers.atlas_client").new()
 if atlas_client then
   local bitbucket = require("config.my.diff.providers.bitbucket").new(atlas_client)
   if bitbucket then table.insert(providers, bitbucket) end
 end
+
+local gh_client = require("config.my.diff.providers.gh_client").new()
+if gh_client then
+  local github = require("config.my.diff.providers.github").new(gh_client)
+  if github then table.insert(providers, github) end
+end
+
 registry.set_providers(providers)
 
 vim.keymap.set("n", "<leader>oc", qf.open, { desc = "PR comments → quickfix" })

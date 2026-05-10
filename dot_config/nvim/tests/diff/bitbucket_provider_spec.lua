@@ -260,3 +260,61 @@ describe("bitbucket.pr_url", function()
     assert.equals("http://html", p.pr_url(make_pr({ html = { href = "http://html" } })))
   end)
 end)
+
+describe("bitbucket.parse_origin_url", function()
+  local p
+  before_each(function() p = bitbucket.new(stub_client()) end)
+
+  it("parses ssh URLs", function()
+    local ws, repo = p.parse_origin_url("git@bitbucket.org:owner/repo.git")
+    assert.equals("owner", ws)
+    assert.equals("repo", repo)
+  end)
+
+  it("parses https URLs", function()
+    local ws, repo = p.parse_origin_url("https://bitbucket.org/owner/repo.git")
+    assert.equals("owner", ws)
+    assert.equals("repo", repo)
+  end)
+
+  it("returns nil for non-bitbucket URLs", function()
+    assert.is_nil(p.parse_origin_url("git@github.com:o/r.git"))
+    assert.is_nil(p.parse_origin_url(""))
+    assert.is_nil(p.parse_origin_url(nil))
+  end)
+end)
+
+describe("bitbucket.find_pr_for_branch", function()
+  it("matches by source.branch", function()
+    local client = stub_client()
+    client.next.fetch_open_prs = { result = {
+      { id = 1, source = { branch = "other" } },
+      { id = 2, source = { branch = "feature" } },
+    }, err = nil }
+    local p = bitbucket.new(client)
+    local found, err
+    p.find_pr_for_branch("ws", "repo", "feature", function(pr, e) found, err = pr, e end)
+    assert.is_nil(err)
+    assert.equals(2, found.id)
+  end)
+
+  it("errors when no PR matches", function()
+    local client = stub_client()
+    client.next.fetch_open_prs = { result = {}, err = nil }
+    local p = bitbucket.new(client)
+    local found, err
+    p.find_pr_for_branch("ws", "repo", "feature", function(pr, e) found, err = pr, e end)
+    assert.is_nil(found)
+    assert.matches("feature", err)
+  end)
+
+  it("propagates client error with prefix", function()
+    local client = stub_client()
+    client.next.fetch_open_prs = { result = nil, err = "down" }
+    local p = bitbucket.new(client)
+    local found, err
+    p.find_pr_for_branch("ws", "repo", "feature", function(pr, e) found, err = pr, e end)
+    assert.is_nil(found)
+    assert.matches("down", err)
+  end)
+end)

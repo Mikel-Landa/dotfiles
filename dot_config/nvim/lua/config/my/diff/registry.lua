@@ -39,6 +39,20 @@ function M.provider_for(tabpage)
   return nil, view_session
 end
 
+---@param url string  origin URL (ssh or https)
+---@return table|nil provider, string|nil workspace, string|nil repo
+function M.provider_for_origin_url(url)
+  for _, mod in ipairs(providers) do
+    if mod.parse_origin_url then
+      local workspace, repo = mod.parse_origin_url(url)
+      if workspace and repo then
+        return mod, workspace, repo
+      end
+    end
+  end
+  return nil
+end
+
 function M.show(tabpage)
   local s = sessions[tabpage]
   if not s or not s.pr then return end
