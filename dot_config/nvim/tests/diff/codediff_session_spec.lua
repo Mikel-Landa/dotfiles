@@ -97,12 +97,39 @@ describe("codediff_session.read", function()
         end,
       }
     end)
+    codediff_session._set_branch_resolver(function(_, sha)
+      if sha == "cafebabe" then return "feature/x" end
+      if sha == "deadbeef" then return "main" end
+      return nil
+    end)
     local s = codediff_session.read(1)
     assert.is_table(s)
     assert.equals("/repo", s.git_root)
     assert.equals("cafebabe", s.modified_revision)
     assert.equals("deadbeef", s.original_revision)
+    assert.equals("feature/x", s.modified_branch)
+    assert.equals("main", s.original_branch)
     assert.equals("/repo/a.lua", s.modified_path)
     assert.equals(fake_buf, s.modified_bufnr)
+  end)
+
+  it("leaves branch fields nil when resolver returns nil", function()
+    codediff_session._set_lifecycle_loader(function()
+      return {
+        get_session = function(_)
+          return {
+            git_root = "/repo",
+            original_revision = "deadbeef",
+            modified_revision = "cafebabe",
+            original_path = "/repo/a.lua",
+            modified_path = "/repo/a.lua",
+          }
+        end,
+      }
+    end)
+    codediff_session._set_branch_resolver(function() return nil end)
+    local s = codediff_session.read(1)
+    assert.is_nil(s.modified_branch)
+    assert.is_nil(s.original_branch)
   end)
 end)

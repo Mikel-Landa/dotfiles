@@ -14,6 +14,31 @@ local function rev_to_sha(toplevel, rev)
   return vim.trim(result.stdout)
 end
 
+-- Resolve a branch name for a sha via `git for-each-ref --points-at`.
+-- Prefers local heads over remote-tracking refs; skips remote HEAD pointers.
+-- Returns nil if the sha matches no ref (caller falls back to current branch).
+local function branch_for_sha(toplevel, sha)
+  if not toplevel or not sha or not sha:match("^[0-9a-f]+$") then return nil end
+  local result = vim.system({
+    "git", "-C", toplevel, "for-each-ref",
+    "--points-at=" .. sha,
+    "--format=%(refname:short)",
+    "refs/heads", "refs/remotes",
+  }, { text = true }):wait()
+  if not result or result.code ~= 0 then return nil end
+  local local_match, remote_match
+  for line in vim.trim(result.stdout):gmatch("[^\r\n]+") do
+    if line ~= "" and not line:match("/HEAD$") then
+      if line:find("/", 1, true) then
+        remote_match = remote_match or line
+      else
+        local_match = local_match or line
+      end
+    end
+  end
+  return local_match or remote_match
+end
+
 local function valid_bufnr(bufnr)
   if bufnr and vim.api.nvim_buf_is_valid(bufnr) then return bufnr end
   return nil
@@ -23,6 +48,8 @@ end
 ---@field git_root string|nil
 ---@field modified_revision string
 ---@field original_revision string
+---@field modified_branch string|nil
+---@field original_branch string|nil
 ---@field modified_path string
 ---@field original_path string
 ---@field modified_bufnr integer|nil
@@ -49,12 +76,17 @@ function M.read(tabpage)
     git_root = toplevel,
     modified_revision = modified_revision,
     original_revision = sess.original_revision or "",
+    modified_branch = branch_for_sha(toplevel, modified_revision),
+    original_branch = branch_for_sha(toplevel, sess.original_revision),
     modified_path = sess.modified_path or "",
     original_path = (sess.original_path ~= "" and sess.original_path) or sess.modified_path or "",
     modified_bufnr = valid_bufnr(sess.modified_bufnr),
     original_bufnr = valid_bufnr(sess.original_bufnr),
   }
 end
+
+-- Test seam: allow specs to inject a fake branch resolver.
+M._set_branch_resolver = function(fn) branch_for_sha = fn end
 
 ---@param session CodeDiffSession|nil
 function M.has_revision(session)
