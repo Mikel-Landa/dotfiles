@@ -6,21 +6,39 @@ local commands = require("config.my.diff.commands")
 local diffview_session = require("config.my.diff.diffview_session")
 local qf = require("config.my.diff.qf")
 
-local providers = {}
+-- Provider construction is deferred and memoized per-kind: lazy plugins
+-- (atlas.nvim is `cmd`-loaded) may not be on the runtimepath when this file
+-- runs, so we re-attempt on every lookup until each provider resolves.
+local cache = {}
 
-local atlas_client = require("config.my.diff.providers.atlas_client").new()
-if atlas_client then
-  local bitbucket = require("config.my.diff.providers.bitbucket").new(atlas_client)
-  if bitbucket then table.insert(providers, bitbucket) end
+local function ensure_atlas_loaded()
+  pcall(function()
+    local lazy = require("lazy")
+    if lazy and lazy.load then lazy.load({ plugins = { "atlas.nvim" }, show = false }) end
+  end)
 end
 
-local gh_client = require("config.my.diff.providers.gh_client").new()
-if gh_client then
-  local github = require("config.my.diff.providers.github").new(gh_client)
-  if github then table.insert(providers, github) end
+local function build_providers()
+  if not cache.bitbucket then
+    ensure_atlas_loaded()
+    local atlas_client = require("config.my.diff.providers.atlas_client").new()
+    if atlas_client then
+      cache.bitbucket = require("config.my.diff.providers.bitbucket").new(atlas_client)
+    end
+  end
+  if not cache.github then
+    local gh_client = require("config.my.diff.providers.gh_client").new()
+    if gh_client then
+      cache.github = require("config.my.diff.providers.github").new(gh_client)
+    end
+  end
+  local list = {}
+  if cache.bitbucket then table.insert(list, cache.bitbucket) end
+  if cache.github then table.insert(list, cache.github) end
+  return list
 end
 
-registry.set_providers(providers)
+registry.set_provider_factory(build_providers)
 
 vim.keymap.set("n", "<leader>oc", qf.open, { desc = "PR comments → quickfix" })
 vim.keymap.set("n", "<leader>oC", qf.close, { desc = "PR comments: clear (qf + signs + K)" })

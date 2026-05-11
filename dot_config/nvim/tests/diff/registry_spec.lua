@@ -250,3 +250,29 @@ describe("registry.provider_for_origin_url", function()
     assert.equals("p2", picked.name)
   end)
 end)
+
+describe("registry.set_provider_factory", function()
+  it("re-invokes factory on each lookup so deferred providers can resolve", function()
+    local registry = fresh_registry()
+    local late = nil
+    local calls = 0
+    registry.set_provider_factory(function()
+      calls = calls + 1
+      if late then return { late } end
+      return {}
+    end)
+
+    -- First lookup: factory returns empty list (e.g. lazy plugin not loaded yet).
+    assert.is_nil(registry.provider_for_origin_url("git@github.com:ws/repo.git"))
+    assert.equals(1, calls)
+
+    -- The provider becomes available later (plugin finished loading).
+    late = { name = "bitbucket", parse_origin_url = function() return "ws", "repo" end }
+
+    local picked, ws, repo = registry.provider_for_origin_url("git@github.com:ws/repo.git")
+    assert.equals("bitbucket", picked.name)
+    assert.equals("ws", ws)
+    assert.equals("repo", repo)
+    assert.equals(2, calls)
+  end)
+end)

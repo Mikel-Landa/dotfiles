@@ -11,6 +11,9 @@ local ns = vim.api.nvim_create_namespace("diff_pr_comments")
 ---@type table[]
 local providers = {}
 
+---@type fun(): table[]|nil
+local provider_factory = nil
+
 ---@type table<integer, table>
 local sessions = {}
 
@@ -21,6 +24,26 @@ end
 ---@param list table[]
 function M.set_providers(list)
   providers = list or {}
+  provider_factory = nil
+end
+
+-- Lazy alternative to set_providers. The factory is invoked on each lookup so
+-- providers gated on lazy-loaded plugins (e.g. atlas.nvim) can register once
+-- their dependencies become available. The factory should memoize built
+-- providers itself to keep identities stable across calls.
+---@param fn fun(): table[]|nil
+function M.set_provider_factory(fn)
+  provider_factory = fn
+  providers = {}
+end
+
+local function current_providers()
+  if provider_factory then
+    local built = provider_factory()
+    if type(built) == "table" then return built end
+    return {}
+  end
+  return providers
 end
 
 ---@param tabpage integer|nil
@@ -31,7 +54,7 @@ end
 function M.provider_for(tabpage)
   local view_session = diffview_session.read(tabpage)
   if not view_session then return nil, nil end
-  for _, mod in ipairs(providers) do
+  for _, mod in ipairs(current_providers()) do
     if mod.can_handle and mod.can_handle(view_session) then
       return mod, view_session
     end
@@ -42,7 +65,7 @@ end
 ---@param url string  origin URL (ssh or https)
 ---@return table|nil provider, string|nil workspace, string|nil repo
 function M.provider_for_origin_url(url)
-  for _, mod in ipairs(providers) do
+  for _, mod in ipairs(current_providers()) do
     if mod.parse_origin_url then
       local workspace, repo = mod.parse_origin_url(url)
       if workspace and repo then

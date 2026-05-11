@@ -28,13 +28,15 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
   **gh client**) are injected; `init.lua` skips registering the provider if
   `new` returns nil. The seam is real now (two adapters: Bitbucket via
   atlas.nvim, GitHub via the `gh` CLI).
-- **Atlas client** — single adapter onto `atlas.nvim`. Probed once at module
-  load via `atlas_client.new()`; returns nil if `atlas.pulls.providers.bitbucket.api.*` is
-  unavailable, in which case `init.lua` skips registering the Bitbucket
-  provider. Methods (`fetch_open_prs`, `fetch_diff`, `create_comment`,
-  `reply_comment`, `delete_comment`, `approve`, `request_changes`) all return
-  `(result, err)` uniformly. Replaces the inline `safe_require` dance that
-  used to live across the Bitbucket provider.
+- **Atlas client** — single adapter onto `atlas.nvim`. Re-probed lazily via
+  `atlas_client.new()` from `init.lua`'s provider factory; returns nil if
+  `atlas.pulls.providers.bitbucket.api.*` is unavailable, in which case
+  registration is deferred until a later lookup succeeds. `init.lua` triggers
+  `lazy.load({plugins={"atlas.nvim"}})` before probing so the plugin's
+  `cmd`-lazy loading doesn't hide the modules at first lookup. Methods
+  (`fetch_open_prs`, `fetch_diff`, `create_comment`, `reply_comment`,
+  `delete_comment`, `approve`, `request_changes`) all return `(result, err)`
+  uniformly.
 - **gh client** — single adapter onto the `gh` CLI for GitHub PR review-comment
   endpoints (atlas.nvim's GitHub provider only handles issue comments).
   Probed once at module load via `gh_client.new()`; returns nil if `gh` isn't
