@@ -94,8 +94,8 @@ Press leader and pause — which-key shows the menu.
 |---|---|
 | `<leader>gp` | Preview hunk (floating diff) |
 | `<leader>gb` | Blame current line (full) |
-| `<leader>gd` | Diff vs index |
-| `<leader>gD` | Diff vs `HEAD~` |
+| `<leader>gd` | Diff current file vs `HEAD` (CodeDiff) |
+| `<leader>gD` | Diff current file vs `HEAD~` (CodeDiff) |
 
 ### Browse (snacks.picker)
 
@@ -106,25 +106,44 @@ Press leader and pause — which-key shows the menu.
 | `<leader>gL` | Git log (current file) |
 | `<leader>gB` | Git branches |
 | `<leader>gO` | Open file in browser (n, v) |
+| `<leader>gq` | Unstaged files → quickfix (auto-refreshes on stage/commit) |
 
-### CodeDiff
+### Neogit (magit-style UI)
 
 | Key | Action |
 |---|---|
-| `<leader>gg` | Toggle codediff |
-| `<leader>gG` | Toggle codediff vs origin default branch (PR overlay) |
-| `<leader>gvo` | CodeDiff open |
+| `<leader>gg` | Open Neogit status |
+| `<leader>gc` | Neogit commit popup |
+| `<leader>gP` | Neogit push popup |
+
+Inside the Neogit status buffer: `s`/`u` stage/unstage, `c` commit popup, `p`/`P` pull/push, `b` branch, `l` log, `Z` stash, `d` diff (opens codediff), `?` full keymap help.
+
+### CodeDiff (day-to-day)
+
+VSCode-parity diff viewer. Inline layout by default; toggle with `t` inside the view. 3-way merge layout (`center`) for conflict resolution.
+
+| Key | Action |
+|---|---|
+| `<leader>gvo` | CodeDiff explorer (working tree changes) |
 | `<leader>gvc` | CodeDiff close |
 | `<leader>gvh` | File history (repo) |
 | `<leader>gvf` | File history (current file) |
+| `<leader>gvp` | PR-like diff vs origin default branch (merge-base) |
+| `<leader>gG` | Toggle codediff vs origin default branch (PR overlay) |
+| `<leader>gz` | Toggle compressed view (fold unchanged regions) |
+
+Compressed view is on by default: unchanged regions fold away, leaving only changed lines plus 5 lines of context. `gz` inside a CodeDiff window does the same toggle.
+
+Inside a CodeDiff view: `]c`/`[c` next/prev hunk, `]f`/`[f` next/prev file, `]x`/`[x` next/prev conflict, `do`/`dp` get/put change, `gf` open in previous tab, `-` stage/unstage file, `<leader>hs`/`<leader>hu`/`<leader>hr` stage/unstage/discard hunk, `t` toggle inline ↔ side-by-side, `gz` toggle compressed view, `q` close, `g?` help. Merge conflict: `<leader>co`/`<leader>ct`/`<leader>cb`/`<leader>cx` accept ours/theirs/both/discard.
 
 ### Toggles
 
 | Key | Action |
 |---|---|
-| `<leader>gtb` | Toggle inline blame |
+| `<leader>gtb` | Toggle inline blame (on by default) |
 | `<leader>gtd` | Toggle deleted lines |
 | `<leader>gtw` | Toggle word diff |
+| `<leader>gti` | Toggle inline diff (linehl + deleted + word, composite) |
 
 ### PR comments overlay (CodeDiff + Bitbucket)
 

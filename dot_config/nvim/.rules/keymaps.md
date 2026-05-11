@@ -16,7 +16,8 @@ vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short descriptio
 | `<leader>b` | Buffers |
 | `<leader>g` | Git / hunks (gitsigns + snacks.picker) |
 | `<leader>gt` | Git toggles (inline blame, deleted, word diff) |
-| `<leader>gv` | CodeDiff |
+| `<leader>gv` | CodeDiff (day-to-day diff viewer) |
+| `<leader>gG` | CodeDiff vs origin default branch (PR overlay) |
 | `<leader>l` | LSP (symbols, etc.) |
 | `<leader>d` | Diagnostics (`<leader>dd` = float) |
 | `<leader>x` | Trouble panel (diagnostics/symbols/refs) |

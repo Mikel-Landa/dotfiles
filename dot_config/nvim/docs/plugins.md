@@ -52,7 +52,7 @@ Smooth motion smear when cursor jumps. Auto-disables in cmdline (no smear while 
 
 ### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent, terminal)
 
-Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (codediff) for in-editor git, or run `lazygit` in the floating terminal (`<leader>ut`).
+Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (neogit) for in-editor git, or run `lazygit` in the floating terminal (`<leader>t`).
 
 Toggle the explorer with `<leader>e`. Inside the tree:
 
@@ -308,22 +308,56 @@ See [Debug (DAP)](keymaps.md#debug-dap) for the full keymap reference.
 
 ## Git
 
-### esmuellert/codediff.nvim — VSCode-style side-by-side diff & file history
+### NeogitOrg/neogit — Magit-style git UI
 
-Open a tabpage with side-by-side diffs (line + character-level highlighting) across the working tree, ranges, commits, or arbitrary files/directories. File explorer on the left lists changed files; `<CR>` opens diff. First run downloads a small pre-built C library — run `:CodeDiff install` if it does not auto-install.
+Interactive status buffer with popups for commit, branch, push/pull, rebase, merge, stash, log, and diff. Loads on `:Neogit` or `<leader>gg`. CodeDiff integration enabled (`diff_viewer = "codediff"`) — press `d` in the status buffer to open the current change in CodeDiff.
 
 | Key | Action |
 |---|---|
-| `<leader>gvo` | Open codediff (working tree vs index) |
-| `<leader>gvc` | Close codediff |
-| `<leader>gvh` | File history (whole repo) |
-| `<leader>gvf` | File history (current file) |
+| `<leader>gg` | Open Neogit status |
+| `<leader>gc` | Commit popup |
+| `<leader>gP` | Push popup |
 
-Commands accept revisions: `:CodeDiff HEAD~3` (against 3 commits ago), `:CodeDiff main...` (PR-like merge-base diff), `:CodeDiff history %` (current file), `:CodeDiff history origin/main..HEAD` (range). `:CodeDiff file <a> <b>` compares two arbitrary files; `:CodeDiff dir <d1> <d2>` compares two directories; `:CodeDiff merge "$MERGED"` is the git merge-tool entry point.
+Inside status: `s`/`u` stage/unstage, `x` discard, `c` commit, `p`/`P` pull/push, `b` branch, `l` log, `Z` stash, `M` remote, `r` rebase, `m` merge, `?` help.
+
+### esmuellert/codediff.nvim — VSCode-parity diff viewer
+
+Day-to-day diff viewer. C-based diff engine with VSCode's algorithm: two-tier line+char highlights, moved-code detection (opt-in via `compute_moves`), and an inline (unified) layout as default — toggle to side-by-side with `t` inside the view. 3-way merge layout (`conflict_result_position = "center"`) for conflict resolution. Used by Neogit's `d` action, the unstaged-files quickfix `<CR>`, atlas.nvim PR diffs, and the Bitbucket PR-comments overlay. First run downloads a small pre-built C library — run `:CodeDiff install` if it does not auto-install.
+
+| Key | Action |
+|---|---|
+| `<leader>gvo` | CodeDiff explorer (working tree) |
+| `<leader>gvc` | Close codediff |
+| `<leader>gvh` | File history (repo) |
+| `<leader>gvf` | File history (current file) |
+| `<leader>gvp` | PR-like diff vs origin default branch (merge-base) |
+| `<leader>gG` | Toggle codediff vs origin default branch (PR overlay) |
+| `<leader>gz` | Toggle compressed view (fold unchanged regions) |
+
+Compressed view (custom, `lua/config/my/codediff_folds.lua`): on by default. Scans codediff's `codediff-highlight` extmarks, then drives `foldmethod=expr` to collapse every line not within 5 lines of a change. Inside a CodeDiff window press `gz` to toggle; outside use `<leader>gz`.
+
+Inside a CodeDiff view:
+
+| Key | Action |
+|---|---|
+| `]c` / `[c` | Next / prev hunk |
+| `]f` / `[f` | Next / prev file (explorer / history modes) |
+| `]x` / `[x` | Next / prev conflict (merge mode) |
+| `do` / `dp` | Diff get / put (like vimdiff) |
+| `gf` | Open in previous tab |
+| `-` | Stage / unstage current file |
+| `<leader>hs` / `<leader>hu` / `<leader>hr` | Stage / unstage / discard hunk |
+| `t` | Toggle inline ↔ side-by-side layout |
+| `q` | Close diff tab |
+| `g?` | Help |
+
+Merge conflict resolution: `<leader>co/ct/cb/cx` accept ours / theirs / both / discard; uppercase `<leader>cO/cT/cB/cX` apply to the whole file.
+
+Commands accept revisions and `git merge-base` syntax: `:CodeDiff HEAD~5`, `:CodeDiff main`, `:CodeDiff main...` (PR-like, merge-base vs working tree), `:CodeDiff file HEAD` (current buffer vs revision), `:CodeDiff history HEAD~10 %` (current file history), `:CodeDiff dir <a> <b>` (directory compare). `--inline` / `--side-by-side` override layout per invocation.
 
 ### lewis6991/gitsigns.nvim — Git in gutter
 
-Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md#git-hunks-gitsigns) for the full keymap list. Highlights:
+Signs in signcolumn show added/changed/deleted lines. Inline blame on current line on by default (300ms delay, end-of-line virtual text) — toggle with `<leader>gtb`. See [Git hunks](keymaps.md#git-hunks-gitsigns) for the full keymap list. Highlights:
 
 | Key | Action |
 |---|---|
@@ -380,6 +414,10 @@ Module layout (see `lua/config/my/diff/CONTEXT.md` for full vocab):
 - `providers/<name>.lua` — host adapter; emits the normalized comment shape.
 
 Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-codediff--bitbucket).
+
+### Unstaged-files quickfix (custom, `lua/config/my/unstaged_qf.lua`)
+
+`<leader>gq` populates the quickfix with every file that has unstaged changes (modified, deleted, untracked). The list refreshes automatically on gitsigns/neogit events, so files drop out as soon as they're staged. No-op while a different qf list is active. Inside the list, `<CR>` opens the file in CodeDiff against `HEAD` (falls back to plain edit for untracked files with no index entry).
 
 ### pwntester/octo.nvim — GitHub issues
 
