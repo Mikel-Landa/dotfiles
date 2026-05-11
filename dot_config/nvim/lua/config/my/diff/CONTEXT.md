@@ -6,18 +6,20 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 ## Core terms
 
 - **PR comments overlay** — the feature: surface a PR's review comments as signs in the
-  signcolumn of a Diffview session, with keymaps to add/reply/resolve.
-- **Diffview session** — the (tabpage, view, layout, buffers) tuple the overlay
-  observes. Read by the **Diffview session reader** from `diffview.lib`.
-- **Diffview session reader** — `diffview_session.lua`. The single seam that
-  reads Diffview internals (`view.cur_entry`, `view.adapter.ctx.toplevel`, …)
-  and shapes them into the **Diffview session** record. Isolates Diffview API
-  brittleness; mockable in tests.
+  signcolumn of a CodeDiff session, with keymaps to add/reply/resolve.
+- **CodeDiff session** — the (tabpage, view, layout, buffers) tuple the overlay
+  observes. Read by the **CodeDiff session reader** from
+  `codediff.ui.lifecycle`.
+- **CodeDiff session reader** — `codediff_session.lua`. The single seam that
+  reads codediff internals (`lifecycle.get_session(tabpage)` →
+  `original_bufnr`, `modified_bufnr`, `original_revision`,
+  `modified_revision`, `git_root`, paths) and shapes them into the **CodeDiff
+  session** record. Isolates codediff API brittleness; mockable in tests.
 - **Session registry** — `registry.lua`. Owns the per-tabpage `sessions` map and
   the async refresh state machine (`refresh`, `show`, `destroy`). Drives
   provider fetches, joins dual results (diff files + comments), and enforces
   race guards via `loading_key` + identity checks. Takes provider list and
-  Diffview session reader as dependencies — no autocmd or UI knowledge.
+  CodeDiff session reader as dependencies — no autocmd or UI knowledge.
 - **Provider / adapter** — module under `providers/` that knows one PR host
   (Bitbucket, GitHub…). Implements `can_handle`, `find_pr`, `fetch_diff_files`,
   `fetch_comments`, `add_comment`, `reply`, `submit_review`, `delete_comment`,
@@ -66,11 +68,11 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - `init.lua` — thin glue. Wires keymaps → commands and autocmds → registry.
   No state, no logic.
 - `registry.lua` — **Session registry** (see above). Test surface: drive with
-  stub provider + stub Diffview reader; assert state transitions, race guards,
+  stub provider + stub CodeDiff reader; assert state transitions, race guards,
   dual-fetch join.
-- `diffview_session.lua` — **Diffview session reader** (see above). Test surface:
-  stub `diffview.lib`; assert revision normalization, session-key build, path
-  stripping.
+- `codediff_session.lua` — **CodeDiff session reader** (see above). Test surface:
+  stub `codediff.ui.lifecycle`; assert revision normalization, session-key build,
+  path stripping.
 - `commands.lua` — user-facing actions (`add_comment`, `view_thread`,
   `submit_review`, `reload`) plus their context helpers (`current_context`,
   `visual_context`, `get_thread_at_cursor`, `in_diff`, `ensure_ready`,
@@ -81,7 +83,7 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - `comments_ui.lua` — UI helper with three entry points:
   - `M.input` — floating prompt for write/edit/reply bodies.
   - `M.open` — floating thread popup (centered or `relative_to_cursor`); per-comment
-    `r`/`e`/`d` keymaps. Used by `commands.view_thread` (Diffview) and the qf
+    `r`/`e`/`d` keymaps. Used by `commands.view_thread` (CodeDiff) and the qf
     `K` peek binding.
   - `M.thread_virt_lines` — pure helper: returns a chunked virt_lines payload
     (one inner array per virtual line) for a thread, ready to feed to

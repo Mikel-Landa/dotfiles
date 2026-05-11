@@ -107,11 +107,11 @@ Inside any picker:
 
 In visual mode, `<leader>gs` stages exactly the highlighted lines (gitsigns). No need to stage the whole hunk.
 
-## Diffview for review, not just diffs
+## CodeDiff for review, not just diffs
 
-- `:DiffviewOpen main..feature` reviews a feature branch like a PR locally.
-- `:DiffviewFileHistory %` walks every commit that touched the current file with diffs visible.
-- Inside a merge conflict file: `[x` / `]x` to navigate, `<leader>co/ct/cb/ca` to pick ours/theirs/base/all per region.
+- `:CodeDiff main...` reviews a feature branch like a PR locally (merge-base diff).
+- `:CodeDiff history %` walks every commit that touched the current file with diffs visible.
+- `:CodeDiff merge "$MERGED"` opens a 3-way layout for resolving merge conflicts.
 
 ## LSP rename across the project
 

@@ -4,7 +4,7 @@ local M = {}
 
 local sign_plan = require("config.my.diff.sign_plan")
 local render = require("config.my.diff.render")
-local diffview_session = require("config.my.diff.diffview_session")
+local codediff_session = require("config.my.diff.codediff_session")
 
 local ns = vim.api.nvim_create_namespace("diff_pr_comments")
 
@@ -29,7 +29,7 @@ function M.get(tabpage)
 end
 
 function M.provider_for(tabpage)
-  local view_session = diffview_session.read(tabpage)
+  local view_session = codediff_session.read(tabpage)
   if not view_session then return nil, nil end
   for _, mod in ipairs(providers) do
     if mod.can_handle and mod.can_handle(view_session) then
@@ -43,9 +43,9 @@ function M.show(tabpage)
   local s = sessions[tabpage]
   if not s or not s.pr then return end
 
-  local view_session = diffview_session.read(tabpage)
+  local view_session = codediff_session.read(tabpage)
   if not view_session then return end
-  local file_path = diffview_session.rel_file_path(view_session)
+  local file_path = codediff_session.rel_file_path(view_session)
   if not file_path then return end
 
   local sides = {
@@ -67,7 +67,7 @@ function M.destroy(tabpage)
   -- Best-effort: clear the render memo for the buffers we last saw. The view's
   -- buffers may already be invalid if the tab is closing; render.clear_memo is
   -- a plain table delete and tolerates that.
-  local view_session = diffview_session.read(tabpage)
+  local view_session = codediff_session.read(tabpage)
   if view_session then
     if view_session.original_bufnr then render.clear_memo(view_session.original_bufnr) end
     if view_session.modified_bufnr then render.clear_memo(view_session.modified_bufnr) end
@@ -89,9 +89,9 @@ function M.refresh(tabpage, opts)
   opts = opts or {}
   tabpage = tabpage or vim.api.nvim_get_current_tabpage()
   local provider, view_session = M.provider_for(tabpage)
-  if not provider or not diffview_session.has_revision(view_session) then return end
+  if not provider or not codediff_session.has_revision(view_session) then return end
 
-  local key = diffview_session.session_key(view_session, provider.name)
+  local key = codediff_session.session_key(view_session, provider.name)
   local s = sessions[tabpage]
   if opts.force ~= true and s and key and s.session_key == key and s.pr then
     M.show(tabpage)
@@ -145,9 +145,9 @@ end
 -- Test seam: expose internal sessions map.
 M.__sessions = sessions
 
--- Test seam: swap the diffview_session reader (e.g. with a stub).
-function M._set_diffview_session(stub)
-  diffview_session = stub
+-- Test seam: swap the codediff_session reader (e.g. with a stub).
+function M._set_session_reader(stub)
+  codediff_session = stub
 end
 
 return M

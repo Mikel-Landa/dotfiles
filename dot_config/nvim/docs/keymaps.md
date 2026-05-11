@@ -107,18 +107,16 @@ Press leader and pause — which-key shows the menu.
 | `<leader>gB` | Git branches |
 | `<leader>gO` | Open file in browser (n, v) |
 
-### Diffview
+### CodeDiff
 
 | Key | Action |
 |---|---|
-| `<leader>gg` | Toggle diffview |
-| `<leader>gG` | Toggle diffview vs origin default branch (PR overlay) |
-| `<leader>gvo` | Diffview open |
-| `<leader>gvc` | Diffview close |
+| `<leader>gg` | Toggle codediff |
+| `<leader>gG` | Toggle codediff vs origin default branch (PR overlay) |
+| `<leader>gvo` | CodeDiff open |
+| `<leader>gvc` | CodeDiff close |
 | `<leader>gvh` | File history (repo) |
 | `<leader>gvf` | File history (current file) |
-| `<leader>gvt` | Toggle files panel |
-| `<leader>gvr` | Refresh |
 
 ### Toggles
 
@@ -128,9 +126,9 @@ Press leader and pause — which-key shows the menu.
 | `<leader>gtd` | Toggle deleted lines |
 | `<leader>gtw` | Toggle word diff |
 
-### PR comments overlay (Diffview + Bitbucket)
+### PR comments overlay (CodeDiff + Bitbucket)
 
-Active inside a Diffview session for a Bitbucket PR. Signs `` (published) / `` (pending) appear in the gutter at commented lines.
+Active inside a CodeDiff session for a Bitbucket PR. Signs `` (published) / `` (pending) appear in the gutter at commented lines.
 
 | Key | Mode | Action |
 |---|---|---|
