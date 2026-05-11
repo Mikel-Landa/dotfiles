@@ -34,11 +34,11 @@ return {
     cmd = { "AtlasPulls", "AtlasIssues", "AtlasJqlSearch", "AtlasClearCache", "AtlasLogs" },
     dependencies = {
       "MeanderingProgrammer/render-markdown.nvim",
-      "sindrets/diffview.nvim",
+      "esmuellert/codediff.nvim",
     },
     opts = {
       pulls = {
-        diff = { open_cmd = "DiffviewOpen" },
+        diff = { open_cmd = "CodeDiff" },
         repo_config = {
           -- Maps `workspace/repo` to local paths. Used for checkout and custom actions.
           paths = {

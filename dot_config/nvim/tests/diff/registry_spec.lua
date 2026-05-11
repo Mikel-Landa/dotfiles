@@ -1,4 +1,4 @@
--- Drives registry.refresh against stub provider + stub diffview_session reader.
+-- Drives registry.refresh against stub provider + stub codediff_session reader.
 -- Verifies state-machine invariants: loading_key lifecycle, race guards,
 -- dual-fetch join, error paths, destroy.
 local function fresh_registry()
@@ -19,7 +19,7 @@ local function make_view_session(opts)
   }
 end
 
-local function stub_diffview(view_session)
+local function stub_session_reader(view_session)
   return {
     read = function(_) return view_session end,
     has_revision = function(s)
@@ -64,7 +64,7 @@ describe("registry.refresh — happy path", function()
   local registry, provider
   before_each(function()
     registry = fresh_registry()
-    registry._set_diffview_session(stub_diffview(make_view_session()))
+    registry._set_session_reader(stub_session_reader(make_view_session()))
     provider = deferred_provider("bitbucket")
     registry.set_providers({ provider })
   end)
@@ -97,7 +97,7 @@ describe("registry.refresh — guards", function()
   local registry, provider
   before_each(function()
     registry = fresh_registry()
-    registry._set_diffview_session(stub_diffview(make_view_session()))
+    registry._set_session_reader(stub_session_reader(make_view_session()))
     provider = deferred_provider("bitbucket")
     registry.set_providers({ provider })
   end)
@@ -125,7 +125,7 @@ describe("registry.refresh — guards", function()
     -- Simulate the tab switching to a different revision before find_pr returns.
     local stale_session = registry.get(1)
     registry.__sessions[1] = nil
-    registry._set_diffview_session(stub_diffview(make_view_session({ modified_revision = "def456" })))
+    registry._set_session_reader(stub_session_reader(make_view_session({ modified_revision = "def456" })))
     registry.refresh(1)
 
     -- Flush the original (stale) find_pr — must not corrupt the new session.
@@ -151,7 +151,7 @@ describe("registry.refresh — error paths", function()
   local registry, provider
   before_each(function()
     registry = fresh_registry()
-    registry._set_diffview_session(stub_diffview(make_view_session()))
+    registry._set_session_reader(stub_session_reader(make_view_session()))
     provider = deferred_provider("bitbucket")
     registry.set_providers({ provider })
   end)
@@ -184,7 +184,7 @@ end)
 describe("registry.destroy", function()
   it("removes the entry for the tabpage", function()
     local registry = fresh_registry()
-    registry._set_diffview_session(stub_diffview(make_view_session()))
+    registry._set_session_reader(stub_session_reader(make_view_session()))
     local provider = deferred_provider("bitbucket")
     registry.set_providers({ provider })
 
@@ -202,7 +202,7 @@ end)
 describe("registry.provider_for", function()
   it("returns first provider whose can_handle is true", function()
     local registry = fresh_registry()
-    registry._set_diffview_session(stub_diffview(make_view_session()))
+    registry._set_session_reader(stub_session_reader(make_view_session()))
     local p1 = { name = "p1", can_handle = function() return false end }
     local p2 = { name = "p2", can_handle = function() return true end }
     local p3 = { name = "p3", can_handle = function() return true end }
@@ -215,7 +215,7 @@ describe("registry.provider_for", function()
 
   it("returns nil provider when no view session", function()
     local registry = fresh_registry()
-    registry._set_diffview_session({ read = function() return nil end })
+    registry._set_session_reader({ read = function() return nil end })
     local picked = registry.provider_for(1)
     assert.is_nil(picked)
   end)

@@ -9,7 +9,7 @@ return {
         { "<leader>b", group = "buffer" },
         { "<leader>g", group = "git" },
         { "<leader>gt", group = "git toggles" },
-        { "<leader>gv", group = "diffview" },
+        { "<leader>gv", group = "codediff" },
         { "<leader>l", group = "lsp" },
         { "<leader>d", group = "debug + diagnostics" },
         { "<leader>dP", group = "python debug" },

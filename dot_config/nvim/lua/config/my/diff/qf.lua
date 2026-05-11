@@ -210,7 +210,7 @@ local function is_mine(comment)
 end
 
 -- ---------------------------------------------------------------------------
--- Floating popup ("K" / Diffview view_thread)
+-- Floating popup ("K" / CodeDiff view_thread)
 -- ---------------------------------------------------------------------------
 
 local function show_popup_for_thread(thread, opts)

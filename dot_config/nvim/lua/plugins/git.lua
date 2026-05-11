@@ -1,4 +1,4 @@
--- git: gitsigns gutter+hunks, diffview tabbed diff/file-history viewer
+-- git: gitsigns gutter+hunks, codediff side-by-side diff/file-history viewer
 return {
   -- Git signs in gutter
   {
@@ -68,36 +68,29 @@ return {
     },
   },
 
-  -- Tabbed diff & file history viewer
+  -- Side-by-side diff & file history viewer (VSCode-style)
   {
-    "sindrets/diffview.nvim",
-    cmd = {
-      "DiffviewOpen",
-      "DiffviewClose",
-      "DiffviewToggleFiles",
-      "DiffviewFocusFiles",
-      "DiffviewRefresh",
-      "DiffviewFileHistory",
-    },
+    "esmuellert/codediff.nvim",
+    cmd = { "CodeDiff" },
     keys = {
       {
         "<leader>gg",
         function()
-          local lib = require("diffview.lib")
-          if lib.get_current_view() then
-            vim.cmd("DiffviewClose")
+          local lifecycle = require("codediff.ui.lifecycle")
+          if lifecycle.get_session(vim.api.nvim_get_current_tabpage()) then
+            lifecycle.cleanup()
           else
-            vim.cmd("DiffviewOpen")
+            vim.cmd("CodeDiff")
           end
         end,
-        desc = "Toggle diffview",
+        desc = "Toggle codediff",
       },
       {
         "<leader>gG",
         function()
-          local lib = require("diffview.lib")
-          if lib.get_current_view() then
-            vim.cmd("DiffviewClose")
+          local lifecycle = require("codediff.ui.lifecycle")
+          if lifecycle.get_session(vim.api.nvim_get_current_tabpage()) then
+            lifecycle.cleanup()
             return
           end
 
@@ -118,25 +111,19 @@ return {
             vim.notify("Could not resolve origin's default branch. Run: git remote set-head origin -a", vim.log.levels.WARN)
             return
           end
-          vim.cmd(("DiffviewOpen %s...HEAD"):format(base))
+          vim.cmd(("CodeDiff %s...HEAD"):format(base))
         end,
-        desc = "Toggle diffview vs origin default branch (PR overlay)",
+        desc = "Toggle codediff vs origin default branch (PR overlay)",
       },
-      { "<leader>gvo", "<cmd>DiffviewOpen<cr>",          desc = "Diffview open" },
-      { "<leader>gvc", "<cmd>DiffviewClose<cr>",         desc = "Diffview close" },
-      { "<leader>gvh", "<cmd>DiffviewFileHistory<cr>",   desc = "File history (repo)" },
-      { "<leader>gvf", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current)" },
-      { "<leader>gvt", "<cmd>DiffviewToggleFiles<cr>",   desc = "Toggle files panel" },
-      { "<leader>gvr", "<cmd>DiffviewRefresh<cr>",       desc = "Refresh diffview" },
-    },
-    opts = {
-      enhanced_diff_hl = true,
-      view = {
-        merge_tool = {
-          layout = "diff3_mixed",
-          disable_diagnostics = true,
-        },
+      { "<leader>gvo", "<cmd>CodeDiff<cr>",            desc = "CodeDiff open" },
+      {
+        "<leader>gvc",
+        function() require("codediff.ui.lifecycle").cleanup() end,
+        desc = "CodeDiff close",
       },
+      { "<leader>gvh", "<cmd>CodeDiff history<cr>",    desc = "File history (repo)" },
+      { "<leader>gvf", "<cmd>CodeDiff history %<cr>",  desc = "File history (current)" },
     },
+    opts = {},
   },
 }

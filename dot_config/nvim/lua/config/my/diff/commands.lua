@@ -3,7 +3,7 @@
 local M = {}
 
 local registry = require("config.my.diff.registry")
-local diffview_session = require("config.my.diff.diffview_session")
+local codediff_session = require("config.my.diff.codediff_session")
 local comments_ui = require("config.my.diff.comments_ui")
 local hunks = require("config.my.diff.hunks")
 local thread = require("config.my.diff.thread")
@@ -33,14 +33,14 @@ end
 
 local function current_context()
   local tabpage = vim.api.nvim_get_current_tabpage()
-  local view_session = diffview_session.read(tabpage)
+  local view_session = codediff_session.read(tabpage)
   if not view_session then
-    notify(vim.log.levels.WARN, "Not in a Diffview session")
+    notify(vim.log.levels.WARN, "Not in a CodeDiff session")
     return nil
   end
-  local file_path = diffview_session.rel_file_path(view_session)
+  local file_path = codediff_session.rel_file_path(view_session)
   if not file_path then
-    notify(vim.log.levels.WARN, "Not in a Diffview session")
+    notify(vim.log.levels.WARN, "Not in a CodeDiff session")
     return nil
   end
 
@@ -75,7 +75,7 @@ local function ensure_ready()
   local provider = registry.provider_for(tabpage)
   local s = registry.get(tabpage)
   if not provider or not s or s.provider ~= provider or not s.pr then
-    notify(vim.log.levels.WARN, "No PR data cached. Open Diffview for a PR first.")
+    notify(vim.log.levels.WARN, "No PR data cached. Open CodeDiff for a PR first.")
     return nil, nil
   end
   return provider, s

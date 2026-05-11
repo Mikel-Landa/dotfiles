@@ -52,7 +52,7 @@ Smooth motion smear when cursor jumps. Auto-disables in cmdline (no smear while 
 
 ### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent, terminal)
 
-Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (diffview) for in-editor git, or run `lazygit` in the floating terminal (`<leader>ut`).
+Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (codediff) for in-editor git, or run `lazygit` in the floating terminal (`<leader>ut`).
 
 Toggle the explorer with `<leader>e`. Inside the tree:
 
@@ -308,32 +308,18 @@ See [Debug (DAP)](keymaps.md#debug-dap) for the full keymap reference.
 
 ## Git
 
-### sindrets/diffview.nvim — Tabbed diff & file history viewer
+### esmuellert/codediff.nvim — VSCode-style side-by-side diff & file history
 
-Open a tabpage with side-by-side diffs across the working tree, ranges, or commits. File panel on the left lists changed files; navigate with `j`/`k`, `<CR>` opens diff.
+Open a tabpage with side-by-side diffs (line + character-level highlighting) across the working tree, ranges, commits, or arbitrary files/directories. File explorer on the left lists changed files; `<CR>` opens diff. First run downloads a small pre-built C library — run `:CodeDiff install` if it does not auto-install.
 
 | Key | Action |
 |---|---|
-| `<leader>gvo` | Open diffview (working tree vs index) |
-| `<leader>gvc` | Close diffview |
+| `<leader>gvo` | Open codediff (working tree vs index) |
+| `<leader>gvc` | Close codediff |
 | `<leader>gvh` | File history (whole repo) |
 | `<leader>gvf` | File history (current file) |
-| `<leader>gvt` | Toggle files panel |
-| `<leader>gvr` | Refresh |
 
-Inside diff/history view:
-
-| Key | Action |
-|---|---|
-| `<Tab>` / `<S-Tab>` | Next / prev file |
-| `gf` | Open file in new split |
-| `<C-w>gf` | Open in new tab |
-| `[x` / `]x` | Prev / next merge conflict |
-| `<leader>co/ct/cb/ca` | Choose ours / theirs / base / all (merge conflict) |
-| `dx` | Delete conflict region |
-| `g?` | Help |
-
-Commands accept revisions: `:DiffviewOpen HEAD~3` (against 3 commits ago), `:DiffviewOpen main..feature` (range), `:DiffviewFileHistory %` (current file), `:DiffviewFileHistory path/` (subtree).
+Commands accept revisions: `:CodeDiff HEAD~3` (against 3 commits ago), `:CodeDiff main...` (PR-like merge-base diff), `:CodeDiff history %` (current file), `:CodeDiff history origin/main..HEAD` (range). `:CodeDiff file <a> <b>` compares two arbitrary files; `:CodeDiff dir <d1> <d2>` compares two directories; `:CodeDiff merge "$MERGED"` is the git merge-tool entry point.
 
 ### lewis6991/gitsigns.nvim — Git in gutter
 
@@ -361,7 +347,7 @@ Signs in signcolumn show added/changed/deleted lines. See [Git hunks](keymaps.md
 
 ### emrearmagan/atlas.nvim — GitHub + Bitbucket + Jira
 
-GitHub & Bitbucket PR browser + Jira issue browser. Loads on `:AtlasPulls`, `:AtlasIssues`, `:AtlasJqlSearch`. PR diffs open in Diffview. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in `lua/plugins/atlas.lua` with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
+GitHub & Bitbucket PR browser + Jira issue browser. Loads on `:AtlasPulls`, `:AtlasIssues`, `:AtlasJqlSearch`. PR diffs open in CodeDiff. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in `lua/plugins/atlas.lua` with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
 
 | Command | Action |
 |---|---|
@@ -381,19 +367,19 @@ Custom actions in the Bitbucket PR list (open via `:AtlasPulls bitbucket`, press
 
 ### Bitbucket PR comments overlay (custom, `lua/config/my/diff/`)
 
-Inline PR-comment markers in Diffview sessions for Bitbucket PRs. Activates on `:DiffviewOpen <base>...<source-branch>` (or any diffview session whose modified revision matches an open Bitbucket PR head). Reuses atlas.nvim's Bitbucket API for fetch / post / delete.
+Inline PR-comment markers in CodeDiff sessions for Bitbucket PRs. Activates on `:CodeDiff <base>...<source-branch>` (or any codediff session whose modified revision matches an open Bitbucket PR head). Reuses atlas.nvim's Bitbucket API for fetch / post / delete.
 
-How it works: on `DiffviewViewOpened` and per-file `DiffviewDiffBufWinEnter`, the overlay finds an open PR matching the diff's right revision (or current branch as fallback), fetches comments + diff metadata, and places sign-column markers at commented lines on both LEFT and RIGHT diff buffers.
+How it works: on `CodeDiffOpen` and per-file `CodeDiffFileSelect`, the overlay finds an open PR matching the diff's right revision (or current branch as fallback), fetches comments + diff metadata, and places sign-column markers at commented lines on both LEFT and RIGHT diff buffers.
 
 Module layout (see `lua/config/my/diff/CONTEXT.md` for full vocab):
 
-- `init.lua` — wires keymaps and Diffview autocmds.
+- `init.lua` — wires keymaps and CodeDiff autocmds.
 - `registry.lua` — per-tabpage session map + async refresh state machine.
-- `diffview_session.lua` — single seam onto Diffview internals.
+- `codediff_session.lua` — single seam onto codediff internals (`codediff.ui.lifecycle.get_session`).
 - `commands.lua` — user-facing actions (`add_comment`, `view_thread`, `submit_review`, `reload`).
 - `providers/<name>.lua` — host adapter; emits the normalized comment shape.
 
-Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-diffview--bitbucket).
+Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-codediff--bitbucket).
 
 ### pwntester/octo.nvim — GitHub issues
 

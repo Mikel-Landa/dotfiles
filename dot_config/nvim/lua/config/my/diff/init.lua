@@ -1,9 +1,9 @@
 -- PR comments overlay: thin glue. Wires keymaps → commands and
 -- autocmds → registry. State lives in registry.lua, user actions in
--- commands.lua, Diffview reads in diffview_session.lua.
+-- commands.lua, CodeDiff reads in codediff_session.lua.
 local registry = require("config.my.diff.registry")
 local commands = require("config.my.diff.commands")
-local diffview_session = require("config.my.diff.diffview_session")
+local codediff_session = require("config.my.diff.codediff_session")
 local qf = require("config.my.diff.qf")
 
 local atlas_client = require("config.my.diff.providers.atlas_client").new()
@@ -21,30 +21,30 @@ local group = vim.api.nvim_create_augroup("my_diff_comments", { clear = true })
 
 vim.api.nvim_create_autocmd("User", {
   group = group,
-  pattern = "DiffviewViewOpened",
+  pattern = "CodeDiffOpen",
   callback = function(event)
-    vim.schedule(function() registry.refresh(diffview_session.tabpage_from_event(event)) end)
+    vim.schedule(function() registry.refresh(codediff_session.tabpage_from_event(event)) end)
   end,
 })
 
 vim.api.nvim_create_autocmd("User", {
   group = group,
-  pattern = "DiffviewDiffBufRead",
+  pattern = "CodeDiffFileSelect",
   callback = function(event)
-    local tabpage = diffview_session.tabpage_from_event(event)
-    vim.schedule(function() registry.show(tabpage) end)
-  end,
-})
-
-vim.api.nvim_create_autocmd("User", {
-  group = group,
-  pattern = "DiffviewDiffBufWinEnter",
-  callback = function(event)
-    local tabpage = diffview_session.tabpage_from_event(event)
+    local tabpage = codediff_session.tabpage_from_event(event)
     vim.schedule(function()
       registry.refresh(tabpage)
       vim.defer_fn(function() registry.show(tabpage) end, 50)
     end)
+  end,
+})
+
+vim.api.nvim_create_autocmd("User", {
+  group = group,
+  pattern = "CodeDiffClose",
+  callback = function(event)
+    local tabpage = codediff_session.tabpage_from_event(event)
+    registry.destroy(tabpage)
   end,
 })
 
