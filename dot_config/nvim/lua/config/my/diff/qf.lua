@@ -1,8 +1,9 @@
--- PR comments quickfix browser + sign-column overlay for the working tree.
+-- PR comments quickfix browser for the working tree.
 --
--- Fetches comments for the current branch's PR (Bitbucket only), populates the
--- quickfix list with one entry per thread root, and paints signs in the
--- signcolumn of any open buffer whose path matches a thread.
+-- Fetches comments for the current branch's PR from whichever provider
+-- claims the origin URL, populates the quickfix list with one entry per
+-- thread root, and asks the sign painter to render signs in the signcolumn
+-- of any open buffer whose path matches a thread.
 --
 -- Inside the qf list:
 --   * cursor on entry → thread renders inline as `virt_lines` extmarks below
@@ -20,20 +21,14 @@
 -- `:cprev`).
 local M = {}
 
-local atlas_client_mod = require("config.my.diff.providers.atlas_client")
-local bitbucket = require("config.my.diff.providers.bitbucket")
-local links = require("config.my.diff.providers.bitbucket_links")
+local registry = require("config.my.diff.registry")
+local sign_painter = require("config.my.diff.sign_painter")
 local comments_ui = require("config.my.diff.comments_ui")
 
 local QF_TITLE = "PR Comments"
-local SIGN_HL = "PRCommentSign"
-local SIGN_PENDING_HL = "PRCommentSignPending"
-local SIGN_ICON = "▌"
-
-local sign_ns = vim.api.nvim_create_namespace("pr_comments_signs")
 local virt_ns = vim.api.nvim_create_namespace("pr_comments_qf_virt")
 
----@type { root: string, pr: table, threads_by_path: table<string, table[]>, current_user: table|nil }|nil
+---@type { root: string, pr: table, provider: table, threads_by_path: table<string, table[]>, current_user: table|nil }|nil
 local state
 local active_popup
 -- Tracks the extmark currently providing virt_lines under a qf entry so
@@ -63,42 +58,21 @@ local function current_branch(root)
   return branch ~= "" and branch or nil
 end
 
-local function parse_origin(root)
+local function origin_url(root)
   local result = vim.system({ "git", "-C", root, "remote", "get-url", "origin" }, { text = true }):wait()
   if not result or result.code ~= 0 then return nil end
   local url = trim(result.stdout)
-  if not url:find("bitbucket", 1, false) then return nil end
-  local path = url:match("^[%w_-]+@[^:]+:(.+)$")
-    or url:match("^https?://[^/]+/(.+)$")
-    or url:match("^[%w]+://[^/]+/(.+)$")
-  if not path then return nil end
-  path = path:gsub("%.git$", "")
-  local workspace, repo = path:match("^([^/]+)/(.+)$")
-  return workspace, repo
+  return url ~= "" and url or nil
 end
 
-local function setup_highlights()
-  if vim.fn.hlexists(SIGN_HL) == 0 then
-    vim.api.nvim_set_hl(0, SIGN_HL, { fg = "#c6a0f6", bold = true })
+local function range_from_comment(comment)
+  if comment.range and comment.range.start_line and comment.range.end_line then
+    return { start_line = comment.range.start_line, end_line = comment.range.end_line }
   end
-  if vim.fn.hlexists(SIGN_PENDING_HL) == 0 then
-    vim.api.nvim_set_hl(0, SIGN_PENDING_HL, { fg = "#f5a97f", bold = true })
+  if comment.anchor and comment.anchor.line then
+    return { start_line = comment.anchor.line, end_line = comment.anchor.line }
   end
-end
-
-local function range_from_raw(comment)
-  local raw = comment._raw or {}
-  local inline = raw.inline or {}
-  local end_line = tonumber(inline.to) or tonumber(inline["from"])
-  if not end_line then
-    if comment.anchor and comment.anchor.line then
-      return { start_line = comment.anchor.line, end_line = comment.anchor.line }
-    end
-    return nil
-  end
-  local start_line = tonumber(inline.start_to) or tonumber(inline.start_from) or end_line
-  if start_line > end_line then start_line, end_line = end_line, start_line end
-  return { start_line = start_line, end_line = end_line }
+  return nil
 end
 
 local function build_threads(comments)
@@ -131,70 +105,20 @@ local function group_by_path(roots, replies_by_root)
   local out = {}
   for _, c in ipairs(roots) do
     out[c.path] = out[c.path] or {}
-    local range = range_from_raw(c) or { start_line = c.anchor.line, end_line = c.anchor.line }
-    table.insert(out[c.path], {
-      root = c,
-      replies = replies_by_root[c.id] or {},
-      range = range,
-      line = c.anchor.line,
-    })
+    local range = range_from_comment(c)
+    if range then
+      table.insert(out[c.path], {
+        root = c,
+        replies = replies_by_root[c.id] or {},
+        range = range,
+        line = c.anchor.line,
+      })
+    end
   end
   for _, threads in pairs(out) do
     table.sort(threads, function(a, b) return a.line < b.line end)
   end
   return out
-end
-
-local function buf_relative_path(bufnr)
-  if not state then return nil end
-  local name = vim.api.nvim_buf_get_name(bufnr)
-  if name == "" then return nil end
-  local abs = vim.fn.fnamemodify(name, ":p")
-  local root = state.root
-  if abs:sub(1, #root + 1) == root .. "/" then
-    return abs:sub(#root + 2)
-  end
-  return nil
-end
-
-local function clear_signs(bufnr)
-  if vim.api.nvim_buf_is_valid(bufnr) then
-    vim.api.nvim_buf_clear_namespace(bufnr, sign_ns, 0, -1)
-  end
-end
-
-local function render_signs(bufnr)
-  if not state then return end
-  if not vim.api.nvim_buf_is_valid(bufnr) then return end
-  if vim.bo[bufnr].buftype ~= "" then return end
-
-  local rel = buf_relative_path(bufnr)
-  if not rel then return end
-  local threads = state.threads_by_path[rel]
-  if not threads then return end
-
-  vim.api.nvim_buf_clear_namespace(bufnr, sign_ns, 0, -1)
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
-  for _, t in ipairs(threads) do
-    local pending = t.root.pending == true
-    local hl = pending and SIGN_PENDING_HL or SIGN_HL
-    for line_num = t.range.start_line, t.range.end_line do
-      if line_num >= 1 and line_num <= line_count then
-        vim.api.nvim_buf_set_extmark(bufnr, sign_ns, line_num - 1, 0, {
-          sign_text = SIGN_ICON,
-          sign_hl_group = hl,
-          priority = 100,
-        })
-      end
-    end
-  end
-end
-
-local function thread_for_line(threads, line)
-  for _, t in ipairs(threads) do
-    if t.range.start_line <= line and line <= t.range.end_line then return t end
-  end
-  return nil
 end
 
 local function is_mine(comment)
@@ -388,15 +312,21 @@ local function bind_qf_buffer(qf_winid)
 end
 
 -- ---------------------------------------------------------------------------
--- Code-buffer keymaps (K = peek-or-hover)
+-- Code-buffer K (peek-or-hover) binding
 -- ---------------------------------------------------------------------------
+
+local function thread_for_line(threads, line)
+  for _, t in ipairs(threads) do
+    if t.range.start_line <= line and line <= t.range.end_line then return t end
+  end
+  return nil
+end
 
 local function bind_buffer(bufnr)
   vim.keymap.set("n", "K", function()
     if vim.bo[bufnr].buftype ~= "" then return vim.lsp.buf.hover() end
-    if not state then return vim.lsp.buf.hover() end
-    local rel = buf_relative_path(bufnr)
-    local threads = rel and state.threads_by_path[rel] or {}
+    local threads = sign_painter.threads_for_buffer(bufnr)
+    if not threads then return vim.lsp.buf.hover() end
     local thread = thread_for_line(threads, vim.fn.line("."))
     if thread then
       show_popup_for_thread(thread, { relative_to_cursor = true })
@@ -410,18 +340,11 @@ local function unbind_buffer(bufnr)
   pcall(vim.keymap.del, "n", "K", { buffer = bufnr })
 end
 
-local function refresh_all_buffers()
+local function refresh_keymaps()
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(bufnr) then
-      clear_signs(bufnr)
-      if state then
-        local rel = buf_relative_path(bufnr)
-        if rel and state.threads_by_path[rel] then
-          render_signs(bufnr)
-          bind_buffer(bufnr)
-        else
-          unbind_buffer(bufnr)
-        end
+      if state and sign_painter.threads_for_buffer(bufnr) then
+        bind_buffer(bufnr)
       else
         unbind_buffer(bufnr)
       end
@@ -438,30 +361,23 @@ local function setup_autocmds()
       if vim.bo[args.buf].buftype ~= "" then return end
       vim.schedule(function()
         if not vim.api.nvim_buf_is_valid(args.buf) then return end
-        if state then
-          local rel = buf_relative_path(args.buf)
-          if rel and state.threads_by_path[rel] then
-            render_signs(args.buf)
-            bind_buffer(args.buf)
-          end
+        if not state then return end
+        sign_painter.refresh_buffer(args.buf)
+        if sign_painter.threads_for_buffer(args.buf) then
+          bind_buffer(args.buf)
         end
       end)
     end,
   })
 end
 
-local function with_atlas_client(callback)
-  local client = atlas_client_mod.new()
-  if not client then
-    notify(vim.log.levels.WARN, "atlas.nvim Bitbucket API is not available")
-    return
-  end
-  callback(client)
-end
+-- ---------------------------------------------------------------------------
+-- Quickfix list + load orchestration
+-- ---------------------------------------------------------------------------
 
 local function populate_qf(roots, replies_by_root, root_path)
   -- Most-recent first. Falls back to id when timestamps are missing or equal
-  -- so order stays deterministic even on Bitbucket payloads without created_at.
+  -- so order stays deterministic even on payloads without created_at.
   local sorted = vim.list_extend({}, roots)
   table.sort(sorted, function(a, b)
     local ta, tb = a.created_at or "", b.created_at or ""
@@ -472,7 +388,7 @@ local function populate_qf(roots, replies_by_root, root_path)
   local items = {}
   for _, c in ipairs(sorted) do
     local replies = replies_by_root[c.id] or {}
-    local range = range_from_raw(c) or { start_line = c.anchor.line, end_line = c.anchor.line }
+    local range = range_from_comment(c) or { start_line = c.anchor.line, end_line = c.anchor.line }
     table.insert(items, {
       filename = root_path .. "/" .. c.path,
       lnum = c.anchor.line,
@@ -494,67 +410,64 @@ local function load(on_done)
   local root = git_root()
   if not root then notify(vim.log.levels.WARN, "Not in a git repository"); on_done(false); return end
 
-  local workspace, repo = parse_origin(root)
-  if not workspace or not repo then
-    notify(vim.log.levels.WARN, "Origin is not a Bitbucket remote"); on_done(false); return
+  local url = origin_url(root)
+  if not url then notify(vim.log.levels.WARN, "No origin remote"); on_done(false); return end
+
+  local provider, workspace, repo = registry.provider_for_origin_url(url)
+  if not provider then
+    notify(vim.log.levels.WARN, "No PR provider claims this remote"); on_done(false); return
   end
 
   local branch = current_branch(root)
   if not branch then notify(vim.log.levels.WARN, "Could not resolve current branch"); on_done(false); return end
 
-  with_atlas_client(function(client)
-    local user_done, prs_done = false, false
-    local current_user, pr, comments_normalized
+  local user_done, prs_done = false, false
+  local current_user, pr, comments_normalized
 
-    local function maybe_finish()
-      if not (user_done and prs_done) then return end
-      if not pr then on_done(false); return end
+  local function maybe_finish()
+    if not (user_done and prs_done) then return end
+    if not pr then on_done(false); return end
 
-      local roots, replies_by_root = build_threads(comments_normalized or {})
-      local threads_by_path = group_by_path(roots, replies_by_root)
-      state = {
-        root = root,
-        pr = pr,
-        threads_by_path = threads_by_path,
-        current_user = current_user,
-      }
-      setup_highlights()
-      refresh_all_buffers()
-      populate_qf(roots, replies_by_root, root)
-      on_done(true)
-    end
+    local roots, replies_by_root = build_threads(comments_normalized or {})
+    local threads_by_path = group_by_path(roots, replies_by_root)
+    state = {
+      root = root,
+      pr = pr,
+      provider = provider,
+      threads_by_path = threads_by_path,
+      current_user = current_user,
+    }
+    sign_painter.set_state({ root = root, threads_by_path = threads_by_path })
+    refresh_keymaps()
+    populate_qf(roots, replies_by_root, root)
+    on_done(true)
+  end
 
-    client.fetch_current_user(function(user, err)
+  if provider.fetch_current_user then
+    provider.fetch_current_user(function(user, err)
       if err then notify(vim.log.levels.DEBUG, "current user: " .. err) end
       current_user = user
       user_done = true
       maybe_finish()
     end)
+  else
+    user_done = true
+  end
 
-    notify(vim.log.levels.INFO, ("Loading PR comments for %s..."):format(branch))
-    client.fetch_open_prs(workspace, repo, function(prs, err)
-      if err then notify(vim.log.levels.WARN, err); prs_done = true; maybe_finish(); return end
-      for _, candidate in ipairs(prs or {}) do
-        if (candidate.source or {}).branch == branch then pr = candidate; break end
-      end
-      if not pr then
-        notify(vim.log.levels.WARN, "No open PR for branch " .. branch)
-        prs_done = true; maybe_finish(); return
-      end
+  notify(vim.log.levels.INFO, ("Loading PR comments for %s..."):format(branch))
+  provider.find_pr_for_branch(workspace, repo, branch, function(found_pr, err)
+    if err then notify(vim.log.levels.WARN, err); prs_done = true; maybe_finish(); return end
+    if not found_pr then
+      notify(vim.log.levels.WARN, "No open PR for branch " .. branch)
+      prs_done = true; maybe_finish(); return
+    end
+    pr = found_pr
 
-      local url = links.comments(pr)
-      if url == "" then
-        notify(vim.log.levels.WARN, "PR has no comments URL")
-        pr = nil; prs_done = true; maybe_finish(); return
-      end
-
-      client.fetch_comments(url, function(values, err2)
-        if err2 then notify(vim.log.levels.WARN, err2); pr = nil; prs_done = true; maybe_finish(); return end
-        for _, c in ipairs(values or {}) do c._raw = c end
-        comments_normalized = bitbucket._normalize_comments(values or {})
-        prs_done = true
-        maybe_finish()
-      end)
+    provider.fetch_comments(pr, function(values, err2)
+      if err2 then notify(vim.log.levels.WARN, err2); pr = nil; prs_done = true; maybe_finish(); return end
+      comments_normalized = values or {}
+      prs_done = true
+      maybe_finish()
     end)
   end)
 end
@@ -601,7 +514,8 @@ function M.close()
     active_popup.close()
   end
   active_popup = nil
-  refresh_all_buffers()
+  sign_painter.set_state(nil)
+  refresh_keymaps()
   pcall(vim.api.nvim_clear_autocmds, { group = "pr_comments_qf_cursor" })
   local list = vim.fn.getqflist({ title = 0 })
   if list.title == QF_TITLE then
@@ -628,9 +542,9 @@ function M.open()
 end
 
 function M._edit(comment)
-  if not state or not state.pr then return end
-  local provider = bitbucket.new(atlas_client_mod.new())
-  if not provider or not provider.edit_comment then
+  if not state or not state.pr or not state.provider then return end
+  local provider = state.provider
+  if not provider.edit_comment then
     notify(vim.log.levels.WARN, "Edit not supported"); return
   end
 
@@ -655,9 +569,9 @@ function M._edit(comment)
 end
 
 function M._delete(comment, close, preserve_root_id)
-  if not state or not state.pr then return end
-  local provider = bitbucket.new(atlas_client_mod.new())
-  if not provider or not provider.delete_comment then return end
+  if not state or not state.pr or not state.provider then return end
+  local provider = state.provider
+  if not provider.delete_comment then return end
 
   local target = comment.in_reply_to_id and "reply" or "thread"
   local fallback_idx
@@ -680,9 +594,9 @@ function M._delete(comment, close, preserve_root_id)
 end
 
 function M._reply_to(thread)
-  if not state or not state.pr then return end
-  local provider = bitbucket.new(atlas_client_mod.new())
-  if not provider then return end
+  if not state or not state.pr or not state.provider then return end
+  local provider = state.provider
+  if not provider.reply then return end
 
   local preserve_id = thread.root.id
 
@@ -700,6 +614,6 @@ function M._reply_to(thread)
 end
 
 setup_autocmds()
-setup_highlights()
+sign_painter.setup_highlights()
 
 return M

@@ -10,13 +10,11 @@ local function trim(value)
   return vim.trim(value)
 end
 
-local function parse_origin(root)
-  if type(root) ~= "string" or root == "" then return nil end
-  local result = vim.system({ "git", "-C", root, "remote", "get-url", "origin" }, { text = true }):wait()
-  if not result or result.code ~= 0 then return nil end
-
-  local url = trim(result.stdout)
-  if not url:find("bitbucket", 1, false) then return nil end
+---@param url string  origin URL (ssh or https)
+---@return string|nil workspace, string|nil repo
+local function parse_origin_url(url)
+  if type(url) ~= "string" or url == "" then return nil end
+  if not url:find("bitbucket", 1, true) then return nil end
 
   local path = url:match("^[%w_-]+@[^:]+:(.+)$")
     or url:match("^https?://[^/]+/(.+)$")
@@ -27,6 +25,19 @@ local function parse_origin(root)
   local workspace, repo = path:match("^([^/]+)/(.+)$")
   if not workspace or not repo then return nil end
   return workspace, repo
+end
+
+local function origin_url_for(git_root)
+  if type(git_root) ~= "string" or git_root == "" then return nil end
+  local result = vim.system({ "git", "-C", git_root, "remote", "get-url", "origin" }, { text = true }):wait()
+  if not result or result.code ~= 0 then return nil end
+  return trim(result.stdout)
+end
+
+local function parse_origin(root)
+  local url = origin_url_for(root)
+  if not url then return nil end
+  return parse_origin_url(url)
 end
 
 local function hash_matches(left, right)
@@ -48,7 +59,13 @@ local function normalize_comment(comment)
   local to_line = tonumber(inline.to)
   local from_line = tonumber(inline["from"])
   local side = to_line and "RIGHT" or "LEFT"
-  local line = to_line or from_line
+  local end_line = to_line or from_line
+  local start_line = end_line
+  if to_line then
+    start_line = tonumber(inline.start_to) or end_line
+  elseif from_line then
+    start_line = tonumber(inline.start_from) or end_line
+  end
 
   local author = comment.author or comment.user or {}
   local content = comment.content or {}
@@ -67,8 +84,13 @@ local function normalize_comment(comment)
     pending = comment.pending == true or tostring(comment.state or ""):upper() == "PENDING",
     in_reply_to_id = comment.parent_id or parent.id,
   }
-  if result.path and line then
-    result.anchor = { side = side, line = line }
+  if result.path and end_line then
+    result.anchor = { side = side, line = end_line }
+    if start_line and start_line ~= end_line then
+      result.range = { start_line = math.min(start_line, end_line), end_line = math.max(start_line, end_line) }
+    else
+      result.range = { start_line = end_line, end_line = end_line }
+    end
   end
   return result
 end
@@ -86,7 +108,7 @@ local function normalize_comments(comments)
     end
   end
 
-  -- Second pass: replies inherit anchor + path from their root.
+  -- Second pass: replies inherit anchor + path + range from their root.
   for _, comment in ipairs(comments or {}) do
     local item = normalize_comment(comment)
     if item.in_reply_to_id and not item.path then
@@ -94,6 +116,7 @@ local function normalize_comments(comments)
       if parent_item then
         item.path = parent_item.path
         item.anchor = parent_item.anchor
+        item.range = parent_item.range
         table.insert(normalized, item)
       end
     end
@@ -138,8 +161,13 @@ local function inline_for(context)
   }
 end
 
--- Test seam: expose normalize_comments for fixture-driven specs (static).
+-- Public + test seam. `_normalize_comments` is the legacy alias kept so
+-- existing specs continue to pass; `normalize_comments` is the new public
+-- name used by callers (e.g. qf.lua before the working-tree path moved
+-- behind the provider seam).
+M.normalize_comments = normalize_comments
 M._normalize_comments = normalize_comments
+M._parse_origin_url = parse_origin_url
 
 ---@param atlas_client table  see providers/atlas_client.lua
 ---@return table|nil  provider table, or nil when atlas_client is missing
@@ -147,6 +175,10 @@ function M.new(atlas_client)
   if not atlas_client then return nil end
 
   local provider = { name = "bitbucket" }
+
+  function provider.parse_origin_url(url)
+    return parse_origin_url(url)
+  end
 
   function provider.can_handle(session)
     return session ~= nil and parse_origin(session.git_root) ~= nil
@@ -170,6 +202,18 @@ function M.new(atlas_client)
     end)
   end
 
+  local function pr_from_branch_internal(workspace, repo, branch, callback)
+    if not workspace or not repo or not branch or branch == "" then callback(nil); return end
+    atlas_client.fetch_open_prs(workspace, repo, function(prs, err)
+      if err then callback(nil, err); return end
+      for _, pr in ipairs(prs or {}) do
+        local source_branch = (pr.source or {}).branch
+        if source_branch == branch then callback(pr); return end
+      end
+      callback(nil)
+    end)
+  end
+
   local function pr_from_branch(session, callback)
     if not session or not session.git_root then callback(nil); return end
     local workspace, repo = parse_origin(session.git_root)
@@ -180,16 +224,7 @@ function M.new(atlas_client)
       local result = vim.system({ "git", "-C", session.git_root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
       branch = result and result.code == 0 and trim(result.stdout) or ""
     end
-    if branch == "" then callback(nil); return end
-
-    atlas_client.fetch_open_prs(workspace, repo, function(prs, err)
-      if err then callback(nil, err); return end
-      for _, pr in ipairs(prs or {}) do
-        local source_branch = (pr.source or {}).branch
-        if source_branch == branch then callback(pr); return end
-      end
-      callback(nil)
-    end)
+    pr_from_branch_internal(workspace, repo, branch, callback)
   end
 
   local function wait_for_pr(session, attempt, callback)
@@ -208,6 +243,14 @@ function M.new(atlas_client)
     wait_for_pr(session, 1, function(pr, err)
       if err then callback(nil, "Failed to find Bitbucket PR: " .. err); return end
       if not pr then callback(nil, "No Bitbucket PR found"); return end
+      callback(pr)
+    end)
+  end
+
+  function provider.find_pr_for_branch(workspace, repo, branch, callback)
+    pr_from_branch_internal(workspace, repo, branch, function(pr, err)
+      if err then callback(nil, "Failed to find Bitbucket PR: " .. err); return end
+      if not pr then callback(nil, ("No open PR for branch %s"):format(branch)); return end
       callback(pr)
     end)
   end
