@@ -1,3 +1,4 @@
 #Ignore local mise files
 .mise.local.toml
 **/.claude/settings.local.json
+graphify-out/

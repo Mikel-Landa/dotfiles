@@ -16,9 +16,8 @@ apt = {
     "zsh",
     "zsh-autosuggestions",
     "zsh-syntax-highlighting",
-    # "neovim", -- don't install, as it too out of date. Use mise for it instead
+    # neovim + tmux on Ubuntu: see groups/apt-outdated.toml.tmpl (mise instead — apt too old)
     "ripgrep",
-    "tmux",
     "yq",
     "jq",
   ]

@@ -13,6 +13,7 @@ Metapac is the single source of truth for all installed packages. When adding a 
 | `kubernetes.toml` | Kubernetes tooling | yes |
 | `work.toml` | Work-only tools | yes |
 | `wsl.toml` | WSL-only tools (jq, imagemagick, matugen, xdg-open-wsl) — skipped off WSL | yes |
+| `apt-outdated.toml.tmpl` | Ubuntu-only: packages where apt is too stale, installed via mise (tmux, neovim) | yes |
 | `system.toml` | **System-specific packages — gitignored, never commit** | no |
 
 ## Where to Add Packages
@@ -26,6 +27,8 @@ Metapac is the single source of truth for all installed packages. When adding a 
 **Niri-specific** → `niri.toml`
 
 **WSL-specific** → `wsl.toml`
+
+**Apt-stale, need mise on Ubuntu** → `apt-outdated.toml.tmpl` (arch keeps native package in its normal group)
 
 **Work tools** → `work.toml`
 

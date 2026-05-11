@@ -1,0 +1,12 @@
+{{- /*
+Packages where apt ships a too-old version → install via mise on Ubuntu.
+On arch, leave native package as source of truth (see terminal.toml [arch]).
+*/ -}}
+{{- if eq .chezmoi.osRelease.id "ubuntu" }}
+mise = {
+  packages = [
+    "tmux",     # apt stuck at 3.4 (no extended-keys-format); need 3.5+
+    "neovim",   # apt ships too-old neovim
+  ]
+}
+{{- end }}

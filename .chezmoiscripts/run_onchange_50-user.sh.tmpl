@@ -18,7 +18,7 @@ fi
 {{- if .work }}
 
 # Work GPG signing key + ~/.gitconfig-work. Skip entirely if gitconfig-work exists.
-GITCONFIG_WORK="$HOME/.gitconfig-work"
+GITCONFIG_WORK="$HOME/.config/git/config-work"
 if [ ! -f "$GITCONFIG_WORK" ]; then
     echo "Enter work email address:"
     read -r WORK_EMAIL

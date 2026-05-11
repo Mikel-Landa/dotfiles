@@ -24,13 +24,17 @@
 typeset -gA TV_STAR_JOIN
 
 _tv_star_complete() {
-    emulate -L zsh
-    setopt local_options no_aliases noshwordsplit noksh_arrays
-
+    # Fast path: no `**` trigger — delegate to user's normal TAB widget under
+    # their current options. Must NOT `emulate`/`setopt no_aliases` here:
+    # `_git` (and friends) inherit those options and fall through to file
+    # completion when git aliases / shwordsplit defaults mismatch.
     if [[ $LBUFFER != *'**' ]]; then
         zle ${_tv_star_fallback:-expand-or-complete}
         return
     fi
+
+    emulate -L zsh
+    setopt local_options no_aliases noshwordsplit noksh_arrays
 
     local prefix=${LBUFFER%\*\*}
     local stripped=${prefix%% }
