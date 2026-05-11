@@ -4,21 +4,22 @@ Metapac is the single source of truth for all installed packages. When adding a 
 
 ## Group Overview
 
-| File | Purpose | Committed |
-|------|---------|-----------|
-| `base.toml` | Core CLI utilities (git, curl, gcc, etc.) — cross-platform | yes |
-| `terminal.toml` | Terminal tools (neovim, zsh, tmux, ripgrep, etc.) — cross-platform | yes |
-| `apps.toml` | GUI applications (kitty, VSCode, Chrome, Spotify) — skipped on WSL | yes |
-| `niri.toml` | Niri compositor extras — skipped on WSL | yes |
-| `kubernetes.toml` | Kubernetes tooling | yes |
-| `work.toml` | Work-only tools | yes |
-| `wsl.toml` | WSL-only tools (jq, imagemagick, matugen, xdg-open-wsl) — skipped off WSL | yes |
-| `apt-outdated.toml.tmpl` | Ubuntu-only: packages where apt is too stale, installed via mise (tmux, neovim) | yes |
-| `system.toml` | **System-specific packages — gitignored, never commit** | no |
+| File                     | Purpose                                                                         | Committed |
+| ------------------------ | ------------------------------------------------------------------------------- | --------- |
+| `base.toml`              | Core CLI utilities (git, curl, gcc, etc.) — cross-platform                      | yes       |
+| `terminal.toml`          | Terminal tools (neovim, zsh, tmux, ripgrep, etc.) — cross-platform              | yes       |
+| `apps.toml`              | GUI applications (kitty, VSCode, Chrome, Spotify) — skipped on WSL              | yes       |
+| `niri.toml`              | Niri compositor extras — skipped on WSL                                         | yes       |
+| `kubernetes.toml`        | Kubernetes tooling                                                              | yes       |
+| `work.toml`              | Work-only tools                                                                 | yes       |
+| `wsl.toml`               | WSL-only tools (jq, imagemagick, matugen, xdg-open-wsl) — skipped off WSL       | yes       |
+| `apt-outdated.toml.tmpl` | Ubuntu-only: packages where apt is too stale, installed via mise (tmux, neovim) | yes       |
+| `system.toml`            | **System-specific packages — gitignored, never commit**                         | no        |
 
 ## Where to Add Packages
 
 **Should exist on every machine** → `base.toml` or `terminal.toml`
+
 - Add both `arch` and `apt` entries if the package exists on both
 - Use `cargo`/`mise`/`go` backends for cross-distro installs
 
@@ -33,6 +34,7 @@ Metapac is the single source of truth for all installed packages. When adding a 
 **Work tools** → `work.toml`
 
 **System/distro-specific packages** → `system.toml` only
+
 - `system.toml` is gitignored — changes stay local, never propagate to other machines
 - Hardware drivers, distro-specific utilities, kernel variants, OS defaults belong here
 - Applies regardless of OS: CachyOS packages, Ubuntu system packages, etc.
@@ -40,6 +42,7 @@ Metapac is the single source of truth for all installed packages. When adding a 
 ## Backends
 
 Configured in `config.toml.tmpl` (chezmoi-templated):
+
 - Global: `cargo`, `mise`, `go`, `pipx`, `npm`
 - WSL machines: also `apt`
 - `cachyos` hostname: also `arch` (paru)
@@ -47,9 +50,10 @@ Configured in `config.toml.tmpl` (chezmoi-templated):
 
 ## Metapac Config Reference
 
-Full docs: https://github.com/Mikel-Landa/metapac/tree/metapac-go
+Full docs: <https://github.com/Mikel-Landa/metapac/tree/metapac-go>
 
 **Packages** — string or object form:
+
 ```toml
 "package-name"
 { name = "package-name", hooks = { after_sync = ["cmd", "arg"] } }

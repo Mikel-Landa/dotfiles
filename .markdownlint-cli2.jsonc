@@ -1,0 +1,6 @@
+{
+  // Disable line-length: prose wrapping is editor preference, tables can't wrap.
+  "config": {
+    "MD013": false
+  }
+}
