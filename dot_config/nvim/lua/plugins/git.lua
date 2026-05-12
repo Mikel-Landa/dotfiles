@@ -175,6 +175,9 @@ return {
         layout = "inline",
         conflict_result_position = "center",
       },
+      explorer = {
+        view_mode = "tree",
+      },
     },
   },
 }
