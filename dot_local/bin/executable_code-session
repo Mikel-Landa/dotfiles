@@ -17,7 +17,8 @@ if [ "$#" -eq 0 ]; then
   sess="$(tmux display-message -p '#S')"
   cwd="$(tmux display-message -p '#{session_path}')"
   apply_layout "$sess" "$cwd"
-  exec nvim
+  nvim || true
+  exec "${SHELL:-bash}" -l
 fi
 
 path="${1/#\~/$HOME}"
