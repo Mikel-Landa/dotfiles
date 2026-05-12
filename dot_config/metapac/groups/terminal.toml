@@ -8,7 +8,6 @@ arch = {
     "tmux",
     "go-yq",
     "jq",
-    "shellcheck",
   ]
 }
 
@@ -21,7 +20,6 @@ apt = {
     "ripgrep",
     "yq",
     "jq",
-    "shellcheck",
   ]
 }
 

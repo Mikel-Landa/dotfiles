@@ -32,6 +32,8 @@ Metapac is the single source of truth for all installed packages. When adding a 
 
 **Work tools** → `work.toml`
 
+**Nvim-only LSPs/formatters/linters/DAP** → leave to mason (`mason-tool-installer` `ensure_installed` in `lua/plugins/lang/*.lua`). Add to metapac only if the tool is also used outside nvim (CI, pre-commit, shell).
+
 **System/distro-specific packages** → `system.toml` only
 - `system.toml` is gitignored — changes stay local, never propagate to other machines
 - Hardware drivers, distro-specific utilities, kernel variants, OS defaults belong here
