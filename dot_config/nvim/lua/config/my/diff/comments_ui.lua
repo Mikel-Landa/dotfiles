@@ -111,8 +111,8 @@ function M.input(opts)
 		vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(opts.initial_body, "\n", { plain = true }))
 	end
 
-	local width = math.min(opts.width or 80, vim.o.columns - 4)
-	local height = math.min(opts.height or 15, vim.o.lines - 6)
+	local width = math.min(80, vim.o.columns - 4)
+	local height = math.min(15, vim.o.lines - 6)
 	local win = vim.api.nvim_open_win(buf, true, {
 		relative = "editor",
 		width = width,
@@ -259,10 +259,8 @@ local function build_thread_render(comments, opts, width)
 	return lines, line_to_comment, spans
 end
 
--- Build virt_lines extmark payload for `comments`. Returns array of chunk
--- arrays, ready for nvim_buf_set_extmark{virt_lines=...}. Width auto-clamped
--- to (`opts.width` or 90). `opts.no_actions` defaults to true here (virt_lines
--- aren't interactive — actions live on the host entry line).
+-- virt_lines extmark payload for `comments`. Defaults `no_actions = true`
+-- because virt_lines aren't interactive — actions live on the host entry line.
 function M.thread_virt_lines(comments, opts)
 	opts = vim.tbl_extend("keep", opts or {}, { no_actions = true })
 	setup_highlights()
@@ -308,7 +306,7 @@ function M.open(comments, opts)
 	vim.bo[buf].filetype = "markdown"
 	vim.bo[buf].bufhidden = "wipe"
 
-	local width = math.min(opts.width or 90, vim.o.columns - 4)
+	local width = math.min(90, vim.o.columns - 4)
 	local lines, line_to_comment, spans = build_thread_render(comments, opts, width)
 
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -321,7 +319,7 @@ function M.open(comments, opts)
 		})
 	end
 
-	local height = math.min(opts.height or 30, vim.o.lines - 6)
+	local height = math.min(30, vim.o.lines - 6)
 	local win_config = {
 		relative = "editor",
 		width = width,

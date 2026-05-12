@@ -84,55 +84,34 @@ local function normalize_comment(comment)
   return result
 end
 
+-- Single pass: normalize once into by_id (roots only), then walk pending
+-- replies and reparent. Halves allocations vs. the two-pass shape.
 local function normalize_comments(comments)
   local normalized = {}
   local by_id = {}
+  local pending_replies = {}
 
-  -- First pass: thread roots (have inline path + line of their own).
   for _, comment in ipairs(comments or {}) do
     local item = normalize_comment(comment)
     if item.path and item.anchor then
       table.insert(normalized, item)
       by_id[item.id] = item
+    elseif item.in_reply_to_id then
+      pending_replies[#pending_replies + 1] = item
     end
   end
 
-  -- Second pass: replies inherit anchor + path + range from their root.
-  for _, comment in ipairs(comments or {}) do
-    local item = normalize_comment(comment)
-    if item.in_reply_to_id and not item.path then
-      local parent_item = by_id[item.in_reply_to_id]
-      if parent_item then
-        item.path = parent_item.path
-        item.anchor = parent_item.anchor
-        item.range = parent_item.range
-        table.insert(normalized, item)
-      end
+  for _, item in ipairs(pending_replies) do
+    local parent_item = by_id[item.in_reply_to_id]
+    if parent_item then
+      item.path = parent_item.path
+      item.anchor = parent_item.anchor
+      item.range = parent_item.range
+      table.insert(normalized, item)
     end
   end
 
   return normalized
-end
-
-local function dedup(comments)
-  local out = {}
-  local seen = {}
-  for _, comment in ipairs(comments or {}) do
-    if comment.path and comment.anchor then
-      local key = tostring(comment.id or "")
-      if key == "" then
-        key = table.concat({
-          comment.path or "", comment.anchor.side or "",
-          tostring(comment.anchor.line or ""), comment.body or "",
-        }, ":")
-      end
-      if not seen[key] then
-        seen[key] = true
-        table.insert(out, comment)
-      end
-    end
-  end
-  return out
 end
 
 local function inline_for(context)
@@ -151,7 +130,6 @@ local function inline_for(context)
 end
 
 M._normalize_comments = normalize_comments
-M._parse_origin_url = parse_origin_url
 
 ---@param atlas_client table  see providers/atlas_client.lua
 ---@return table|nil  provider table, or nil when atlas_client is missing
@@ -255,7 +233,7 @@ function M.new(atlas_client)
     atlas_client.fetch_comments(url, function(values, err)
       if err then callback(nil, "Failed to load comments: " .. err); return end
       for _, c in ipairs(values or {}) do c._raw = c end
-      callback(dedup(normalize_comments(values)))
+      callback(lib.dedup_comments(normalize_comments(values)))
     end)
   end
 

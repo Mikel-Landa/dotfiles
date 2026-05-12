@@ -62,13 +62,16 @@ local function normalize_comment(comment)
   return result
 end
 
+-- Single pass: normalize roots into by_id, then reparent replies.
 local function normalize_comments(comments)
   local normalized = {}
   local by_id = {}
+  local pending_replies = {}
 
-  -- First pass: thread roots (have inline path + line of their own, no parent).
   for _, comment in ipairs(comments or {}) do
-    if not comment.in_reply_to_id then
+    if comment.in_reply_to_id then
+      pending_replies[#pending_replies + 1] = comment
+    else
       local item = normalize_comment(comment)
       if item.path and item.anchor then
         table.insert(normalized, item)
@@ -77,18 +80,15 @@ local function normalize_comments(comments)
     end
   end
 
-  -- Second pass: replies inherit anchor + path + range from their root if missing.
-  for _, comment in ipairs(comments or {}) do
-    if comment.in_reply_to_id then
-      local item = normalize_comment(comment)
-      local parent_item = by_id[item.in_reply_to_id]
-      if parent_item then
-        item.path = item.path or parent_item.path
-        item.anchor = item.anchor or parent_item.anchor
-        item.range = item.range or parent_item.range
-        if item.path and item.anchor then
-          table.insert(normalized, item)
-        end
+  for _, comment in ipairs(pending_replies) do
+    local item = normalize_comment(comment)
+    local parent_item = by_id[item.in_reply_to_id]
+    if parent_item then
+      item.path = item.path or parent_item.path
+      item.anchor = item.anchor or parent_item.anchor
+      item.range = item.range or parent_item.range
+      if item.path and item.anchor then
+        table.insert(normalized, item)
       end
     end
   end
@@ -96,30 +96,7 @@ local function normalize_comments(comments)
   return normalized
 end
 
-local function dedup(comments)
-  local out = {}
-  local seen = {}
-  for _, comment in ipairs(comments or {}) do
-    if comment.path and comment.anchor then
-      local key = tostring(comment.id or "")
-      if key == "" then
-        key = table.concat({
-          comment.path or "", comment.anchor.side or "",
-          tostring(comment.anchor.line or ""), comment.body or "",
-        }, ":")
-      end
-      if not seen[key] then
-        seen[key] = true
-        table.insert(out, comment)
-      end
-    end
-  end
-  return out
-end
-
--- Test seam: expose normalize_comments for fixture-driven specs (static).
 M._normalize_comments = normalize_comments
-M._parse_origin_url = parse_origin_url
 
 ---@param gh_client table  see providers/gh_client.lua
 ---@return table|nil  provider table, or nil when gh_client is missing
@@ -216,7 +193,7 @@ function M.new(gh_client)
     gh_client.fetch_review_comments(pr, function(values, err)
       if err then callback(nil, "Failed to load comments: " .. err); return end
       for _, c in ipairs(values or {}) do c._raw = c end
-      callback(dedup(normalize_comments(values)))
+      callback(lib.dedup_comments(normalize_comments(values)))
     end)
   end
 

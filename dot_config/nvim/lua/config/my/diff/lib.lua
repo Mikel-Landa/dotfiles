@@ -1,12 +1,5 @@
--- Shared helpers for diff/* modules. Pure utility seam — no state beyond the
--- per-root origin URL memo. Adapters and qf.lua import from here instead of
--- inlining `trim`/`notify`/git shell-outs.
+-- Shared helpers for diff/* modules.
 local M = {}
-
-function M.trim(value)
-  if type(value) ~= "string" then return "" end
-  return vim.trim(value)
-end
 
 function M.notify(level, msg)
   vim.notify("[PR comments] " .. tostring(msg), level)
@@ -17,7 +10,7 @@ M.git = {}
 local function run_git(args)
   local result = vim.system(args, { text = true }):wait()
   if not result or result.code ~= 0 then return nil end
-  local out = M.trim(result.stdout)
+  local out = vim.trim(result.stdout or "")
   return out ~= "" and out or nil
 end
 
@@ -32,8 +25,8 @@ function M.git.current_branch(root)
   return run_git({ "git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD" })
 end
 
--- Memoized per root: `git remote get-url origin` is invariant across the
--- session and gets hit 3× per PR-load by the provider chain otherwise.
+-- Memoized: `git remote get-url origin` is invariant across a session and the
+-- provider chain hits it 3× per PR-load otherwise.
 local origin_cache = {}
 
 function M.git.origin_url(root)
@@ -47,6 +40,27 @@ end
 
 function M.git.clear_origin_cache()
   origin_cache = {}
+end
+
+-- Dedup normalized comments by id (or anchor+body when id missing).
+function M.dedup_comments(comments)
+  local out, seen = {}, {}
+  for _, c in ipairs(comments or {}) do
+    if c.path and c.anchor then
+      local key = tostring(c.id or "")
+      if key == "" then
+        key = table.concat({
+          c.path or "", c.anchor.side or "",
+          tostring(c.anchor.line or ""), c.body or "",
+        }, ":")
+      end
+      if not seen[key] then
+        seen[key] = true
+        out[#out + 1] = c
+      end
+    end
+  end
+  return out
 end
 
 return M

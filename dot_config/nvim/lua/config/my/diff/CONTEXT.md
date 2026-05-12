@@ -9,9 +9,9 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
   signcolumn of a CodeDiff session, with keymaps to add/reply/resolve. The
   overlay is **sticky**: it never auto-loads on `CodeDiffOpen`; the first
   fetch must come from an explicit invocation (`qf.open` via `<leader>oc`
-  seeds the registry, or call `commands.reload`). Once a tabpage has a
-  registry session, `CodeDiffFileSelect` re-fetches so signs stay in sync
-  with the new file; closing the tab tears the session down.
+  seeds the registry). Once a tabpage has a registry session,
+  `CodeDiffFileSelect` re-fetches so signs stay in sync with the new file;
+  closing the tab tears the session down.
 - **CodeDiff session** — the (tabpage, view, layout, buffers) tuple the overlay
   observes. Read by the **CodeDiff session reader** from
   `codediff.ui.lifecycle`.
@@ -23,66 +23,42 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 - **Session registry** — `registry.lua`. Owns the per-tabpage `sessions` map and
   the async refresh state machine (`refresh`, `show`, `destroy`). Drives
   provider fetches, joins dual results (diff files + comments), and enforces
-  race guards via `loading_key` + identity checks. Takes provider list and
-  CodeDiff session reader as dependencies — no autocmd or UI knowledge.
-  `set_providers` accepts either provider tables or factory functions
-  (`() -> provider | nil`); factories are resolved on each `provider_for*`
-  call, with successful results cached and nil results re-probed on the next
-  lookup. This lets `init.lua` register adapters whose plugin deps are still
-  `cmd`-lazy at config-load time.
+  race guards via `loading_key` + identity checks. `set_providers` accepts
+  either provider tables or factory functions (`() -> provider | nil`);
+  factories are resolved on each `provider_for*` call, with successful
+  results cached and nil results re-probed on the next lookup. This lets
+  `init.lua` register adapters whose plugin deps are still `cmd`-lazy at
+  config-load time.
 - **Provider / adapter** — module under `providers/` that knows one PR host
   (Bitbucket, GitHub…). Implements `name`, `parse_origin_url`, `can_handle`,
   `find_pr` (CodeDiff path), `find_pr_for_branch` (working-tree path),
   `fetch_diff_files`, `fetch_comments`, `add_comment`, `reply`,
   `submit_review`, `delete_comment`, `edit_comment`, `fetch_current_user`,
   `pr_url`. Emits comments in the **normalized comment shape** below. Built
-  via `providers/<host>.new(deps)` so dependencies (e.g. **Atlas client**,
-  **gh client**) are injected; `init.lua` registers each provider as a
-  **factory** (a `function () -> provider | nil`) on `registry.set_providers`
-  rather than eagerly-constructed tables, so probes run after `lazy.setup()`
-  has packadded plugin deps. The seam is real now (two adapters: Bitbucket
-  via atlas.nvim, GitHub via the `gh` CLI).
-- **Atlas client** — single adapter onto `atlas.nvim`. Probed lazily through
-  the Bitbucket factory in `init.lua`: the factory force-loads `atlas.nvim`
-  via `lazy.core.loader.load` (atlas is `cmd`-lazy and `config.my` is required
-  before plugin specs are registered, so an eager probe would always fail),
-  then calls `atlas_client.new()`, which returns nil if
-  `atlas.pulls.providers.bitbucket.api.*` is still unavailable — in which case
-  the factory returns nil and the registry retries on the next lookup.
-  Methods (`fetch_open_prs`, `fetch_diff`, `create_comment`, `reply_comment`,
-  `delete_comment`, `approve`, `request_changes`) all return `(result, err)`
-  uniformly. Replaces the inline `safe_require` dance that used to live
-  across the Bitbucket provider.
-- **gh client** — single adapter onto the `gh` CLI for GitHub PR review-comment
-  endpoints (atlas.nvim's GitHub provider only handles issue comments).
-  Probed lazily through the GitHub factory in `init.lua` via `gh_client.new()`;
-  returns nil if `gh` isn't installed, in which case the factory returns nil
-  and the registry retries on the next lookup.
-  Methods (`fetch_open_prs`, `fetch_pr_files`, `fetch_review_comments`,
-  `create_review_comment`, `reply_review_comment`, `edit_review_comment`,
-  `delete_review_comment`, `submit_review`, `fetch_current_user`) shell out
-  via `vim.system({"gh", "api", …})` and return `(result, err)` uniformly.
-- **Bitbucket links** — pure module that extracts URLs from a PR's `_raw`
-  payload: `diff(pr)`, `comments(pr)`, `approve(pr)`, `request_changes(pr)`,
-  `html(pr)`, `self(comment)`. Owns the Bitbucket link schema (key forks like
-  `request-changes` vs `request_changes`, defensive nil-walking) so call
-  sites read as routing, not table archaeology.
+  via `providers/<host>.new(deps)` so dependencies are injected; `init.lua`
+  registers each provider as a **factory** (`function () -> provider | nil`)
+  on `registry.set_providers` so probes run after `lazy.setup()` packadds
+  plugin deps.
+- **Atlas client** — `providers/atlas_client.lua`. Single adapter onto
+  `atlas.nvim`. Probed lazily through the Bitbucket factory in `init.lua`:
+  the factory force-loads `atlas.nvim` via `lazy.core.loader.load` (atlas is
+  `cmd`-lazy and `config.my` loads before plugin specs register), then calls
+  `atlas_client.new()` which returns nil if `atlas.pulls.providers.bitbucket.api.*`
+  is still unavailable. Methods return `(result, err)` uniformly.
+- **gh client** — `providers/gh_client.lua`. Single adapter onto the `gh` CLI
+  for GitHub PR review-comment endpoints (atlas.nvim's GitHub provider only
+  handles issue comments). Returns nil if `gh` isn't installed. Methods
+  shell out via `vim.system({"gh", "api", …})` and return `(result, err)`
+  uniformly.
+- **Bitbucket links** — `providers/bitbucket_links.lua`. Pure module that
+  extracts URLs from a PR's `_raw` payload. Owns the Bitbucket link schema
+  (key forks like `request-changes` vs `request_changes`, defensive
+  nil-walking) so call sites read as routing.
 - **Sign painter** — `sign_painter.lua`. State-driven module that paints
   sign-column extmarks on working-tree code buffers given a
   `{ root, threads_by_path }` snapshot, plus a `threads_for_buffer(bufnr)`
   query used by the qf code-buffer K binding. No autocmds, no provider
-  knowledge — `qf.lua` drives it. Replaces the inline sign-column code that
-  used to live in `qf.lua`.
-- **Thread finder** — pure module mapping `(comments, location)` to
-  `{ root, replies } | nil` where `location = { file_path, side, line }`.
-  Centralizes the thread-matching invariants (root has `in_reply_to_id ==
-  nil`, anchor matches location, replies sorted by id) currently inlined in
-  `commands.get_thread_at_cursor`. Vim cursor reads stay in `commands.lua`.
-- **Mutation runner** — helper inside `commands.lua`:
-  `run_mutation(tabpage, op, success_msg)`. Wraps every provider mutation
-  (`add_comment`, `reply`, `submit_review`, `delete_comment`) with the
-  err-or-notify-then-`registry.refresh(force=true)` contract, so adding a
-  new mutation can't silently skip the refresh.
+  knowledge — `qf.lua` drives it.
 - **Normalized comment** — `{ id, anchor = { side, line }, range = { start_line,
   end_line }, path, body, user, user_id, created_at, pending, in_reply_to_id,
   _raw }`. The *only* shape the registry and planner know. Adapters translate
@@ -91,11 +67,9 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
   comments; `sign_plan` only reads `anchor.line`, but `qf.lua`'s sign painter
   paints over the full range.
 - **Anchor** — `{ side: "LEFT"|"RIGHT", line: integer }`. Single source of truth
-  for which file line a comment attaches to. Replaces the older
-  `line` / `original_line` dual fields.
+  for which file line a comment attaches to.
 - **Sign plan** — pure output of `sign_plan.plan(comments, path, side, line_count)`:
-  a `{ line → SignSpec }` map. Tells `render` what to draw, without doing any
-  drawing.
+  a `{ line → SignSpec }` map. Tells `render` what to draw.
 - **Hunk** — `{ left_start, left_count, right_start, right_count }` parsed from the
   adapter's diff representation. `hunks.contains(...)` decides whether a comment
   range is inside the diff (gates `add_comment`).
@@ -104,45 +78,26 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 
 ## Module roles
 
-- `init.lua` — thin glue. Wires keymaps → commands and autocmds → registry.
-  No state, no logic.
-- `registry.lua` — **Session registry** (see above). Test surface: drive with
-  stub provider + stub CodeDiff reader; assert state transitions, race guards,
-  dual-fetch join.
-- `codediff_session.lua` — **CodeDiff session reader** (see above). Test surface:
-  stub `codediff.ui.lifecycle`; assert revision normalization, session-key build,
-  path stripping.
-- `commands.lua` — user-facing actions (`add_comment`, `view_thread`,
-  `submit_review`, `reload`) plus their context helpers (`current_context`,
-  `visual_context`, `get_thread_at_cursor`, `in_diff`, `ensure_ready`,
-  `open_comment_popup`). Imports registry + `comments_ui` + providers.
+- `init.lua` — thin glue. Wires keymaps → qf and autocmds → registry. No state.
+- `registry.lua` — **Session registry**.
+- `codediff_session.lua` — **CodeDiff session reader**.
+- `qf.lua` — working-tree quickfix browser. `<leader>oc` opens; cursor on a
+  qf entry renders the thread as `virt_lines` and auto-previews the code in
+  the adjacent window. Inside the qf: `r`/`d`/`e` scope to the entry's root;
+  `K` opens the full per-comment popup; `<CR>` jumps focus to the previewed
+  code window. In code buffers with PR threads loaded, `K` peeks the thread
+  under cursor (falls through to `vim.lsp.buf.hover()` off-thread).
 - `sign_plan.lua` — pure planner. No vim APIs.
 - `render.lua` — buffer effects + per-buffer memo of last-applied plan.
 - `hunks.lua` — pure hunk parser + range check.
-- `comments_ui.lua` — UI helper with three entry points:
+- `comments_ui.lua` — three entry points:
   - `M.input` — floating prompt for write/edit/reply bodies.
-  - `M.open` — floating thread popup (centered or `relative_to_cursor`); per-comment
-    `r`/`e`/`d` keymaps. Used by `commands.view_thread` (CodeDiff) and the qf
-    `K` peek binding.
-  - `M.thread_virt_lines` — pure helper: returns a chunked virt_lines payload
-    (one inner array per virtual line) for a thread, ready to feed to
-    `nvim_buf_set_extmark{virt_lines=…}`. Used by `qf.lua` to expand the
-    selected entry inline. Action footer is suppressed by default
-    (`opts.no_actions = true`).
+  - `M.open` — floating thread popup; per-comment `r`/`e`/`d` keymaps.
+  - `M.thread_virt_lines` — pure helper returning chunked virt_lines.
 - `providers/<name>.lua` — adapter, must emit normalized comments. Exposes
   `new(deps)` factory; module-level state forbidden.
-- `providers/atlas_client.lua` — **Atlas client** (see above). Test surface:
-  inject fake atlas modules; assert `(result, err)` shape and missing-dep
-  routing.
-- `providers/gh_client.lua` — **gh client** (see above). Test surface: inject
-  a fake `runner` (the `gh api` shell-out) via `gh_client.new({ runner = … })`;
-  assert endpoint routing and `(result, err)` shape on stdout/stderr/exit-code
-  combinations.
-- `providers/bitbucket_links.lua` — **Bitbucket links** (see above). Test
-  surface: feed fixture `pr._raw` payloads, assert URL extraction and key-fork
-  handling.
-- `sign_painter.lua` — **Sign painter** (see above). Test surface: drive
-  `set_state`/`refresh_buffer`/`threads_for_buffer` with stub buffers and
-  assert extmark and query behaviour.
-- `thread.lua` — **Thread finder** (see above). Test surface: pure, fixture
-  comments + location records.
+- `providers/atlas_client.lua` — **Atlas client**.
+- `providers/gh_client.lua` — **gh client**.
+- `providers/bitbucket_links.lua` — **Bitbucket links**.
+- `sign_painter.lua` — **Sign painter**.
+- `lib.lua` — `notify`, memoized `git.origin_url`, `dedup_comments`.

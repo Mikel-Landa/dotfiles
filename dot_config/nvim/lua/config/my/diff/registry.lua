@@ -1,5 +1,4 @@
 -- Session registry. Per-tabpage sessions map + async refresh state machine.
--- See CONTEXT.md → "Session registry".
 local M = {}
 
 local sign_plan = require("config.my.diff.sign_plan")
@@ -99,9 +98,6 @@ end
 function M.destroy(tabpage)
   local s = sessions[tabpage]
   if not s then return end
-  -- Best-effort: clear the render memo for the buffers we last saw. The view's
-  -- buffers may already be invalid if the tab is closing; render.clear_memo is
-  -- a plain table delete and tolerates that.
   local view_session = codediff_session.read(tabpage)
   if view_session then
     if view_session.original_bufnr then render.clear_memo(view_session.original_bufnr) end
@@ -111,8 +107,7 @@ function M.destroy(tabpage)
 end
 
 -- Wraps a provider callback so it no-ops once the session for `tabpage` has
--- been replaced or its session_key has changed. Race guard for stale fetches
--- arriving after a tab switch / forced refresh.
+-- been replaced or its session_key has changed. Race guard for stale fetches.
 local function guarded(tabpage, s, key, fn)
   return function(...)
     if sessions[tabpage] ~= s or s.session_key ~= key then return end

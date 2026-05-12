@@ -1,24 +1,5 @@
--- PR comments quickfix browser for the working tree.
---
--- Fetches comments for the current branch's PR from whichever provider
--- claims the origin URL, populates the quickfix list with one entry per
--- thread root, and asks the sign painter to render signs in the signcolumn
--- of any open buffer whose path matches a thread.
---
--- Inside the qf list:
---   * cursor on entry → thread renders inline as `virt_lines` extmarks below
---     the entry, code window auto-previews the entry's file:line (cursor stays
---     in qf)
---   * `r`/`d`/`e` → reply / delete-thread / edit-root, scoped to the entry's
---     thread root
---   * `K`            → floating popup with full per-comment r/d/e (the old
---     popup, kept for fine-grained edits on individual replies)
---   * `<CR>`         → jump focus to the previewed code window
---
--- In a code buffer with PR threads loaded, `K` peeks the thread under cursor
--- (or falls through to `vim.lsp.buf.hover()` when the cursor is off-thread).
--- Inter-thread navigation uses the user's existing `]q`/`[q` (`:cnext` /
--- `:cprev`).
+-- PR comments quickfix browser for the working tree. Bindings + flows
+-- documented in CONTEXT.md.
 local M = {}
 
 local registry = require("config.my.diff.registry")
@@ -93,13 +74,11 @@ local function is_mine(comment)
   return false
 end
 
--- Forward declarations: edit/delete/reply are local mutators defined below;
--- show_popup_for_thread closes over them through these upvalues.
+-- Forward declarations: mutators are defined at the bottom of the file
+-- and closed over by show_popup_for_thread.
 local edit_comment, delete_comment, reply_to_thread
 
--- ---------------------------------------------------------------------------
--- Floating popup ("K" / CodeDiff view_thread)
--- ---------------------------------------------------------------------------
+-- Floating popup ("K" peek)
 
 local function show_popup_for_thread(thread, opts)
   opts = opts or {}
@@ -133,9 +112,7 @@ local function show_popup_for_thread(thread, opts)
   end)
 end
 
--- ---------------------------------------------------------------------------
 -- Quickfix: virt_lines + auto-preview
--- ---------------------------------------------------------------------------
 
 local function clear_virt()
   if active_virt.bufnr and vim.api.nvim_buf_is_valid(active_virt.bufnr) and active_virt.id then
@@ -211,9 +188,7 @@ local function sync_to_entry(qf_winid, qf_bufnr, lnum)
   preview_entry(qf_winid, item)
 end
 
--- ---------------------------------------------------------------------------
 -- Per-entry actions inside the qf buffer
--- ---------------------------------------------------------------------------
 
 local function entry_thread_at_cursor()
   local list = vim.fn.getqflist({ title = 0, items = 0 })
@@ -275,9 +250,7 @@ local function bind_qf_buffer(qf_winid)
   })
 end
 
--- ---------------------------------------------------------------------------
 -- Code-buffer K (peek-or-hover) binding
--- ---------------------------------------------------------------------------
 
 local function bind_buffer(bufnr)
   vim.keymap.set("n", "K", function()
@@ -315,6 +288,7 @@ local function setup_autocmds()
   vim.api.nvim_create_autocmd("BufWinEnter", {
     group = group,
     callback = function(args)
+      if not state then return end
       if vim.bo[args.buf].buftype ~= "" then return end
       vim.schedule(function()
         if not vim.api.nvim_buf_is_valid(args.buf) then return end
@@ -328,9 +302,7 @@ local function setup_autocmds()
   })
 end
 
--- ---------------------------------------------------------------------------
 -- Quickfix list + load orchestration
--- ---------------------------------------------------------------------------
 
 local function populate_qf(roots, replies_by_root, root_path)
   -- Most-recent first. Falls back to id when timestamps are missing or equal

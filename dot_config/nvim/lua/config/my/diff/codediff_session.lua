@@ -1,5 +1,4 @@
 -- CodeDiff session reader. Single seam onto codediff internals.
--- See CONTEXT.md → "CodeDiff session reader".
 local M = {}
 
 local function safe_codediff_require(mod)

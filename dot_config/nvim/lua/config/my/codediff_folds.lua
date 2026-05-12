@@ -1,24 +1,17 @@
 -- Compressed view for CodeDiff buffers: fold away unchanged regions, leaving
--- only changed lines plus N lines of context. Toggle per-tab with `<leader>gz`
--- (or `gz` inside a diff window). Applied automatically on `CodeDiffOpen`.
---
--- Strategy: codediff renders diffs via extmarks rather than vim's diff mode,
--- so `foldmethod=diff` does not apply. Scan codediff's per-buffer extmarks to
--- derive a set of "kept" lines (changed ± context) and drive a
--- `foldmethod=expr` foldexpr from it.
+-- only changed lines plus N context lines. Toggle per-tab with `<leader>gz`
+-- (or `gz` inside a diff window). codediff uses extmarks (not vim diff mode),
+-- so foldmethod=diff doesn't apply — we derive folds from its extmarks.
 
 local M = {}
 
 local codediff_session = require("config.my.diff.codediff_session")
 
 local CONTEXT = 5
--- codediff splits highlights across namespaces: `codediff-highlight` for
--- side-by-side, `codediff-inline` for inline layout. Scan both.
+-- codediff splits highlights across two namespaces — side-by-side vs inline.
 local NS_HL = vim.api.nvim_create_namespace("codediff-highlight")
 local NS_INLINE = vim.api.nvim_create_namespace("codediff-inline")
 
--- Per-buffer cache of "kept" line sets, plus the `changedtick` at compute
--- time so schedule_apply retries can short-circuit when nothing changed.
 -- Module-local rather than `vim.b` because vim variable serialization coerces
 -- sparse integer keys to strings, breaking the numeric lookup in `expr()`.
 local buf_cache = {}
@@ -132,10 +125,9 @@ end
 
 local group = vim.api.nvim_create_augroup("my_codediff_folds", { clear = true })
 
--- Per-tab scheduling. A new schedule_apply call supersedes any pending one
--- (the in-flight attempt sees its token bumped and bails). Stops retry chains
--- from stacking when codediff fires FileSelect repeatedly (e.g. its
--- auto-refresh path re-renders the explorer on buffer changes).
+-- Per-tab scheduling. A new schedule_apply bumps the token, so any in-flight
+-- retry chain sees the change and bails — prevents stacking when codediff
+-- fires FileSelect repeatedly.
 local function schedule_apply(tabpage)
   local t = tabs[tabpage] or { enabled = true, token = 0 }
   tabs[tabpage] = t
@@ -166,9 +158,7 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
--- Explorer mode reuses the same tab when the user selects a different file;
--- new extmarks render but CodeDiffOpen does not re-fire, so we listen for
--- file-select and re-derive folds.
+-- Explorer mode reuses the tab on file-select; CodeDiffOpen doesn't re-fire.
 vim.api.nvim_create_autocmd("User", {
   group = group,
   pattern = "CodeDiffFileSelect",

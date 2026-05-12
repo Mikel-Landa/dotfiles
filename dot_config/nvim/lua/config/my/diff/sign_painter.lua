@@ -1,8 +1,6 @@
 -- Sign painter for the working-tree PR-comments overlay. Paints sign-column
 -- extmarks on code buffers based on a `{ root, threads_by_path }` state, and
--- exposes per-buffer thread lookups for the K peek-or-hover binding. No
--- autocmds, no provider knowledge — callers (qf.lua) drive refreshes.
--- See CONTEXT.md → "Sign painter".
+-- exposes per-buffer thread lookups for the K peek-or-hover binding.
 local M = {}
 
 local SIGN_HL = "PRCommentSign"
@@ -12,6 +10,9 @@ local sign_ns = vim.api.nvim_create_namespace("pr_comments_signs")
 
 ---@type { root: string, threads_by_path: table<string, table[]> }|nil
 local state
+-- Buffers that currently carry our signs. Cleared on set_state(nil) so we
+-- don't iterate every loaded buffer just to no-op.
+local painted = {}
 
 function M.setup_highlights()
   if vim.fn.hlexists(SIGN_HL) == 0 then
@@ -38,11 +39,12 @@ local function clear_signs(bufnr)
   if vim.api.nvim_buf_is_valid(bufnr) then
     vim.api.nvim_buf_clear_namespace(bufnr, sign_ns, 0, -1)
   end
+  painted[bufnr] = nil
 end
 
 ---@param threads table[]
 ---@param line integer
----@return table|nil  thread covering `line`, or nil
+---@return table|nil
 function M.thread_for_line(threads, line)
   for _, t in ipairs(threads or {}) do
     if t.range.start_line <= line and line <= t.range.end_line then return t end
@@ -51,7 +53,7 @@ function M.thread_for_line(threads, line)
 end
 
 ---@param bufnr integer
----@return table[]|nil  list of threads anchored to this buffer's relative path
+---@return table[]|nil
 function M.threads_for_buffer(bufnr)
   if not state then return nil end
   if not vim.api.nvim_buf_is_valid(bufnr) then return nil end
@@ -82,13 +84,12 @@ function M.refresh_buffer(bufnr)
       end
     end
   end
+  painted[bufnr] = true
 end
 
 function M.refresh_all()
   if not state then
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_loaded(bufnr) then clear_signs(bufnr) end
-    end
+    for bufnr in pairs(painted) do clear_signs(bufnr) end
     return
   end
   for rel, _ in pairs(state.threads_by_path) do
