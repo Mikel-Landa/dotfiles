@@ -7,10 +7,9 @@ local codediff_session = require("config.my.diff.codediff_session")
 local comments_ui = require("config.my.diff.comments_ui")
 local hunks = require("config.my.diff.hunks")
 local thread = require("config.my.diff.thread")
+local lib = require("config.my.diff.lib")
 
-local function notify(level, msg)
-  vim.notify("[PR comments] " .. tostring(msg), level)
-end
+local notify = lib.notify
 
 -- Mutation runner. Wraps a provider mutation with the
 -- err-or-notify-then-`registry.refresh(force=true)` contract so adding a

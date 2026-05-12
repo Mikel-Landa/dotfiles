@@ -1,12 +1,9 @@
 -- GitHub PR comments overlay provider.
 -- Built via M.new(gh_client). Emits normalized comments per
 -- `lua/config/my/diff/CONTEXT.md` (anchor = { side, line }).
-local M = {}
+local lib = require("config.my.diff.lib")
 
-local function trim(value)
-  if type(value) ~= "string" then return "" end
-  return vim.trim(value)
-end
+local M = {}
 
 ---@param url string  origin URL (ssh or https)
 ---@return string|nil workspace, string|nil repo
@@ -25,15 +22,8 @@ local function parse_origin_url(url)
   return workspace, repo
 end
 
-local function origin_url_for(git_root)
-  if type(git_root) ~= "string" or git_root == "" then return nil end
-  local result = vim.system({ "git", "-C", git_root, "remote", "get-url", "origin" }, { text = true }):wait()
-  if not result or result.code ~= 0 then return nil end
-  return trim(result.stdout)
-end
-
 local function parse_origin(git_root)
-  local url = origin_url_for(git_root)
+  local url = lib.git.origin_url(git_root)
   if not url then return nil end
   return parse_origin_url(url)
 end
@@ -180,29 +170,20 @@ function M.new(gh_client)
     if not workspace or not repo then callback(nil); return end
     local branch = session.modified_branch
     if not branch or branch == "" then
-      local result = vim.system({ "git", "-C", session.git_root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
-      branch = result and result.code == 0 and trim(result.stdout) or ""
+      branch = lib.git.current_branch(session.git_root) or ""
     end
     pr_from_branch_internal(workspace, repo, branch, callback)
   end
 
-  local function wait_for_pr(session, attempt, callback)
-    attempt = attempt or 1
-    pr_from_revision(session, function(pr, err)
-      if pr or err then callback(pr, err); return end
-      if attempt >= 6 then
-        pr_from_branch(session, callback)
-        return
-      end
-      vim.defer_fn(function() wait_for_pr(session, attempt + 1, callback) end, 100)
-    end)
-  end
-
   function provider.find_pr(session, callback)
-    wait_for_pr(session, 1, function(pr, err)
+    pr_from_revision(session, function(pr, err)
       if err then callback(nil, "Failed to find GitHub PR: " .. err); return end
-      if not pr then callback(nil, "No GitHub PR found"); return end
-      callback(pr)
+      if pr then callback(pr); return end
+      pr_from_branch(session, function(pr2, err2)
+        if err2 then callback(nil, "Failed to find GitHub PR: " .. err2); return end
+        if not pr2 then callback(nil, "No GitHub PR found"); return end
+        callback(pr2)
+      end)
     end)
   end
 

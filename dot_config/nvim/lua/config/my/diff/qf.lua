@@ -24,6 +24,7 @@ local M = {}
 local registry = require("config.my.diff.registry")
 local sign_painter = require("config.my.diff.sign_painter")
 local comments_ui = require("config.my.diff.comments_ui")
+local lib = require("config.my.diff.lib")
 
 local QF_TITLE = "PR Comments"
 local virt_ns = vim.api.nvim_create_namespace("pr_comments_qf_virt")
@@ -35,45 +36,7 @@ local active_popup
 -- CursorMoved can clear it before drawing a new one.
 local active_virt = { bufnr = nil, id = nil }
 
-local function notify(level, msg)
-  vim.notify("[PR comments] " .. tostring(msg), level)
-end
-
-local function trim(value)
-  if type(value) ~= "string" then return "" end
-  return vim.trim(value)
-end
-
-local function git_root()
-  local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
-  if not result or result.code ~= 0 then return nil end
-  local root = trim(result.stdout)
-  return root ~= "" and root or nil
-end
-
-local function current_branch(root)
-  local result = vim.system({ "git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
-  if not result or result.code ~= 0 then return nil end
-  local branch = trim(result.stdout)
-  return branch ~= "" and branch or nil
-end
-
-local function origin_url(root)
-  local result = vim.system({ "git", "-C", root, "remote", "get-url", "origin" }, { text = true }):wait()
-  if not result or result.code ~= 0 then return nil end
-  local url = trim(result.stdout)
-  return url ~= "" and url or nil
-end
-
-local function range_from_comment(comment)
-  if comment.range and comment.range.start_line and comment.range.end_line then
-    return { start_line = comment.range.start_line, end_line = comment.range.end_line }
-  end
-  if comment.anchor and comment.anchor.line then
-    return { start_line = comment.anchor.line, end_line = comment.anchor.line }
-  end
-  return nil
-end
+local notify = lib.notify
 
 local function build_threads(comments)
   local roots = {}
@@ -105,15 +68,12 @@ local function group_by_path(roots, replies_by_root)
   local out = {}
   for _, c in ipairs(roots) do
     out[c.path] = out[c.path] or {}
-    local range = range_from_comment(c)
-    if range then
-      table.insert(out[c.path], {
-        root = c,
-        replies = replies_by_root[c.id] or {},
-        range = range,
-        line = c.anchor.line,
-      })
-    end
+    table.insert(out[c.path], {
+      root = c,
+      replies = replies_by_root[c.id] or {},
+      range = c.range,
+      line = c.anchor.line,
+    })
   end
   for _, threads in pairs(out) do
     table.sort(threads, function(a, b) return a.line < b.line end)
@@ -132,6 +92,10 @@ local function is_mine(comment)
   end
   return false
 end
+
+-- Forward declarations: edit/delete/reply are local mutators defined below;
+-- show_popup_for_thread closes over them through these upvalues.
+local edit_comment, delete_comment, reply_to_thread
 
 -- ---------------------------------------------------------------------------
 -- Floating popup ("K" / CodeDiff view_thread)
@@ -155,14 +119,14 @@ local function show_popup_for_thread(thread, opts)
       on_close = function() active_popup = nil end,
       on_reply = function(_, close)
         close()
-        M._reply_to(thread)
+        reply_to_thread(thread)
       end,
       on_edit = function(comment, close)
         close()
-        M._edit(comment)
+        edit_comment(comment)
       end,
       on_delete = function(comment, close)
-        M._delete(comment, close)
+        delete_comment(comment, close)
       end,
     })
     active_popup = handle
@@ -282,20 +246,20 @@ local function bind_qf_buffer(qf_winid)
 
   vim.keymap.set("n", "r", function()
     local t = entry_thread_at_cursor()
-    if t then M._reply_to(t) end
+    if t then reply_to_thread(t) end
   end, vim.tbl_extend("force", opts, { desc = "Reply to thread root" }))
 
   vim.keymap.set("n", "d", function()
     local t = entry_thread_at_cursor()
     if not t then return end
-    M._delete(t.root, nil, t.root.id)
+    delete_comment(t.root, nil, t.root.id)
   end, vim.tbl_extend("force", opts, { desc = "Delete thread" }))
 
   vim.keymap.set("n", "e", function()
     local t = entry_thread_at_cursor()
     if not t then return end
     if not is_mine(t.root) then notify(vim.log.levels.WARN, "Can only edit your own comments"); return end
-    M._edit(t.root)
+    edit_comment(t.root)
   end, vim.tbl_extend("force", opts, { desc = "Edit thread root" }))
 
   -- Auto-preview + virt_lines on cursor moves inside the qf buffer.
@@ -315,19 +279,12 @@ end
 -- Code-buffer K (peek-or-hover) binding
 -- ---------------------------------------------------------------------------
 
-local function thread_for_line(threads, line)
-  for _, t in ipairs(threads) do
-    if t.range.start_line <= line and line <= t.range.end_line then return t end
-  end
-  return nil
-end
-
 local function bind_buffer(bufnr)
   vim.keymap.set("n", "K", function()
     if vim.bo[bufnr].buftype ~= "" then return vim.lsp.buf.hover() end
     local threads = sign_painter.threads_for_buffer(bufnr)
     if not threads then return vim.lsp.buf.hover() end
-    local thread = thread_for_line(threads, vim.fn.line("."))
+    local thread = sign_painter.thread_for_line(threads, vim.fn.line("."))
     if thread then
       show_popup_for_thread(thread, { relative_to_cursor = true })
     else
@@ -388,14 +345,13 @@ local function populate_qf(roots, replies_by_root, root_path)
   local items = {}
   for _, c in ipairs(sorted) do
     local replies = replies_by_root[c.id] or {}
-    local range = range_from_comment(c) or { start_line = c.anchor.line, end_line = c.anchor.line }
     table.insert(items, {
       filename = root_path .. "/" .. c.path,
       lnum = c.anchor.line,
       text = ("@%s: %s"):format(c.user or "?", first_line(c.body)),
       user_data = {
         path = c.path,
-        range = range,
+        range = c.range,
         thread = { root = c, replies = replies },
       },
     })
@@ -407,10 +363,10 @@ end
 ---@param on_done fun(success: boolean)
 local function load(on_done)
   on_done = on_done or function() end
-  local root = git_root()
+  local root = lib.git.root()
   if not root then notify(vim.log.levels.WARN, "Not in a git repository"); on_done(false); return end
 
-  local url = origin_url(root)
+  local url = lib.git.origin_url(root)
   if not url then notify(vim.log.levels.WARN, "No origin remote"); on_done(false); return end
 
   local provider, workspace, repo = registry.provider_for_origin_url(url)
@@ -418,7 +374,7 @@ local function load(on_done)
     notify(vim.log.levels.WARN, "No PR provider claims this remote"); on_done(false); return
   end
 
-  local branch = current_branch(root)
+  local branch = lib.git.current_branch(root)
   if not branch then notify(vim.log.levels.WARN, "Could not resolve current branch"); on_done(false); return end
 
   local user_done, prs_done = false, false
@@ -472,12 +428,36 @@ local function load(on_done)
   end)
 end
 
--- After mutation, re-load + restore qf cursor onto the same root id (so the
--- user keeps their place across reply/edit). For deletes, `preserve_root_id`
--- is the *deleted* id — we fall through to the same line index, which now
--- points at the next thread (entries shifted up by one).
+-- Refresh comments only, reusing cached state.pr / state.root / state.provider.
+-- Skips the 3 git shell-outs and the PR-find round-trip that `load` does on a
+-- cold start — mutations (reply/edit/delete) keep all three constant.
+local function reload_comments(on_done)
+  on_done = on_done or function() end
+  if not state or not state.pr or not state.provider then on_done(false); return end
+  local root, pr, provider = state.root, state.pr, state.provider
+  local current_user = state.current_user
+  provider.fetch_comments(pr, function(values, err)
+    if err then notify(vim.log.levels.WARN, err); on_done(false); return end
+    local roots, replies_by_root = build_threads(values or {})
+    local threads_by_path = group_by_path(roots, replies_by_root)
+    state = {
+      root = root, pr = pr, provider = provider,
+      threads_by_path = threads_by_path,
+      current_user = current_user,
+    }
+    sign_painter.set_state({ root = root, threads_by_path = threads_by_path })
+    refresh_keymaps()
+    populate_qf(roots, replies_by_root, root)
+    on_done(true)
+  end)
+end
+
+-- After mutation, refresh comments + restore qf cursor onto the same root id
+-- (so the user keeps their place across reply/edit). For deletes,
+-- `preserve_root_id` is the *deleted* id — we fall through to the same line
+-- index, which now points at the next thread (entries shifted up by one).
 local function refresh_after_mutation(preserve_root_id, fallback_idx)
-  load(function(success)
+  reload_comments(function(success)
     if not success or not state then return end
     local list = vim.fn.getqflist({ title = 0, items = 0 })
     if list.title ~= QF_TITLE then return end
@@ -526,6 +506,12 @@ function M.close()
 end
 
 function M.open()
+  -- Seed the CodeDiff overlay registry for the current tab too, so the
+  -- sticky overlay (signs inside the codediff buffers) lights up off the
+  -- same explicit invocation. No-op when the tab isn't a CodeDiff session.
+  local tabpage = vim.api.nvim_get_current_tabpage()
+  registry.refresh(tabpage, { force = true })
+
   load(function(success)
     if not success or not state then return end
     local thread_count = 0
@@ -541,7 +527,7 @@ function M.open()
   end)
 end
 
-function M._edit(comment)
+edit_comment = function(comment)
   if not state or not state.pr or not state.provider then return end
   local provider = state.provider
   if not provider.edit_comment then
@@ -568,7 +554,7 @@ function M._edit(comment)
   })
 end
 
-function M._delete(comment, close, preserve_root_id)
+delete_comment = function(comment, close, preserve_root_id)
   if not state or not state.pr or not state.provider then return end
   local provider = state.provider
   if not provider.delete_comment then return end
@@ -593,7 +579,7 @@ function M._delete(comment, close, preserve_root_id)
   end)
 end
 
-function M._reply_to(thread)
+reply_to_thread = function(thread)
   if not state or not state.pr or not state.provider then return end
   local provider = state.provider
   if not provider.reply then return end

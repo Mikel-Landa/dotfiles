@@ -6,12 +6,10 @@
 
 local TITLE = "Unstaged changes"
 
-local function unstaged_files()
-  local result = vim.system({ "git", "status", "--porcelain", "-z" }, { text = true }):wait()
-  if result.code ~= 0 then return nil end
-  -- Porcelain v1 with -z: NUL-separated `XY path` entries; renamed/copied (R/C)
-  -- entries are followed by an extra NUL-terminated original-path field.
-  local entries = vim.split(result.stdout, "\0", { plain = true, trimempty = true })
+-- Porcelain v1 with -z: NUL-separated `XY path` entries; renamed/copied (R/C)
+-- entries are followed by an extra NUL-terminated original-path field.
+local function parse_unstaged(stdout)
+  local entries = vim.split(stdout, "\0", { plain = true, trimempty = true })
   local files, i = {}, 1
   while i <= #entries do
     local entry = entries[i]
@@ -28,17 +26,19 @@ end
 local function refresh(open)
   local is_ours = vim.fn.getqflist({ title = 0 }).title == TITLE
   if not open and not is_ours then return end
-  local files = unstaged_files()
-  if not files then return end
-  local items = vim.tbl_map(function(f)
-    return { filename = f, lnum = 1, text = f }
-  end, files)
-  -- Initial open pushes a new list onto the qf stack (so :colder restores
-  -- whatever list the user had before). Background refresh replaces in place
-  -- to avoid spamming the stack on every gitsigns/neogit event.
-  local action = open and " " or "r"
-  vim.fn.setqflist({}, action, { title = TITLE, items = items })
-  if open then vim.cmd("copen") end
+  vim.system({ "git", "status", "--porcelain", "-z" }, { text = true }, vim.schedule_wrap(function(result)
+    if not result or result.code ~= 0 then return end
+    local files = parse_unstaged(result.stdout or "")
+    local items = vim.tbl_map(function(f)
+      return { filename = f, lnum = 1, text = f }
+    end, files)
+    -- Initial open pushes a new list onto the qf stack (so :colder restores
+    -- whatever list the user had before). Background refresh replaces in place
+    -- to avoid spamming the stack on every gitsigns/neogit event.
+    local action = open and " " or "r"
+    vim.fn.setqflist({}, action, { title = TITLE, items = items })
+    if open then vim.cmd("copen") end
+  end))
 end
 
 -- Coalesce bursts (gitsigns fires per-buffer on attach/update).
@@ -59,16 +59,13 @@ local function open_in_codediff()
   local path = item.filename or vim.api.nvim_buf_get_name(item.bufnr)
   if path == "" then return end
 
-  local in_index = vim.system({ "git", "ls-files", "--error-unmatch", "--", path }, { text = true }):wait()
-  if in_index.code ~= 0 then
+  vim.system({ "git", "ls-files", "--error-unmatch", "--", path }, { text = true }, vim.schedule_wrap(function(in_index)
     vim.cmd("wincmd p")
     vim.cmd("edit " .. vim.fn.fnameescape(path))
-    return
-  end
-
-  vim.cmd("wincmd p")
-  vim.cmd("edit " .. vim.fn.fnameescape(path))
-  vim.cmd("CodeDiff file HEAD")
+    if in_index and in_index.code == 0 then
+      vim.cmd("CodeDiff file HEAD")
+    end
+  end))
 end
 
 vim.keymap.set("n", "<leader>gq", function() refresh(true) end,

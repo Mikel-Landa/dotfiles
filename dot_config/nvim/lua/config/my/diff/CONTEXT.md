@@ -6,7 +6,12 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
 ## Core terms
 
 - **PR comments overlay** — the feature: surface a PR's review comments as signs in the
-  signcolumn of a CodeDiff session, with keymaps to add/reply/resolve.
+  signcolumn of a CodeDiff session, with keymaps to add/reply/resolve. The
+  overlay is **sticky**: it never auto-loads on `CodeDiffOpen`; the first
+  fetch must come from an explicit invocation (`qf.open` via `<leader>oc`
+  seeds the registry, or call `commands.reload`). Once a tabpage has a
+  registry session, `CodeDiffFileSelect` re-fetches so signs stay in sync
+  with the new file; closing the tab tears the session down.
 - **CodeDiff session** — the (tabpage, view, layout, buffers) tuple the overlay
   observes. Read by the **CodeDiff session reader** from
   `codediff.ui.lifecycle`.
@@ -20,6 +25,11 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
   provider fetches, joins dual results (diff files + comments), and enforces
   race guards via `loading_key` + identity checks. Takes provider list and
   CodeDiff session reader as dependencies — no autocmd or UI knowledge.
+  `set_providers` accepts either provider tables or factory functions
+  (`() -> provider | nil`); factories are resolved on each `provider_for*`
+  call, with successful results cached and nil results re-probed on the next
+  lookup. This lets `init.lua` register adapters whose plugin deps are still
+  `cmd`-lazy at config-load time.
 - **Provider / adapter** — module under `providers/` that knows one PR host
   (Bitbucket, GitHub…). Implements `name`, `parse_origin_url`, `can_handle`,
   `find_pr` (CodeDiff path), `find_pr_for_branch` (working-tree path),
@@ -27,20 +37,27 @@ in code; sharpen a term here whenever a conversation reveals it was fuzzy.
   `submit_review`, `delete_comment`, `edit_comment`, `fetch_current_user`,
   `pr_url`. Emits comments in the **normalized comment shape** below. Built
   via `providers/<host>.new(deps)` so dependencies (e.g. **Atlas client**,
-  **gh client**) are injected; `init.lua` skips registering the provider if
-  `new` returns nil. The seam is real now (two adapters: Bitbucket via
-  atlas.nvim, GitHub via the `gh` CLI).
-- **Atlas client** — single adapter onto `atlas.nvim`. Probed once at module
-  load via `atlas_client.new()`; returns nil if `atlas.pulls.providers.bitbucket.api.*` is
-  unavailable, in which case `init.lua` skips registering the Bitbucket
-  provider. Methods (`fetch_open_prs`, `fetch_diff`, `create_comment`,
-  `reply_comment`, `delete_comment`, `approve`, `request_changes`) all return
-  `(result, err)` uniformly. Replaces the inline `safe_require` dance that
-  used to live across the Bitbucket provider.
+  **gh client**) are injected; `init.lua` registers each provider as a
+  **factory** (a `function () -> provider | nil`) on `registry.set_providers`
+  rather than eagerly-constructed tables, so probes run after `lazy.setup()`
+  has packadded plugin deps. The seam is real now (two adapters: Bitbucket
+  via atlas.nvim, GitHub via the `gh` CLI).
+- **Atlas client** — single adapter onto `atlas.nvim`. Probed lazily through
+  the Bitbucket factory in `init.lua`: the factory force-loads `atlas.nvim`
+  via `lazy.core.loader.load` (atlas is `cmd`-lazy and `config.my` is required
+  before plugin specs are registered, so an eager probe would always fail),
+  then calls `atlas_client.new()`, which returns nil if
+  `atlas.pulls.providers.bitbucket.api.*` is still unavailable — in which case
+  the factory returns nil and the registry retries on the next lookup.
+  Methods (`fetch_open_prs`, `fetch_diff`, `create_comment`, `reply_comment`,
+  `delete_comment`, `approve`, `request_changes`) all return `(result, err)`
+  uniformly. Replaces the inline `safe_require` dance that used to live
+  across the Bitbucket provider.
 - **gh client** — single adapter onto the `gh` CLI for GitHub PR review-comment
   endpoints (atlas.nvim's GitHub provider only handles issue comments).
-  Probed once at module load via `gh_client.new()`; returns nil if `gh` isn't
-  installed, in which case `init.lua` skips registering the GitHub provider.
+  Probed lazily through the GitHub factory in `init.lua` via `gh_client.new()`;
+  returns nil if `gh` isn't installed, in which case the factory returns nil
+  and the registry retries on the next lookup.
   Methods (`fetch_open_prs`, `fetch_pr_files`, `fetch_review_comments`,
   `create_review_comment`, `reply_review_comment`, `edit_review_comment`,
   `delete_review_comment`, `submit_review`, `fetch_current_user`) shell out

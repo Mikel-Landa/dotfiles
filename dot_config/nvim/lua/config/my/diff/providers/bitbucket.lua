@@ -2,13 +2,9 @@
 -- Built via M.new(atlas_client). Emits normalized comments per
 -- `lua/config/my/diff/CONTEXT.md` (anchor = { side, line }).
 local links = require("config.my.diff.providers.bitbucket_links")
+local lib = require("config.my.diff.lib")
 
 local M = {}
-
-local function trim(value)
-  if type(value) ~= "string" then return "" end
-  return vim.trim(value)
-end
 
 ---@param url string  origin URL (ssh or https)
 ---@return string|nil workspace, string|nil repo
@@ -27,15 +23,8 @@ local function parse_origin_url(url)
   return workspace, repo
 end
 
-local function origin_url_for(git_root)
-  if type(git_root) ~= "string" or git_root == "" then return nil end
-  local result = vim.system({ "git", "-C", git_root, "remote", "get-url", "origin" }, { text = true }):wait()
-  if not result or result.code ~= 0 then return nil end
-  return trim(result.stdout)
-end
-
 local function parse_origin(root)
-  local url = origin_url_for(root)
+  local url = lib.git.origin_url(root)
   if not url then return nil end
   return parse_origin_url(url)
 end
@@ -161,11 +150,6 @@ local function inline_for(context)
   }
 end
 
--- Public + test seam. `_normalize_comments` is the legacy alias kept so
--- existing specs continue to pass; `normalize_comments` is the new public
--- name used by callers (e.g. qf.lua before the working-tree path moved
--- behind the provider seam).
-M.normalize_comments = normalize_comments
 M._normalize_comments = normalize_comments
 M._parse_origin_url = parse_origin_url
 
@@ -221,29 +205,20 @@ function M.new(atlas_client)
 
     local branch = session.modified_branch
     if not branch or branch == "" then
-      local result = vim.system({ "git", "-C", session.git_root, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true }):wait()
-      branch = result and result.code == 0 and trim(result.stdout) or ""
+      branch = lib.git.current_branch(session.git_root) or ""
     end
     pr_from_branch_internal(workspace, repo, branch, callback)
   end
 
-  local function wait_for_pr(session, attempt, callback)
-    attempt = attempt or 1
-    pr_from_revision(session, function(pr, err)
-      if pr or err then callback(pr, err); return end
-      if attempt >= 6 then
-        pr_from_branch(session, callback)
-        return
-      end
-      vim.defer_fn(function() wait_for_pr(session, attempt + 1, callback) end, 100)
-    end)
-  end
-
   function provider.find_pr(session, callback)
-    wait_for_pr(session, 1, function(pr, err)
+    pr_from_revision(session, function(pr, err)
       if err then callback(nil, "Failed to find Bitbucket PR: " .. err); return end
-      if not pr then callback(nil, "No Bitbucket PR found"); return end
-      callback(pr)
+      if pr then callback(pr); return end
+      pr_from_branch(session, function(pr2, err2)
+        if err2 then callback(nil, "Failed to find Bitbucket PR: " .. err2); return end
+        if not pr2 then callback(nil, "No Bitbucket PR found"); return end
+        callback(pr2)
+      end)
     end)
   end
 

@@ -5,22 +5,43 @@ local M = {}
 local sign_plan = require("config.my.diff.sign_plan")
 local render = require("config.my.diff.render")
 local codediff_session = require("config.my.diff.codediff_session")
+local lib = require("config.my.diff.lib")
 
 local ns = vim.api.nvim_create_namespace("diff_pr_comments")
 
----@type table[]
+---@type table[] entries are provider tables or factory functions returning a provider (or nil)
 local providers = {}
+
+---@type table<integer, table> caches successful factory probes by index; missing entries are re-probed on each lookup
+local resolved = {}
 
 ---@type table<integer, table>
 local sessions = {}
 
-local function notify(level, msg)
-  vim.notify("[PR comments] " .. tostring(msg), level)
-end
+local notify = lib.notify
 
 ---@param list table[]
 function M.set_providers(list)
   providers = list or {}
+  resolved = {}
+end
+
+local function resolve(i, entry)
+  if type(entry) ~= "function" then return entry end
+  local cached = resolved[i]
+  if cached then return cached end
+  local provider = entry()
+  if provider then resolved[i] = provider end
+  return provider
+end
+
+local function iter_providers()
+  return coroutine.wrap(function()
+    for i, entry in ipairs(providers) do
+      local provider = resolve(i, entry)
+      if provider then coroutine.yield(provider) end
+    end
+  end)
 end
 
 ---@param tabpage integer|nil
@@ -31,7 +52,7 @@ end
 function M.provider_for(tabpage)
   local view_session = codediff_session.read(tabpage)
   if not view_session then return nil, nil end
-  for _, mod in ipairs(providers) do
+  for mod in iter_providers() do
     if mod.can_handle and mod.can_handle(view_session) then
       return mod, view_session
     end
@@ -42,7 +63,7 @@ end
 ---@param url string  origin URL (ssh or https)
 ---@return table|nil provider, string|nil workspace, string|nil repo
 function M.provider_for_origin_url(url)
-  for _, mod in ipairs(providers) do
+  for mod in iter_providers() do
     if mod.parse_origin_url then
       local workspace, repo = mod.parse_origin_url(url)
       if workspace and repo then

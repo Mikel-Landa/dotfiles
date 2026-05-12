@@ -40,6 +40,16 @@ local function clear_signs(bufnr)
   end
 end
 
+---@param threads table[]
+---@param line integer
+---@return table|nil  thread covering `line`, or nil
+function M.thread_for_line(threads, line)
+  for _, t in ipairs(threads or {}) do
+    if t.range.start_line <= line and line <= t.range.end_line then return t end
+  end
+  return nil
+end
+
 ---@param bufnr integer
 ---@return table[]|nil  list of threads anchored to this buffer's relative path
 function M.threads_for_buffer(bufnr)
@@ -75,8 +85,15 @@ function M.refresh_buffer(bufnr)
 end
 
 function M.refresh_all()
-  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(bufnr) then
+  if not state then
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(bufnr) then clear_signs(bufnr) end
+    end
+    return
+  end
+  for rel, _ in pairs(state.threads_by_path) do
+    local bufnr = vim.fn.bufnr(state.root .. "/" .. rel)
+    if bufnr > 0 and vim.api.nvim_buf_is_loaded(bufnr) then
       M.refresh_buffer(bufnr)
     end
   end
