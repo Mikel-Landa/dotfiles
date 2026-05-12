@@ -45,6 +45,14 @@ return {
       run_on_start = true,
       start_delay = 3000,
     },
+    -- The plugin's `plugin/mason-tool-installer.lua` registers a VimEnter
+    -- autocmd to trigger `run_on_start()`. Under `event = "VeryLazy"` the
+    -- plugin file is sourced AFTER VimEnter fired, so the autocmd never
+    -- runs. Call it explicitly here so installs still auto-trigger.
+    config = function(_, opts)
+      require("mason-tool-installer").setup(opts)
+      require("mason-tool-installer").run_on_start()
+    end,
   },
 
   {
