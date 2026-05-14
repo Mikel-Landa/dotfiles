@@ -89,4 +89,23 @@ return {
         { desc = "Prev parameter" })
     end,
   },
+
+  -- Sticky scope at top of window (VSCode "sticky scroll"): shows the class /
+  -- function the cursor is currently inside, pinned to the top line(s).
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    event = { "BufReadPre", "BufNewFile" },
+    keys = {
+      { "<leader>uc", "<cmd>TSContextToggle<cr>",  desc = "Toggle sticky context" },
+      { "[x",         function() require("treesitter-context").go_to_context(vim.v.count1) end, desc = "Jump up to context" },
+    },
+    opts = {
+      enable = true,
+      max_lines = 3,            -- cap total sticky lines (class + method + inner)
+      min_window_height = 20,   -- skip on tiny splits
+      multiline_threshold = 1,  -- collapse each scope to its first line
+      mode = "cursor",          -- track cursor scope, not just topline
+      separator = "─",          -- thin divider under sticky region
+    },
+  },
 }

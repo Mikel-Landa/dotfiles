@@ -338,8 +338,10 @@ Format on save runs automatically.
 | `<leader>un` | Dismiss notifications (snacks.notifier) |
 | `<leader>uh` | Toggle inlay hints |
 | `<leader>ui` | Toggle indent guides (current buffer) |
+| `<leader>uc` | Toggle sticky context (treesitter-context) |
 | `<leader>uw` | Toggle word wrap (current buffer) |
 | `<leader>uu` | Open undo tree (built-in `:Undotree`) |
+| `[x` | Jump up to current context line (treesitter-context) |
 
 ## Window / pane navigation
 

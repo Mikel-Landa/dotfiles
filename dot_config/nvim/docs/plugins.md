@@ -205,7 +205,16 @@ Move between nodes:
 | Key | Action |
 |---|---|
 | `]f` / `[f` | Next / prev function |
-| `]c` / `[c` | Next / prev class |
+| `]C` / `[C` | Next / prev class |
+
+### nvim-treesitter-context — Sticky scope at top of window
+
+VSCode-style "sticky scroll": as you scroll inside a function or class, the enclosing scope (class signature, method signature, etc.) stays pinned to the top of the window. Up to 3 lines, one per scope level.
+
+| Key | Action |
+|---|---|
+| `<leader>uc` | Toggle sticky context |
+| `[x` | Jump up to the context line under the cursor's current scope |
 
 ---
 
