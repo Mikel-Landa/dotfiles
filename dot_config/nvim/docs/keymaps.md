@@ -341,6 +341,7 @@ Format on save runs automatically.
 | `<leader>uc` | Toggle sticky context (treesitter-context) |
 | `<leader>uw` | Toggle word wrap (current buffer) |
 | `<leader>uu` | Open undo tree (built-in `:Undotree`) |
+| `<leader>uT` | Pick colorscheme (matugen / catppuccin / monokai-pro, persists) |
 | `[x` | Jump up to current context line (treesitter-context) |
 
 ## Window / pane navigation

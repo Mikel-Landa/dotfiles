@@ -1,110 +1,84 @@
+-- Colorschemes + theme switcher (LazyVim-style).
+--
+-- All theme plugins are `lazy = true` — only the chosen one actually loads.
+-- Lazy.nvim auto-detects installed colorschemes by scanning each plugin's
+-- `colors/` dir, so `:colorscheme catppuccin-mocha` (driven by the picker
+-- or the persisted-theme bootstrap) pulls in `catppuccin/nvim` on demand.
+-- Switching schemes at runtime is cheap; the unused two never start up.
+--
+-- The actual `:colorscheme` call, persistence, and theme-agnostic highlight
+-- tweaks live in `lua/config/my/theme.lua` (invoked from `init.lua` after
+-- `lazy.setup`).
+
 return {
   {
     "daedlock/matugen.nvim",
-    lazy = false,
-    priority = 1000,
-    config = function()
-      require("matugen").setup({
-        colors_path = "~/.config/matugen/colors.json",
-      })
-      vim.cmd.colorscheme("matugen")
+    lazy = true,
+    opts = {
+      colors_path = "~/.config/matugen/colors.json",
+    },
+  },
 
-      local function apply_transparent_bg()
-        local groups = {
-          "Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle",
-          "SnacksNormal", "SnacksNormalNC",
-          "SnacksPicker", "SnacksPickerInput", "SnacksPickerList", "SnacksPickerPreview",
-          "SnacksPickerBox", "SnacksPickerBorder", "SnacksPickerTitle", "SnacksPickerFooter",
-          "SnacksPickerInputBorder", "SnacksPickerInputTitle",
-          "SnacksPickerListBorder", "SnacksPickerListTitle",
-          "SnacksPickerPreviewBorder", "SnacksPickerPreviewTitle",
-          "SnacksPickerBoxBorder", "SnacksPickerBoxTitle",
-          "SnacksPickerNormalFloat",
-        }
-        for _, g in ipairs(groups) do
-          local hl = vim.api.nvim_get_hl(0, { name = g, link = false })
-          hl.bg = "NONE"
-          vim.api.nvim_set_hl(0, g, hl)
-        end
-      end
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    lazy = true,
+    opts = {
+      flavour = "mocha",
+      background = { dark = "mocha" },
+      transparent_background = true,
+      integrations = {
+        blink_cmp = true,
+        gitsigns = true,
+        mini = { enabled = true },
+        neogit = true,
+        noice = true,
+        notify = true,
+        snacks = { enabled = true },
+        treesitter = true,
+        treesitter_context = true,
+        which_key = true,
+        flash = true,
+        fidget = true,
+        rainbow_delimiters = true,
+        render_markdown = true,
+        markdown = true,
+        dap = true,
+        dap_ui = true,
+        native_lsp = {
+          enabled = true,
+          underlines = {
+            errors = { "undercurl" },
+            hints = { "undercurl" },
+            warnings = { "undercurl" },
+            information = { "undercurl" },
+          },
+        },
+      },
+    },
+  },
 
-      -- Apply immediately and re-apply after all plugins have loaded.
-      apply_transparent_bg()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_transparent_bg })
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "VeryLazy",
-        once = true,
-        callback = apply_transparent_bg,
-      })
-
-      -- VSCode-style faint indent guides (snacks.indent). Link to NonText so
-      -- the lines stay barely visible regardless of matugen palette shifts.
-      local function apply_indent_hl()
-        vim.api.nvim_set_hl(0, "SnacksIndent", { link = "NonText", default = false })
-        vim.api.nvim_set_hl(0, "SnacksIndentScope", { link = "Comment", default = false })
-      end
-      apply_indent_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_indent_hl })
-
-      -- VSCode-style git colors in snacks explorer/picker. Default snacks links
-      -- both Untracked and Ignored to NonText, making new files indistinguishable
-      -- from gitignored ones. Render untracked as green (Added) like VSCode.
-      local function apply_git_status_hl()
-        vim.api.nvim_set_hl(0, "SnacksPickerGitStatusUntracked", { link = "Added", default = false })
-      end
-      apply_git_status_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_git_status_hl })
-
-      -- matugen's "ember" palette caps fn / module / property chroma so low
-      -- (~0.03–0.05) that on most wallpapers `fmt.Fprintf(...)` reads as all
-      -- white — no separation between module, call, and variable. Build
-      -- higher-chroma colors from the existing palette hues (so they still
-      -- harmonize with the wallpaper) and apply to calls + module names.
-      local function apply_call_hl()
-        local matugen = package.loaded["matugen"]
-        local pal = matugen and matugen._palette
-        if not pal then return end
-        local color = require("matugen.color")
-        local fn_lch    = color.hex_to_oklch(pal.fn)
-        local type_lch  = color.hex_to_oklch(pal.type)
-        local prop_lch  = color.hex_to_oklch(pal.prop)
-        -- Boost chroma well above cast/whisper caps (0.05 / 0.035) so the
-        -- hue is actually perceptible. Lightness is held >= 0.78 for
-        -- readability on dark surfaces.
-        local L = math.max(fn_lch.L, 0.78)
-        local C = 0.09 -- subtle but perceptible; tweak 0.07–0.12 to taste
-        local fn_color   = color.oklch(L, C, fn_lch.h)
-        local mod_color  = color.oklch(L, C * 0.85, type_lch.h)
-        local prop_color = color.oklch(L, C * 0.55, prop_lch.h)
-        vim.api.nvim_set_hl(0, "@function",             { fg = fn_color })
-        vim.api.nvim_set_hl(0, "@function.call",        { fg = fn_color })
-        vim.api.nvim_set_hl(0, "@function.method",      { fg = fn_color })
-        vim.api.nvim_set_hl(0, "@function.method.call", { fg = fn_color })
-        vim.api.nvim_set_hl(0, "Function",              { fg = fn_color })
-        vim.api.nvim_set_hl(0, "@module",               { fg = mod_color })
-        vim.api.nvim_set_hl(0, "@variable.member",      { fg = prop_color })
-        vim.api.nvim_set_hl(0, "@property",             { fg = prop_color })
-      end
-      apply_call_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_call_hl })
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "MatugenReloaded",
-        callback = apply_call_hl,
-      })
-
-      -- Re-apply undercurl style so diagnostic underlines use colored undercurl,
-      -- not plain underline (kitty supports Smulx undercurl natively).
-      for name, _ in pairs({
-        DiagnosticUnderlineError = true,
-        DiagnosticUnderlineWarn = true,
-        DiagnosticUnderlineInfo = true,
-        DiagnosticUnderlineHint = true,
-      }) do
-        local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
-        hl.undercurl = true
-        hl.underline = nil
-        vim.api.nvim_set_hl(0, name, hl)
-      end
-    end,
+  {
+    "loctvl842/monokai-pro.nvim",
+    lazy = true,
+    opts = {
+      transparent_background = true,
+      terminal_colors = true,
+      devicons = true,
+      filter = "pro",
+      day_night = { enable = false },
+      inc_search = "background",
+      background_clear = {
+        "float_win",
+        "toggleterm",
+        "telescope",
+        "renamer",
+        "notify",
+      },
+      plugins = {
+        bufferline = { underline_selected = false, underline_visible = false },
+        indent_blankline = { context_highlight = "default", context_start_underline = false },
+      },
+    },
   },
 }

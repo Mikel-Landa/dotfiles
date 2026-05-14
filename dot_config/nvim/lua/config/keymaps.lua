@@ -110,6 +110,11 @@ map("n", "J", "mzJ`z", { desc = "Join lines (cursor fixed)" })
 -- Undo tree (built-in nvim.undotree, 0.12+)
 map("n", "<leader>uu", "<cmd>Undotree<cr>", { desc = "Open undo tree" })
 
+-- Theme picker (matugen / catppuccin / monokai-pro)
+map("n", "<leader>uT", function()
+	require("config.my.theme").pick()
+end, { desc = "Pick colorscheme" })
+
 -- Toggle word wrap (current buffer)
 map("n", "<leader>uw", function()
 	vim.opt_local.wrap = not vim.wo.wrap

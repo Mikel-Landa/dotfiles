@@ -4,6 +4,7 @@
 return {
   {
     "Exafunction/windsurf.nvim",
+    main = "codeium",
     event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {

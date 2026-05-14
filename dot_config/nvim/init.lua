@@ -37,3 +37,7 @@ require("lazy").setup({
 -- Built-in opt packs (0.12+). lazy.nvim wipes packpath so :packadd can't find these;
 -- we keep nvim.undotree in rtp via performance.rtp.paths above and source its plugin file.
 vim.cmd.runtime("plugin/undotree.lua")
+
+-- Apply persisted colorscheme. Theme plugins are `lazy = true`; this triggers
+-- lazy.nvim's colors/* handler to load only the chosen one.
+require("config.my.theme").bootstrap()
