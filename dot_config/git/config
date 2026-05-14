@@ -69,6 +69,7 @@
 	updateRefs = true
 
 [alias]
+	wt = worktree
 	root = rev-parse --show-toplevel
 	
 	# `git log` with patches shown with difftastic.

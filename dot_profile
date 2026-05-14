@@ -46,6 +46,7 @@ path_push "$HOME/.cargo/bin"
 # mise shims expose mise-managed tools (node, python, etc.) to non-interactive
 # shells (scripts) without needing `mise activate` to run.
 path_push "$HOME/.local/share/mise/shims"
-[ -d /opt/nvim/bin ] && path_push /opt/nvim/bin
+# Fallback nvim if mise doesn't have one installed. Pushed to back so mise wins.
+[ -d /opt/nvim/bin ] && path_push_back /opt/nvim/bin
 
 # vim: ft=sh
