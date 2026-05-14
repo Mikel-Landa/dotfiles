@@ -57,4 +57,21 @@ return {
       },
     },
   },
+
+  -- Wire lazydev completions into blink.cmp for Lua files.
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    opts = function(_, opts)
+      opts.sources = opts.sources or {}
+      opts.sources.default = opts.sources.default or {}
+      vim.list_extend(opts.sources.default, { "lazydev" })
+      opts.sources.providers = opts.sources.providers or {}
+      opts.sources.providers.lazydev = {
+        name = "LazyDev",
+        module = "lazydev.integrations.blink",
+        score_offset = 100,
+      }
+    end,
+  },
 }

@@ -297,7 +297,7 @@ See [Debug (DAP)](keymaps.md#debug-dap) for the full keymap reference.
 
 ### Language-specific plugins
 
-- **lua**: `folke/lazydev.nvim` — workspace globals for nvim/Snacks/Lazy in lua_ls.
+- **lua**: `folke/lazydev.nvim` — workspace globals for nvim/Snacks/Lazy in lua_ls; also registered as a blink.cmp source (`lazydev`) for rich completion in Lua files.
 - **python**: `linux-cultist/venv-selector.nvim` (`<leader>cv`), `mfussenegger/nvim-dap-python`.
 - **rust**: `mrcjkb/rustaceanvim` (replaces lspconfig rust_analyzer), `Saecki/crates.nvim` (Cargo.toml).
 - **go**: `leoluz/nvim-dap-go`.
@@ -456,6 +456,20 @@ Switch model / provider mid-session via `:AvanteSwitchProvider`.
 | `:AvanteHistory` | Browse previous conversations |
 
 Default keymaps live under `<leader>a*` — see [Avante (AI assistant)](keymaps.md#avante-ai-assistant).
+
+### Exafunction/windsurf.nvim — AI inline completions (Codeium)
+
+Inline ghost-text completions powered by the Codeium backend, plus a blink.cmp menu source. One-time auth: `:Codeium Auth` (browser flow). Loads automatically at startup.
+
+Virtual text keybindings (insert mode):
+
+| Key | Action |
+|---|---|
+| `<M-CR>` | Accept full inline suggestion |
+| `<M-]>` | Next suggestion |
+| `<M-[>` | Prev suggestion |
+
+Codeium suggestions also appear in the blink.cmp completion menu (`codeium` source).
 
 ### Cursor agent — `cursor-agent` floating terminal
 

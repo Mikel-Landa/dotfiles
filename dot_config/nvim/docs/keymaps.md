@@ -20,7 +20,7 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>o` | Workflow (remote PR/issue browsers) |
 | `<leader>p` | Path |
 | `<leader>a` | Avante (AI assistant) |
-| `<leader>sn` | Noice (messages/cmdline) |
+| `<leader>n` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
 | `<leader><tab>` | Tabs |
 
@@ -73,8 +73,7 @@ Press leader and pause — which-key shows the menu.
 
 | Key | Action |
 |---|---|
-| `]h` / `[h` | Next / prev hunk (falls back to `]c` / `[c` in diff mode) |
-| `]H` / `[H` | Last / first hunk |
+| `]c` / `[c` | Next / prev hunk (falls back to native `]c` / `[c` in diff mode) |
 
 ### Stage / reset
 
@@ -233,6 +232,18 @@ References / implementation / type-def / rename / code-action use Neovim 0.11 bu
 |---|---|
 | `<leader>cp` | Toggle browser preview (markdown-preview.nvim) |
 
+## AI inline completions (windsurf.nvim)
+
+Insert mode. Ghost text appears automatically while typing.
+
+| Key | Action |
+|---|---|
+| `<M-CR>` | Accept full suggestion |
+| `<M-]>` | Next suggestion |
+| `<M-[>` | Prev suggestion |
+
+Codeium suggestions also surface in the blink.cmp menu. Auth once with `:Codeium Auth`.
+
 ## Diagnostics
 
 | Key | Action |
@@ -312,10 +323,10 @@ Format on save runs automatically.
 
 | Key | Mode | Action |
 |---|---|---|
-| `<leader>snl` | n | Last message |
-| `<leader>snh` | n | Message history |
-| `<leader>sna` | n | All messages |
-| `<leader>snd` | n | Dismiss all |
+| `<leader>nl` | n | Last message |
+| `<leader>nh` | n | Message history |
+| `<leader>na` | n | All messages |
+| `<leader>nd` | n | Dismiss all |
 | `<S-Enter>` | c | Redirect cmdline output |
 | `<C-f>` / `<C-b>` | n, i, s | Scroll forward/back inside LSP hover/signature |
 
@@ -374,8 +385,6 @@ Format on save runs automatically.
 | `<C-u>` | normal | Half-page up (cursor centered) |
 | `n` / `N` | normal | Next / prev search match (centered, unfolded) |
 | `<C-s>` | n, i, v | Save file |
-| `<leader>y` | n, v | Yank to system clipboard |
-| `<C-S-V>` | n | Paste from system clipboard |
 
 ## Treesitter text objects
 
@@ -385,7 +394,7 @@ Format on save runs automatically.
 | `ac` / `ic` | x, o | Class outer / inner |
 | `aa` / `ia` | x, o | Parameter outer / inner |
 | `]f` / `[f` | n | Next / prev function |
-| `]c` / `[c` | n | Next / prev class |
+| `]C` / `[C` | n | Next / prev class |
 
 ## Flash (flash.nvim)
 
