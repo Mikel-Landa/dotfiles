@@ -56,5 +56,70 @@ if transcript and os.path.exists(transcript):
     except OSError:
         pass
 
-print(f"{model} | {ctx_pct}% ctx {session_total/1_000_000:.1f}M ses | {rl_pct}% {refresh} refresh")
+def compact_path(raw):
+    if not raw:
+        return ""
+    home = os.path.expanduser("~")
+    if raw == home:
+        return "~"
+    if raw.startswith(home + "/"):
+        full = "~/" + raw[len(home) + 1:]
+        parts = full.split("/")
+    else:
+        parts = raw.lstrip("/").split("/")
+        parts = ["/" + parts[0]] + parts[1:] if parts else ["/"]
+    if len(parts) <= 3:
+        return "/".join(parts).replace("//", "/")
+    return ".../" + "/".join(parts[-3:])
+
+cwd_raw = inp.get("cwd") or ""
+path_str = compact_path(cwd_raw)
+
+left = f"{model} | {ctx_pct}% ctx {session_total/1_000_000:.1f}M ses | {rl_pct}% {refresh} refresh"
+
+import shutil, subprocess
+def detect_cols():
+    if os.environ.get("TMUX"):
+        try:
+            out = subprocess.run(
+                ["tmux", "display-message", "-p", "#{pane_width}"],
+                capture_output=True, text=True, timeout=0.5,
+            )
+            n = int(out.stdout.strip())
+            if n > 0:
+                return n
+        except Exception:
+            pass
+    if os.environ.get("KITTY_LISTEN_ON"):
+        try:
+            out = subprocess.run(
+                ["kitten", "@", "ls", "--match", "state:focused"],
+                capture_output=True, text=True, timeout=0.5,
+            )
+            data = json.loads(out.stdout)
+            for w in data:
+                for t in w.get("tabs", []):
+                    for win in t.get("windows", []):
+                        if win.get("is_focused"):
+                            n = int(win.get("columns") or 0)
+                            if n > 0:
+                                return n
+        except Exception:
+            pass
+    try:
+        c = int(os.environ.get("COLUMNS") or 0)
+        if c > 0:
+            return c
+    except ValueError:
+        pass
+    return shutil.get_terminal_size(fallback=(80, 24)).columns
+
+cols = detect_cols()
+
+RIGHT_MARGIN = 3
+if path_str:
+    pad = max(1, cols - len(left) - len(path_str) - RIGHT_MARGIN)
+    print(left + (" " * pad) + path_str)
+else:
+    print(left)
 PY
