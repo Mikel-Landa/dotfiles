@@ -2,7 +2,6 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -139,10 +138,11 @@
   },
   "effortLevel": "xhigh",
   "advisorModel": "opus",
+  "awaySummaryEnabled": false,
   "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "editorMode": "normal",
   "showTurnDuration": true,
-  "skipAutoPermissionPrompt": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipAutoPermissionPrompt": true
 }

@@ -136,12 +136,12 @@ return {
         preset = {
           header = header,
           keys = {
-            { icon = " ", key = "f", desc = "Find file",    action = ":lua Snacks.picker.files()" },
+            { icon = " ", key = "f", desc = "Find file",    action = ":lua require('fff').find_files()" },
             { icon = " ", key = "r", desc = "Recent files", action = ":lua Snacks.picker.recent({ filter = { cwd = true } })" },
-            { icon = " ", key = "g", desc = "Find text",    action = ":lua Snacks.picker.grep()" },
+            { icon = " ", key = "g", desc = "Find text",    action = ":lua require('fff').live_grep()" },
             { icon = " ", key = "n", desc = "New file",     action = ":enew | startinsert" },
             { icon = " ", key = "s", desc = "Git status",   action = ":lua Snacks.picker.git_status()" },
-            { icon = " ", key = "c", desc = "Config",       action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })" },
+            { icon = " ", key = "c", desc = "Config",       action = ":lua require('fff').find_files_in_dir(vim.fn.stdpath('config'))" },
             { icon = "󰒲 ", key = "l", desc = "Lazy",         action = ":Lazy" },
             { icon = " ", key = "q", desc = "Quit",         action = ":qa" },
           },

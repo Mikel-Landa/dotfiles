@@ -4,6 +4,20 @@ npm = {
   ]
 }
 
+arch = { packages = [{ name = "zig" }] }
+
+cargo = {
+  packages = [
+    {
+      name = "fff-mcp",
+      options = {
+        git = "https://github.com/dmtrKovalenko/fff",
+        binstall = false,
+      }
+    },
+  ]
+}
+
 pipx = {
   packages = [
     {

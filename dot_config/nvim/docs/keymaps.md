@@ -6,7 +6,7 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 
 | Prefix | Domain |
 |---|---|
-| `<leader>f` | Find (snacks.picker) |
+| `<leader>f` | Find (fff.nvim + snacks.picker) |
 | `<leader>b` | Buffers |
 | `<leader>g` | Git / hunks |
 | `<leader>l` | LSP (symbols) |
@@ -28,12 +28,14 @@ Press leader and pause — which-key shows the menu.
 
 ---
 
-## Find (snacks.picker)
+## Find (fff.nvim + snacks.picker)
+
+`<leader>ff`/`fg`/`fc` use **fff.nvim** (Rust-backed, frecency-ranked). The rest stay on **snacks.picker**.
 
 | Key | Action |
 |---|---|
-| `<leader>ff` | Find files |
-| `<leader>fg` | Live grep |
+| `<leader>ff` | Find files (fff) |
+| `<leader>fg` | Live grep (fff) |
 | `<leader>fb` | Buffers |
 | `<leader>fh` | Help tags |
 | `<leader>fr` | Recent files (cwd) |
@@ -42,7 +44,7 @@ Press leader and pause — which-key shows the menu.
 | `<leader>f/` | Lines (current buffer) |
 | `<leader>fd` | Diagnostics |
 | `<leader>fn` | Notification history |
-| `<leader>fc` | Config files (`$XDG_CONFIG_HOME/nvim`) |
+| `<leader>fc` | Config files (`$XDG_CONFIG_HOME/nvim`, fff) |
 | `<leader>ft` | TODO/FIXME comments |
 
 ## Buffers

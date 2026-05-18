@@ -12,7 +12,7 @@ vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short descriptio
 
 | Prefix | Domain |
 |---|---|
-| `<leader>f` | Find (snacks.picker) |
+| `<leader>f` | Find (fff.nvim for files/grep, snacks.picker for the rest) |
 | `<leader>b` | Buffers |
 | `<leader>g` | Git / hunks (gitsigns + snacks.picker) |
 | `<leader>gt` | Git toggles (inline blame, deleted, word diff) |
