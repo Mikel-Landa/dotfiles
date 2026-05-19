@@ -1,4 +1,4 @@
-#
+# shellcheck shell=bash
 # This is my .profile, sourced by every shell:
 #   zsh: via ~/.zshenv
 #   bash (login): direct

@@ -9,7 +9,6 @@ shell_evals_for() {
         "mise activate $_s" \
         "tv init $_s" \
         "kubectl completion $_s" \
-        "helm completion $_s" \
-        "rustup completions $_s"
+        "helm completion $_s"
     unset _s
 }

@@ -38,6 +38,7 @@ setopt interactive_comments # allow for comments in interactive shells
 setopt autocd               # `dir` instead of `cd dir`
 setopt nobeep               # no terminal bell
 setopt numeric_glob_sort    # file10 sorts after file9, not after file1
+typeset -U path PATH        # dedup PATH; future appends become idempotent
 
 
 export ZSH_EVALCACHE_DIR=${ZSH_EVALCACHE_DIR:-"$HOME/.zsh-evalcache"}

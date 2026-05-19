@@ -4,7 +4,8 @@
 zmodload -F zsh/stat b:zstat 2>/dev/null
 
 # Load all stock functions (from $fpath files) called below.
-autoload -U compaudit compinit
+# compaudit is diagnostics-only; load on demand, not eagerly.
+autoload -U compinit
 
 # Figure out the SHORT hostname
 SHORT_HOST=${HOST/.*/}
@@ -56,9 +57,6 @@ if (( $zcompdump_refresh )); then
   print -- "\n$zcompdump_revision\n$zcompdump_fpath" >>! "$ZSH_COMPDUMP"
 fi
 
-# Always run; xzcompile/xzcompiledir are mtime-gated per file (cheap no-ops
-# when .zwc is fresh). Previous daily gate masked stale .zwc after edits.
-xzcompilefpath
-xzcompilehomedir
-
 unset zcompdump_revision zcompdump_fpath zcompdump_refresh
+# .zwc compilation moved to .chezmoiscripts/run_after_60-zcompile.sh —
+# runs on `chezmoi apply`, never on shell startup.
