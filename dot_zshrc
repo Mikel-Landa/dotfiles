@@ -3,23 +3,21 @@
 ##PROFILE ZSH
 # zmodload zsh/zprof
 
-# Auto-attach tmux via sesh + tv (television) picker for fresh interactive shells.
+# Auto-attach tmux via sesh + fzf picker for fresh interactive shells.
 # Must run before p10k instant prompt — picker takes over the screen.
 # Skips: already in tmux, IDE-embedded shells, agent shells, non-interactive.
-# tv is invoked with --source-command (ad-hoc channel) because it crashes on
-# piped stdin. Source order: tmux, zoxide, config — sesh's combined
-# `list` uses a fixed internal order, so each source is called separately and
-# the awk dedupe drops repeats by name (strip coloured-icon prefix, keep first).
+# Source order: tmux, config, zoxide — each `sesh list` is called separately so
+# the awk dedupe (strip coloured-icon prefix, keep first) controls priority.
 if [[ $- == *i* && -z "$TMUX" && -z "$CLAUDECODE" && -z "$VSCODE_INJECTION" \
       && -z "$INTELLIJ_ENVIRONMENT_READER" && -z "$NVIM" ]] \
-   && command -v sesh >/dev/null 2>&1 && command -v tv >/dev/null 2>&1; then
-    _sesh_src='{ sesh list -i -t; sesh list -i -c; sesh list -i -z; } | awk '\''{ k=$0; sub(/^[^ ]+ +/,"",k); if (!seen[k]++) print }'\'
-    _sesh_pick=$(tv --ansi --no-sort --height 20 \
-        --input-prompt '⚡  ' --input-header 'sesh: pick a session' \
-        --source-command "$_sesh_src" \
+   && command -v sesh >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1; then
+    _sesh_pick=$({ sesh list -i -t; sesh list -i -c; sesh list -i -z; } \
+        | awk '{ k=$0; sub(/^[^ ]+ +/,"",k); if (!seen[k]++) print }' \
+        | fzf --ansi --no-sort --height 20 --reverse \
+              --prompt '⚡  ' --header 'sesh: pick a session' \
         | sed -E $'s/\x1b\\[[0-9;]*[a-zA-Z]//g; s/^[^ ]+ +//')
     [[ -n "$_sesh_pick" ]] && exec sesh connect "$_sesh_pick"
-    unset _sesh_pick _sesh_src
+    unset _sesh_pick
 fi
 
 # Powerlevel10k instant prompt. Must stay near top — before anything that

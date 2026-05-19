@@ -34,7 +34,6 @@ cargo = {
     "eza",
     "tlrc",
     "tsql",
-    "television",
   ]
 }
 

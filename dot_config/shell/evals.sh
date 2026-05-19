@@ -7,7 +7,7 @@ shell_evals_for() {
     printf '%s\n' \
         "zoxide init $_s" \
         "mise activate $_s" \
-        "tv init $_s" \
+        "fzf --$_s" \
         "kubectl completion $_s" \
         "helm completion $_s"
     unset _s
