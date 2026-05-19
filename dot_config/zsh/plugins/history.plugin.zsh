@@ -31,17 +31,19 @@ function _history {
 alias history='_history -i'
 
 ## History file configuration
-export HISTSIZE=200000
+export HISTSIZE=100000
 export SAVEHIST=$HISTSIZE
-export HISTFILE="${ZDOTDIR:-$HOME}/.zhistory"
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+[[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 
 ## History command configuration
+setopt append_history         # Append to the history file, don't overwrite
 setopt extended_history       # Write the history file in the ':start:elapsed;command' format
 setopt hist_expire_dups_first # Expire a duplicate event first when trimming history
 setopt hist_find_no_dups      # Do not display a previously found event
 setopt hist_ignore_all_dups   # Delete an old recorded event if a new event is a duplicate
 setopt hist_ignore_dups       # Do not record an event that was just recorded again
-# setopt hist_ignore_space      # Do not record an event starting with a space
+setopt hist_ignore_space      # Do not record an event starting with a space
 setopt hist_save_no_dups      # Do not write a duplicate event to the history file
 setopt hist_verify            # show command with history expansion to user before running it
 setopt share_history          # Share history between all sessions

@@ -13,6 +13,12 @@ SHORT_HOST=${HOST/.*/}
 ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 [[ -d ${ZSH_COMPDUMP:h} ]] || mkdir -p ${ZSH_COMPDUMP:h}
 
+# Prune stale zcompdumps from other hosts / zsh versions.
+for _f in ${ZSH_COMPDUMP:h}/zcompdump-*(N); do
+  [[ $_f == $ZSH_COMPDUMP || $_f == $ZSH_COMPDUMP.zwc ]] || rm -f $_f
+done
+unset _f
+
 # Construct zcompdump metadata, we will rebuild the Zsh compdump if either
 # this file changes or the fpath changes. Use mtime instead of sha1sum to
 # avoid a subprocess fork per shell startup.
@@ -31,6 +37,9 @@ if [[ ${_zcompdump_lines[(r)$zcompdump_revision]} != $zcompdump_revision \
   zcompdump_refresh=1
 fi
 unset _zcompdump_lines
+
+# Interactive menu selection on TAB
+zstyle ':completion:*' menu select
 
 # Case-insensitive completion (full bidirectional)
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'

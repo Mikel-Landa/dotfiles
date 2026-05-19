@@ -21,6 +21,7 @@ export LESS='-n -i -g -q -R -X -K -F'
 
 # Git.
 export GIT_DISCOVERY_ACROSS_FILESYSTEM=0
+
 # Skip tty fork in non-interactive shells (scripts, pipes).
 if [ -t 0 ]; then
     export GPG_TTY=$(tty 2>/dev/null || echo not-a-tty)
@@ -28,7 +29,26 @@ else
     export GPG_TTY=not-a-tty
 fi
 
-# Go (explicit set so mise doesn't override).
+# ---------- XDG base directories ----------
+# Centralizes config/cache/data locations
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+#### CARGO ####
+# Cargo disk-space defaults (applies to all cargo invocations).
+# - line-tables-only: keep backtrace symbols, drop step-debug info. ~40-60% smaller target/.
+# - split-debuginfo=unpacked: faster relink on Linux; debug info as separate files.
+# Override per-project via Cargo.toml [profile.dev] if a full debugger session is needed.
+export CARGO_PROFILE_DEV_DEBUG=line-tables-only
+export CARGO_PROFILE_DEV_SPLIT_DEBUGINFO=unpacked
+
+# sccache cache cap (default 10G, bumped for multi-sibling rust workloads).
+export SCCACHE_CACHE_SIZE=20G
+
+##### GO ####
+# Explicit set so mise doesn't override
 export GOPATH=$HOME/go
 export GOBIN=$HOME/go/bin
 export GO111MODULE=on
