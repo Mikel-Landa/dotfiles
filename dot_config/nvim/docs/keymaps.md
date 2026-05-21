@@ -47,6 +47,15 @@ Press leader and pause — which-key shows the menu.
 | `<leader>fc` | Config files (`$XDG_CONFIG_HOME/nvim`, fff) |
 | `<leader>ft` | TODO/FIXME comments |
 
+Inside the fff picker (prompt / list):
+
+| Key | Action |
+|---|---|
+| `<C-j>` / `<C-k>` | Next / prev result (while typing in prompt) |
+| `<Down>` / `<Up>` | Next / prev result |
+| `<C-n>` / `<C-p>` | Next / prev result |
+| `j` / `k` | Next / prev result (normal mode on list) |
+
 ## Buffers
 
 | Key | Action |
