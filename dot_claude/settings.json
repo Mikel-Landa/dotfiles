@@ -102,6 +102,17 @@
           }
         ]
       }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "m=$(jq -r '.message // \"Claude needs your attention\"' 2>/dev/null); notify-send -u critical -a \"Claude Code\" \"Claude Code\" \"${m:-Claude needs your attention}\"; (pw-play /usr/share/sounds/freedesktop/stereo/message.oga >/dev/null 2>&1 || paplay /usr/share/sounds/freedesktop/stereo/message.oga >/dev/null 2>&1 &)",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -142,6 +153,7 @@
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
+  "preferredNotifChannel": "notifications_disabled",
   "editorMode": "normal",
   "showTurnDuration": true,
   "skipAutoPermissionPrompt": true

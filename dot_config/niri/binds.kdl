@@ -6,7 +6,7 @@ binds {
 
     // === Application Launchers ===
     Mod+Return repeat=false hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
-    Mod+B repeat=false hotkey-overlay-title="Open Brave" { spawn "brave"; }
+    Mod+B repeat=false hotkey-overlay-title="Open Firefox" { spawn "firefox"; }
     Mod+A repeat=false hotkey-overlay-title="Focus AI Workspace" { focus-workspace "ai"; }
     Mod+Space repeat=false hotkey-overlay-title="Application Launcher" {
         spawn "dms" "ipc" "call" "spotlight" "toggle";

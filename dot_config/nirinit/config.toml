@@ -1,3 +1,3 @@
 [skip]
 # Electron / browser apps that restore poorly or relaunch themselves.
-apps = ["discord", "slack", "brave-browser", "code", "dev.zed.Zed", "spotify"]
+apps = ["discord", "slack", "firefox", "code", "dev.zed.Zed", "spotify"]

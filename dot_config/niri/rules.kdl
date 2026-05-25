@@ -37,14 +37,8 @@ window-rule {
 }
 
 window-rule {
-    match app-id="brave-startup"
+    match app-id="firefox-startup"
     open-on-workspace "browser"
-    open-maximized true
-}
-
-window-rule {
-    match app-id="t3code"
-    open-on-workspace "ai"
     open-maximized true
 }
 
@@ -96,7 +90,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id="brave-browser" title=r#"(?i)(bitwarden|1password|password|otp)"#
+    match app-id="firefox" title=r#"(?i)(bitwarden|1password|password|otp)"#
     block-out-from "screencast"
 }
 

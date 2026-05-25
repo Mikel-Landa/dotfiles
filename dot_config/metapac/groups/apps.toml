@@ -5,7 +5,7 @@ arch = {
     "zed",
     "spotify-launcher",
     "google-chrome",
-    "brave-bin",
+    "firefox",
     "fuse2"  # Needed for appimages
   ]
 }
