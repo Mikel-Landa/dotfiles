@@ -69,3 +69,8 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 ##PROFILE ZSH
 # zprof
+
+# OpenSSH agent (systemd user service ssh-agent.service) — wire its socket into
+# the shell so ssh-add / agent use work. Guarded: only set if the socket exists.
+# Not required for git push (passphraseless ~/.ssh/id_ed25519 is used directly).
+[ -S "/run/user/$(id -u)/ssh-agent.socket" ] && export SSH_AUTH_SOCK="/run/user/$(id -u)/ssh-agent.socket"

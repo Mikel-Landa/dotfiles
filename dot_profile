@@ -45,7 +45,15 @@ export CARGO_PROFILE_DEV_DEBUG=line-tables-only
 export CARGO_PROFILE_DEV_SPLIT_DEBUGINFO=unpacked
 
 # sccache cache cap (default 10G, bumped for multi-sibling rust workloads).
-export SCCACHE_CACHE_SIZE=20G
+export SCCACHE_CACHE_SIZE=30G
+
+# Shared target dir: ALL repos write compiled deps to one location so siblings
+# reuse each other's builds (dedup + faster cross-repo builds). Combined with
+# the sccache rustc-wrapper (~/.cargo/config.toml) this is the cross-workspace
+# lib-sharing layer. Per-project `target/` is bypassed when this is set.
+# CARGO_INCREMENTAL intentionally left ON (default) — keeps fast edit-loop
+# rebuilds; sccache still shares all dependency compilations regardless.
+export CARGO_TARGET_DIR="$HOME/.cache/cargo-target/shared"
 
 ##### GO ####
 # Explicit set so mise doesn't override
@@ -55,6 +63,10 @@ export GO111MODULE=on
 
 # mise.
 export MISE_DEFAULT_CONFIG_FILENAME='.mise.local.toml'
+
+# CLAUDE
+# Compact at 30% of window (Currently 300k)
+export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=30
 
 # PATH. Lower-priority paths pushed to back; higher-priority pushed to front.
 path_push_back /sbin
