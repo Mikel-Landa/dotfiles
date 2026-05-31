@@ -1,7 +1,7 @@
 # Supply-Chain Hardening — Design Spec
 
 - **Date:** 2026-05-31
-- **Status:** Approved (brainstorm) — pending spec review. Written, **not committed**.
+- **Status:** EXECUTED on feature branches (not merged). chezmoi `security/supply-chain-hardening`, git-org/app `security/pnpm11-cooldown`, projects `security/supply-chain-hardening`. Phase 4 (Rust) = verified already-hardened, no changes. All globals live-verified.
 
 ## Verified during design (de-risked)
 

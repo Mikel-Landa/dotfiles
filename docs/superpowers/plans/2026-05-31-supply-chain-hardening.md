@@ -684,7 +684,7 @@ git commit -m "feat(security): add cargo-deny coverage"
 **Files:**
 - Modify: `~/.local/share/chezmoi/dot_config/pnpm/config.yaml`
 
-- [ ] **Step 1: Find the exact setting name.** The video calls it a "trust policy" set to "no downgrade" (install fails if a package's trust level dropped vs its previous release). Confirm the exact key/value at https://pnpm.io/settings (search "trust"). 
+- [x] **Step 1: RESOLVED.** Key is `trustPolicy: no-downgrade` (pnpm ≥10.21; values `no-downgrade`|`off`). Verified honored on pnpm 11.1.2. Applied to global config.yaml + app + projects pnpm-workspace.yaml; frozen installs still pass. 
 
 - [ ] **Step 2: Add it** to the global `config.yaml` (and mirror into the two repos' `pnpm-workspace.yaml`). Example shape (replace with the confirmed key):
 
