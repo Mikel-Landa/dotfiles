@@ -1,0 +1,3 @@
+GOFLAGS=-mod=readonly
+GOPROXY=https://proxy.golang.org,direct
+GOSUMDB=sum.golang.org
