@@ -74,3 +74,12 @@ fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
 
 # vim: filetype=zsh syntax=zsh
 
+# --- Socket Firewall (sfw) install-time scanning. Interactive shells only;
+# --- CI coverage comes from socketdev/action. Guarded so it is a no-op if sfw is not installed.
+if (( $+commands[sfw] )); then
+  alias pnpm='sfw pnpm'
+  alias npm='sfw npm'
+  alias cargo='sfw cargo'
+  alias uv='sfw uv'
+  alias pip='sfw pip'
+fi
