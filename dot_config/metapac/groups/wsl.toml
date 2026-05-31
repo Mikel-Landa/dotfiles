@@ -2,4 +2,4 @@ apt = {
   packages = ["imagemagick"]
 }
 
-pipx = { packages = ["xdg-open-wsl"] }
+uv = { packages = ["xdg-open-wsl"] }

@@ -18,7 +18,6 @@ arch = {
     "libyaml",
     "python",
     "python-pip",
-    "python-pipx",
     "python-evdev",
     "keyd",
     "cliphist",
@@ -56,16 +55,16 @@ apt = {
     "libyaml-dev",
     "python3-dev",
     "python3-pip",
-    "pipx",
     "python3-venv",
     "python3-virtualenv",
   ]
 }
 
-pipx = { packages = ["pre-commit"] }
+uv = { packages = ["pre-commit"] }
 
 mise = {
   packages = [
+    "uv",
     "kubectl",
     "go",
     "terraform",

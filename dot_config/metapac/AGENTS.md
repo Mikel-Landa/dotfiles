@@ -42,7 +42,7 @@ Metapac is the single source of truth for all installed packages. When adding a 
 ## Backends
 
 Configured in `config.toml.tmpl` (chezmoi-templated):
-- Global: `cargo`, `mise`, `go`, `pipx`, `npm`
+- Global: `cargo`, `mise`, `go`, `uv`, `npm`
 - WSL machines: also `apt`
 - `cachyos` hostname: also `arch` (paru)
 - `work-ifs` hostname: also `apt`
@@ -60,7 +60,7 @@ Full docs: https://github.com/Mikel-Landa/metapac/tree/metapac-go
 
 **Hooks** — run during `metapac sync`, per-package. Events: `before_install`, `after_install`, `before_sync`, `after_sync`. Main use case: enable systemd services alongside their package.
 
-**Backends** — `arch` (paru), `apt`, `cargo`, `mise`, `go`, `pipx`, `npm`. Configured per-hostname in `config.toml`.
+**Backends** — `arch` (paru), `apt`, `cargo`, `mise`, `go`, `uv`, `npm`. Configured per-hostname in `config.toml`.
 
 **Group files** — each backend section has a `packages` array. Mix strings and objects freely.
 
