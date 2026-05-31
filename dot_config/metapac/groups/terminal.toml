@@ -34,6 +34,8 @@ cargo = {
     "eza",
     "tlrc",
     "tsql",
+    "cargo-deny",
+    "cargo-audit",
   ]
 }
 
@@ -47,6 +49,20 @@ go = {
   packages = [
     "github.com/jesseduffield/lazygit",
     "github.com/cli/cli/v2/cmd/gh",
-    "github.com/joshmedeski/sesh/v2"
+    "github.com/joshmedeski/sesh/v2",
+    "golang.org/x/vuln/cmd/govulncheck",
+    "github.com/google/osv-scanner/v2/cmd/osv-scanner",
+  ]
+}
+
+npm = {
+  packages = [
+    "sfw",
+  ]
+}
+
+uv = {
+  packages = [
+    "pip-audit",
   ]
 }
