@@ -1,0 +1,5 @@
+# Supply-chain hardening — global uv defaults.
+# Note: uv has NO native release-age cooldown. Install-time scanning is provided by `sfw uv ...`
+# (Socket Firewall) and `pip-audit` runs in CI. Lockfiles (uv.lock) + hashes are per-project.
+[pip]
+require-hashes = false   # set true per-project once a hash-pinned requirements lock exists
