@@ -2,4 +2,5 @@
 minimumReleaseAge: 1440          # 1-day cooldown (minutes). pnpm 11 default; pinned explicitly.
 minimumReleaseAgeExclude: []     # add "pkg@version" with a justification comment when a hotfix needs bypass
 blockExoticSubdeps: true         # transitive deps may not use git/tarball sources
+trustPolicy: no-downgrade        # fail install if a dep's trust level dropped vs a prior release (pnpm >=10.21)
 savePrefix: ''                   # exact version pins on `pnpm add`
