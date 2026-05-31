@@ -1,0 +1,5 @@
+# Supply-chain hardening — global pnpm defaults (verified: pnpm reads these from the global config.yaml).
+minimumReleaseAge: 1440          # 1-day cooldown (minutes). pnpm 11 default; pinned explicitly.
+minimumReleaseAgeExclude: []     # add "pkg@version" with a justification comment when a hotfix needs bypass
+blockExoticSubdeps: true         # transitive deps may not use git/tarball sources
+savePrefix: ''                   # exact version pins on `pnpm add`
