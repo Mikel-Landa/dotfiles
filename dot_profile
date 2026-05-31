@@ -64,10 +64,6 @@ export GO111MODULE=on
 # mise.
 export MISE_DEFAULT_CONFIG_FILENAME='.mise.local.toml'
 
-# CLAUDE
-# Compact at 30% of window (Currently 300k)
-export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=30
-
 # PATH. Lower-priority paths pushed to back; higher-priority pushed to front.
 path_push_back /sbin
 path_push_back /usr/sbin
