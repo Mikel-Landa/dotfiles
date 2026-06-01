@@ -94,12 +94,43 @@ map({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 -- Exit terminal mode (more discoverable than <C-\><C-n>)
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
--- Copy absolute file path to clipboard
-map("n", "<leader>pa", function()
-	local path = vim.fn.expand("%:p")
-	vim.fn.setreg("+", path)
-	vim.notify("Copied: " .. path, vim.log.levels.INFO)
-end, { desc = "Copy absolute path" })
+-- Copy file path to clipboard. In visual mode append :start[,end] line range.
+local function abs_path()
+	return vim.fn.expand("%:p")
+end
+local function root_path()
+	local abs = vim.fn.expand("%:p")
+	local root = vim.fs.root(0, ".git")
+	if not root then
+		return vim.fn.fnamemodify(abs, ":~:.")
+	end
+	root = root:gsub("/$", "") .. "/"
+	if abs:sub(1, #root) == root then
+		return abs:sub(#root + 1)
+	end
+	return abs
+end
+local function copy_path(resolve, with_range)
+	return function()
+		local path = resolve()
+		if with_range then
+			local a, b = vim.fn.line("."), vim.fn.line("v")
+			if a > b then
+				a, b = b, a
+			end
+			path = path .. ":" .. a
+			if a ~= b then
+				path = path .. "-" .. b
+			end
+		end
+		vim.fn.setreg("+", path)
+		vim.notify("Copied: " .. path, vim.log.levels.INFO)
+	end
+end
+map("n", "<leader>pa", copy_path(abs_path, false), { desc = "Copy absolute path" })
+map("v", "<leader>pa", copy_path(abs_path, true), { desc = "Copy absolute path + line range" })
+map("n", "<leader>pr", copy_path(root_path, false), { desc = "Copy git-root path" })
+map("v", "<leader>pr", copy_path(root_path, true), { desc = "Copy git-root path + line range" })
 
 -- Delete without yanking (black-hole register)
 map({ "n", "v" }, "<leader>D", '"_d', { desc = "Delete without yank" })

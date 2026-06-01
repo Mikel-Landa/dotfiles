@@ -393,7 +393,8 @@ Format on save runs automatically.
 | `J` | normal | Join lines (cursor position preserved) |
 | `<leader>j` | normal | Toggle split / join block (treesj) |
 | `<leader>D` | n, v | Delete without yank (black-hole register) |
-| `<leader>pa` | n | Copy absolute file path to system clipboard |
+| `<leader>pa` | n, v | Copy absolute file path; in visual append `:start[,end]` line range |
+| `<leader>pr` | n, v | Copy path relative to git root; in visual append `:start[,end]` line range |
 | `p` | visual | Paste without yanking the replaced text |
 | `<C-d>` | normal | Half-page down (cursor centered) |
 | `<C-u>` | normal | Half-page up (cursor centered) |
