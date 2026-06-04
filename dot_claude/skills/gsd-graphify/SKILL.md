@@ -10,7 +10,7 @@ allowed-tools:
 
 **STOP -- DO NOT READ THIS FILE. You are already reading it. This prompt was injected into your context by Claude Code's command system. Using the Read tool on this file wastes tokens. Begin executing Step 0 immediately.**
 
-**CJS-only (graphify):** `graphify` subcommands are not registered on `gsd-sdk query`. Use `node $HOME/.claude/get-shit-done/bin/gsd-tools.cjs graphify …` as documented in this command and in `docs/CLI-TOOLS.md`. Other tooling may still use `gsd-sdk query` where a handler exists.
+**CJS-only (graphify):** `graphify` subcommands are not registered on `gsd-tools query`. Use `node $HOME/.claude/get-shit-done/bin/gsd-tools.cjs graphify …` as documented in this command and in `docs/CLI-TOOLS.md`. Other tooling may still use `gsd-tools query` where a handler exists.
 
 ## Step 0 -- Banner
 
@@ -43,7 +43,7 @@ Knowledge graph is disabled. To activate:
 
   node $HOME/.claude/get-shit-done/bin/gsd-tools.cjs config-set graphify.enabled true
 
-Then run /gsd:graphify build to create the initial graph.
+Then run /gsd-graphify build to create the initial graph.
 ```
 
 ---
@@ -65,7 +65,7 @@ Parse `$ARGUMENTS` to determine the operation mode:
 ```
 GSD > GRAPHIFY
 
-Usage: /gsd:graphify <mode>
+Usage: /gsd-graphify <mode>
 
 Modes:
   build           Build or rebuild the knowledge graph
@@ -85,7 +85,7 @@ node $HOME/.claude/get-shit-done/bin/gsd-tools.cjs graphify query <term>
 Parse the JSON output and display results:
 - If the output contains `"disabled": true`, display the disabled message from Step 1 and **STOP**
 - If the output contains `"error"` field, display the error message and **STOP**
-- If no nodes found, display: `No graph matches for '<term>'. Try /gsd:graphify build to create or rebuild the graph.`
+- If no nodes found, display: `No graph matches for '<term>'. Try /gsd-graphify build to create or rebuild the graph.`
 - Otherwise, display matched nodes grouped by type, with edge relationships and confidence tiers (EXTRACTED/INFERRED/AMBIGUOUS)
 
 **STOP** after displaying results. Do not spawn an agent.
@@ -179,7 +179,7 @@ If the chain succeeds:
 
 ## MVP-Mode Node Rendering
 
-**MVP-mode rendering.** When a phase has `**Mode:** mvp` in ROADMAP.md (resolved via `gsd-sdk query roadmap.get-phase --pick mode`), render its graph node with two distinct visual signals:
+**MVP-mode rendering.** When a phase has `**Mode:** mvp` in ROADMAP.md (resolved via `gsd-tools query roadmap.get-phase --pick mode`), render its graph node with two distinct visual signals:
 
 1. **Distinct fill color.** Use `#22c55e` (green) for MVP-mode phase nodes. Standard phases keep the default fill color. Two-channel signaling (color + label) handles color-blind and grayscale renders.
 2. **`MVP` label suffix.** Append ` (MVP)` to the node's label text. Example: a phase originally labeled `Phase 1: User Auth` renders as `Phase 1: User Auth (MVP)`.
