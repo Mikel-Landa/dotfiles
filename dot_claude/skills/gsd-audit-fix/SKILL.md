@@ -25,7 +25,7 @@ Flags:
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/audit-fix.md
+@$HOME/.claude/gsd-core/workflows/audit-fix.md
 </execution_context>
 
 <process>

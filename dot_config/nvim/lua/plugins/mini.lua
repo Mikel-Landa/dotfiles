@@ -28,7 +28,9 @@ return {
       -- Commenting (replaces Comment.nvim; same gc/gcc keymaps)
       require("mini.comment").setup()
 
-      -- Surround (replaces nvim-surround; ys/ds/cs for muscle memory compatibility)
+      -- Surround (replaces nvim-surround; ys/ds/cs for muscle memory compatibility).
+      -- These need flash.nvim's operator-pending `s` OFF (or {y,d,c}s would race);
+      -- flash keeps `s` in n/x and relocates operator-pending jump to `z` (navigation.lua).
       require("mini.surround").setup({
         mappings = {
           add = "ys",

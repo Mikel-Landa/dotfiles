@@ -29,8 +29,8 @@ Clarify phase requirements through structured Socratic questioning with quantita
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/spec-phase.md
-@$HOME/.claude/get-shit-done/templates/spec.md
+@$HOME/.claude/gsd-core/workflows/spec-phase.md
+@$HOME/.claude/gsd-core/templates/spec.md
 </execution_context>
 
 <runtime_note>

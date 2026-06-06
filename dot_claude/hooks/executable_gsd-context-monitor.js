@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// gsd-hook-version: 1.2.0
+// gsd-hook-version: 1.3.1
 // Context Monitor - PostToolUse/AfterTool hook (Gemini uses AfterTool)
 // Reads context metrics from the statusline bridge file and injects
 // warnings when context usage is high. This makes the AGENT aware of
@@ -140,10 +140,10 @@ process.stdin.on('end', () => {
     if (isCritical && isGsdActive && !warnData.criticalRecorded) {
       try {
         // Runtime-agnostic path: this hook lives at <runtime-config>/hooks/
-        // and gsd-tools.cjs lives at <runtime-config>/get-shit-done/bin/.
+        // and gsd-tools.cjs lives at <runtime-config>/gsd-core/bin/.
         // Using __dirname makes this work on Claude Code, OpenCode, Gemini,
         // Kilo, etc. without hardcoding ~/.claude/.
-        const gsdTools = path.join(__dirname, '..', 'get-shit-done', 'bin', 'gsd-tools.cjs');
+        const gsdTools = path.join(__dirname, '..', 'gsd-core', 'bin', 'gsd-tools.cjs');
         // Coerce usedPct to a safe number in case bridge file is malformed
         const safeUsedPct = Number(usedPct) || 0;
         const stoppedAt = `context exhaustion at ${safeUsedPct}% (${new Date().toISOString().split('T')[0]})`;

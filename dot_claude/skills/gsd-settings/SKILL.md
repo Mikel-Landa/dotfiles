@@ -21,7 +21,7 @@ Routes to the settings workflow which handles:
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/settings.md
+@$HOME/.claude/gsd-core/workflows/settings.md
 </execution_context>
 
 <process>

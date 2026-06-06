@@ -32,9 +32,9 @@ Mode routing:
 </routing>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/settings.md
-@$HOME/.claude/get-shit-done/workflows/settings-advanced.md
-@$HOME/.claude/get-shit-done/workflows/settings-integrations.md
+@$HOME/.claude/gsd-core/workflows/settings.md
+@$HOME/.claude/gsd-core/workflows/settings-advanced.md
+@$HOME/.claude/gsd-core/workflows/settings-integrations.md
 </execution_context>
 
 <context>

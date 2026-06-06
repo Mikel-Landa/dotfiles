@@ -26,7 +26,7 @@ Flag handling rule:
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/docs-update.md
+@$HOME/.claude/gsd-core/workflows/docs-update.md
 </execution_context>
 
 <context>

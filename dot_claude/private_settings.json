@@ -1,12 +1,14 @@
 {
-  "permissions": {
-    "defaultMode": "auto"
-  },
   "env": {
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "30",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
-    "DISABLE_TELEMETRY": "1"
+    "DISABLE_ERROR_REPORTING": "1",
+    "DISABLE_FEEDBACK_COMMAND": "1",
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1"
+  },
+  "permissions": {
+    "defaultMode": "auto"
   },
   "hooks": {
     "SessionStart": [
@@ -22,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/mikel/.claude/hooks/gsd-check-update.js\""
+            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-check-update.js\""
           }
         ]
       },
@@ -33,6 +35,16 @@
             "command": "bash \"/home/mikel/.claude/hooks/gsd-session-state.sh\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/caveman-activate.js\"",
+            "timeout": 5,
+            "statusMessage": "Loading caveman mode..."
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -41,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
           }
         ]
@@ -51,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/mikel/.claude/hooks/gsd-read-injection-scanner.js\"",
+            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-read-injection-scanner.js\"",
             "timeout": 5
           }
         ]
@@ -117,6 +129,28 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-worktree-path-guard.js\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/caveman-mode-tracker.js\"",
+            "timeout": 5,
+            "statusMessage": "Tracking caveman mode..."
+          }
+        ]
       }
     ]
   },
@@ -161,7 +195,7 @@
   "editorMode": "normal",
   "preferredNotifChannel": "kitty",
   "showTurnDuration": true,
+  "teammateMode": "tmux",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "teammateMode": "tmux"
+  "skipAutoPermissionPrompt": true
 }

@@ -26,7 +26,7 @@ Routes to the update workflow which handles:
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/update.md
+@$HOME/.claude/gsd-core/workflows/update.md
 </execution_context>
 
 <flags>
@@ -44,6 +44,6 @@ Parse the first token of $ARGUMENTS:
 </process>
 
 <execution_context_extended>
-@$HOME/.claude/get-shit-done/workflows/sync-skills.md
-@$HOME/.claude/get-shit-done/workflows/reapply-patches.md
+@$HOME/.claude/gsd-core/workflows/sync-skills.md
+@$HOME/.claude/gsd-core/workflows/reapply-patches.md
 </execution_context_extended>

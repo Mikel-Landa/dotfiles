@@ -23,7 +23,7 @@ Output: updated VALIDATION.md + generated test files.
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/validate-phase.md
+@$HOME/.claude/gsd-core/workflows/validate-phase.md
 </execution_context>
 
 <context>

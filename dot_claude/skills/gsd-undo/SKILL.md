@@ -21,9 +21,9 @@ Three modes:
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/undo.md
-@$HOME/.claude/get-shit-done/references/ui-brand.md
-@$HOME/.claude/get-shit-done/references/gate-prompts.md
+@$HOME/.claude/gsd-core/workflows/undo.md
+@$HOME/.claude/gsd-core/references/ui-brand.md
+@$HOME/.claude/gsd-core/references/gate-prompts.md
 </execution_context>
 
 <context>

@@ -30,10 +30,10 @@ Mode routing:
 </routing>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/new-workspace.md
-@$HOME/.claude/get-shit-done/workflows/list-workspaces.md
-@$HOME/.claude/get-shit-done/workflows/remove-workspace.md
-@$HOME/.claude/get-shit-done/references/ui-brand.md
+@$HOME/.claude/gsd-core/workflows/new-workspace.md
+@$HOME/.claude/gsd-core/workflows/list-workspaces.md
+@$HOME/.claude/gsd-core/workflows/remove-workspace.md
+@$HOME/.claude/gsd-core/references/ui-brand.md
 </execution_context>
 
 <context>

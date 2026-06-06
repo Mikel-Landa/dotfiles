@@ -28,10 +28,10 @@ Auto-synthesizes most conflicts using the precedence rule `ADR > SPEC > PRD > DO
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/ingest-docs.md
-@$HOME/.claude/get-shit-done/references/ui-brand.md
-@$HOME/.claude/get-shit-done/references/gate-prompts.md
-@$HOME/.claude/get-shit-done/references/doc-conflict-engine.md
+@$HOME/.claude/gsd-core/workflows/ingest-docs.md
+@$HOME/.claude/gsd-core/references/ui-brand.md
+@$HOME/.claude/gsd-core/references/gate-prompts.md
+@$HOME/.claude/gsd-core/references/doc-conflict-engine.md
 </execution_context>
 
 <context>

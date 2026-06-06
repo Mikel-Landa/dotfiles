@@ -21,8 +21,8 @@ Output: {phase_num}-UAT.md tracking all test results. If issues found: diagnosed
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/verify-work.md
-@$HOME/.claude/get-shit-done/templates/UAT.md
+@$HOME/.claude/gsd-core/workflows/verify-work.md
+@$HOME/.claude/gsd-core/templates/UAT.md
 </execution_context>
 
 <context>

@@ -40,7 +40,7 @@ Granular flags are composable: `--discuss --research --validate` gives the same 
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/quick.md
+@$HOME/.claude/gsd-core/workflows/quick.md
 </execution_context>
 
 <context>

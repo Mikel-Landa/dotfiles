@@ -3,6 +3,9 @@
 	useConfigOnly = true
 	signingkey = 7C906F517916F1BB
 	
+[url "git@github.com:Mikel-Landa/"]
+	insteadOf = "ml:"
+
 [url "git@github.com:"]
 	insteadOf = "gh:"
 

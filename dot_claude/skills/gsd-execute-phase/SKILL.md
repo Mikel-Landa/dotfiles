@@ -32,8 +32,8 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/execute-phase.md
-@$HOME/.claude/get-shit-done/references/ui-brand.md
+@$HOME/.claude/gsd-core/workflows/execute-phase.md
+@$HOME/.claude/gsd-core/references/ui-brand.md
 </execution_context>
 
 <runtime_note>

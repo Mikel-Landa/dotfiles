@@ -415,7 +415,8 @@ Format on save runs automatically.
 
 | Key | Mode | Action |
 |---|---|---|
-| `s` | n, x, o | Flash jump |
+| `s` | n, x | Flash jump |
+| `z` | o | Flash jump (operator-pending, e.g. `dz`/`cz`/`yz`) |
 | `S` | n, x, o | Flash Treesitter |
 | `r` | o | Remote Flash |
 | `R` | o, x | Treesitter Search |
@@ -428,7 +429,7 @@ Format on save runs automatically.
 | `ys{motion}{char}` | Add surround |
 | `ds{char}` | Delete surround |
 | `cs{old}{new}` | Change surround |
-| `S{char}` (visual) | Surround selection |
+| `ys{char}` (visual) | Surround selection |
 | `gsf` / `gsF` | Find surround right / left |
 | `gsh` | Highlight surround |
 

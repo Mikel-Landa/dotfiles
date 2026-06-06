@@ -22,9 +22,9 @@ Flow: Select Framework → Research Docs → Research Domain → Design Eval Str
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/ai-integration-phase.md
-@$HOME/.claude/get-shit-done/references/ai-frameworks.md
-@$HOME/.claude/get-shit-done/references/ai-evals.md
+@$HOME/.claude/gsd-core/workflows/ai-integration-phase.md
+@$HOME/.claude/gsd-core/references/ai-frameworks.md
+@$HOME/.claude/gsd-core/references/ai-evals.md
 </execution_context>
 
 <context>

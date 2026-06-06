@@ -30,13 +30,13 @@ Does not require prior new-project setup — auto-creates `.planning/sketches/` 
 </objective>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/sketch.md
-@$HOME/.claude/get-shit-done/workflows/sketch-wrap-up.md
-@$HOME/.claude/get-shit-done/references/ui-brand.md
-@$HOME/.claude/get-shit-done/references/sketch-theme-system.md
-@$HOME/.claude/get-shit-done/references/sketch-interactivity.md
-@$HOME/.claude/get-shit-done/references/sketch-tooling.md
-@$HOME/.claude/get-shit-done/references/sketch-variant-patterns.md
+@$HOME/.claude/gsd-core/workflows/sketch.md
+@$HOME/.claude/gsd-core/workflows/sketch-wrap-up.md
+@$HOME/.claude/gsd-core/references/ui-brand.md
+@$HOME/.claude/gsd-core/references/sketch-theme-system.md
+@$HOME/.claude/gsd-core/references/sketch-interactivity.md
+@$HOME/.claude/gsd-core/references/sketch-tooling.md
+@$HOME/.claude/gsd-core/references/sketch-variant-patterns.md
 </execution_context>
 
 <runtime_note>

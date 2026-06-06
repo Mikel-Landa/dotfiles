@@ -32,10 +32,10 @@ Mode routing:
 </routing>
 
 <execution_context>
-@$HOME/.claude/get-shit-done/workflows/add-phase.md
-@$HOME/.claude/get-shit-done/workflows/insert-phase.md
-@$HOME/.claude/get-shit-done/workflows/remove-phase.md
-@$HOME/.claude/get-shit-done/workflows/edit-phase.md
+@$HOME/.claude/gsd-core/workflows/add-phase.md
+@$HOME/.claude/gsd-core/workflows/insert-phase.md
+@$HOME/.claude/gsd-core/workflows/remove-phase.md
+@$HOME/.claude/gsd-core/workflows/edit-phase.md
 </execution_context>
 
 <context>
