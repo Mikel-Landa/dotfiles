@@ -6,3 +6,5 @@ When the user types `/graphify`, invoke the Skill tool with `skill: "graphify"` 
 # fff
 
 Use the fff MCP tools for all file search operations instead of default tools.
+
+When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
