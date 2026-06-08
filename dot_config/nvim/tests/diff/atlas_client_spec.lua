@@ -23,14 +23,14 @@ local function make_deps(overrides)
         end
       end,
     },
-    ["atlas.pulls.providers.bitbucket.api.pr_normalizer"] = {
-      pullrequests = function(_result, workspace, repo)
+    ["atlas.pulls.providers.bitbucket.api.mapper"] = {
+      to_pull_requests_list = function(_result, workspace, repo)
         return { { id = 1, _ws = workspace, _repo = repo } }
       end,
     },
     ["atlas.pulls.providers.bitbucket.api.pullrequests"] = {
-      fetch_diff = function(url, opts, cb)
-        table.insert(recorded.calls, { name = "pullrequests.fetch_diff", args = { url, opts } })
+      fetch_diff = function(pr, opts, cb)
+        table.insert(recorded.calls, { name = "pullrequests.fetch_diff", args = { pr, opts } })
         cb(recorded.diff_result, recorded.diff_err)
       end,
       approve = function(url, cb)
@@ -43,16 +43,16 @@ local function make_deps(overrides)
       end,
     },
     ["atlas.pulls.providers.bitbucket.api.comments"] = {
-      create_comment = function(url, body, opts, cb)
-        table.insert(recorded.calls, { name = "comments.create_comment", args = { url, body, opts } })
+      add_comment = function(pr, body, opts, cb)
+        table.insert(recorded.calls, { name = "comments.add_comment", args = { pr, body, opts } })
         cb(recorded.create_result, recorded.create_err)
       end,
-      reply_comment = function(url, parent_id, body, opts, cb)
-        table.insert(recorded.calls, { name = "comments.reply_comment", args = { url, parent_id, body, opts } })
+      reply_comment = function(pr, parent_id, body, opts, cb)
+        table.insert(recorded.calls, { name = "comments.reply_comment", args = { pr, parent_id, body, opts } })
         cb(recorded.reply_result, recorded.reply_err)
       end,
-      delete_comment = function(url, cb)
-        table.insert(recorded.calls, { name = "comments.delete_comment", args = { url } })
+      delete_comment = function(pr, comment_id, cb)
+        table.insert(recorded.calls, { name = "comments.delete_comment", args = { pr, comment_id } })
         cb(recorded.delete_ok, recorded.delete_err)
       end,
       edit_comment = function(pr, comment_id, body, opts, cb)
@@ -89,8 +89,8 @@ describe("atlas_client.new", function()
     assert.is_nil(atlas_client_mod.new({ require = loader }))
   end)
 
-  it("returns nil when pr_normalizer missing", function()
-    local _, loader = make_deps({ _missing = { "atlas.pulls.providers.bitbucket.api.pr_normalizer" } })
+  it("returns nil when mapper missing", function()
+    local _, loader = make_deps({ _missing = { "atlas.pulls.providers.bitbucket.api.mapper" } })
     assert.is_nil(atlas_client_mod.new({ require = loader }))
   end)
 
@@ -174,15 +174,15 @@ describe("atlas_client.fetch_comments", function()
 end)
 
 describe("atlas_client.fetch_diff", function()
-  it("delegates to pullrequests.fetch_diff with opts and returns diff", function()
+  it("delegates to pullrequests.fetch_diff with pr + opts and returns diff", function()
     local recorded, loader = make_deps()
     recorded.diff_result = { { path = "a.lua" } }
     local client = atlas_client_mod.new({ require = loader })
     local diff, err
-    client.fetch_diff("https://api/diff", { force_load = true }, function(d, e) diff, err = d, e end)
+    client.fetch_diff({ id = 7 }, { force_load = true }, function(d, e) diff, err = d, e end)
     assert.is_nil(err)
     assert.equals("a.lua", diff[1].path)
-    assert.equals("https://api/diff", recorded.calls[1].args[1])
+    assert.equals(7, recorded.calls[1].args[1].id)
     assert.is_true(recorded.calls[1].args[2].force_load)
   end)
 
@@ -191,40 +191,45 @@ describe("atlas_client.fetch_diff", function()
     recorded.diff_err = "fail"
     local client = atlas_client_mod.new({ require = loader })
     local diff, err
-    client.fetch_diff("u", nil, function(d, e) diff, err = d, e end)
+    client.fetch_diff({ id = 1 }, nil, function(d, e) diff, err = d, e end)
     assert.is_nil(diff)
     assert.equals("fail", err)
   end)
 end)
 
 describe("atlas_client mutations", function()
-  it("create_comment relays result + err", function()
+  it("create_comment delegates to add_comment, relays result + err", function()
     local recorded, loader = make_deps()
     recorded.create_result = { id = 5 }
     local client = atlas_client_mod.new({ require = loader })
     local result, err
-    client.create_comment("u", "body", { inline = { path = "x" } }, function(r, e) result, err = r, e end)
+    client.create_comment({ id = 9 }, "body", { inline = { path = "x" } }, function(r, e) result, err = r, e end)
     assert.equals(5, result.id)
     assert.is_nil(err)
+    assert.equals("comments.add_comment", recorded.calls[1].name)
+    assert.equals(9, recorded.calls[1].args[1].id)
     assert.equals("body", recorded.calls[1].args[2])
   end)
 
-  it("reply_comment passes parent_id through", function()
+  it("reply_comment passes pr + parent_id through", function()
     local recorded, loader = make_deps()
     local client = atlas_client_mod.new({ require = loader })
-    client.reply_comment("u", 42, "body", nil, function() end)
+    client.reply_comment({ id = 9 }, 42, "body", nil, function() end)
+    assert.equals(9, recorded.calls[1].args[1].id)
     assert.equals(42, recorded.calls[1].args[2])
   end)
 
-  it("delete_comment maps falsy ok to (nil, err)", function()
+  it("delete_comment passes pr + comment_id, maps falsy ok to (nil, err)", function()
     local recorded, loader = make_deps()
     recorded.delete_ok = false
     recorded.delete_err = nil
     local client = atlas_client_mod.new({ require = loader })
     local ok, err
-    client.delete_comment("u", function(r, e) ok, err = r, e end)
+    client.delete_comment({ id = 9 }, 123, function(r, e) ok, err = r, e end)
     assert.is_nil(ok)
     assert.is_string(err)
+    assert.equals(9, recorded.calls[1].args[1].id)
+    assert.equals(123, recorded.calls[1].args[2])
   end)
 
   it("delete_comment maps truthy ok to (true, nil)", function()
@@ -232,7 +237,7 @@ describe("atlas_client mutations", function()
     recorded.delete_ok = true
     local client = atlas_client_mod.new({ require = loader })
     local ok, err
-    client.delete_comment("u", function(r, e) ok, err = r, e end)
+    client.delete_comment({ id = 9 }, 123, function(r, e) ok, err = r, e end)
     assert.is_true(ok)
     assert.is_nil(err)
   end)

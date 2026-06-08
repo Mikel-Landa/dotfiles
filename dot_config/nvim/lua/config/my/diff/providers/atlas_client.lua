@@ -9,7 +9,7 @@ end
 
 local REQUIRED = {
   service       = "atlas.pulls.providers.bitbucket.api.service",
-  pr_normalizer = "atlas.pulls.providers.bitbucket.api.pr_normalizer",
+  mapper        = "atlas.pulls.providers.bitbucket.api.mapper",
   pullrequests  = "atlas.pulls.providers.bitbucket.api.pullrequests",
   comments      = "atlas.pulls.providers.bitbucket.api.comments",
   users         = "atlas.pulls.providers.bitbucket.api.users",
@@ -34,12 +34,12 @@ function M.new(opts)
     local endpoint = ("/repositories/%s/%s/pullrequests?state=OPEN&pagelen=50"):format(workspace, repo)
     deps.service.request("GET", endpoint, nil, nil, function(result, err)
       if err then cb(nil, err); return end
-      cb(deps.pr_normalizer.pullrequests(result, workspace, repo), nil)
+      cb(deps.mapper.to_pull_requests_list(result, workspace, repo), nil)
     end)
   end
 
-  function client.fetch_diff(url, fetch_opts, cb)
-    deps.pullrequests.fetch_diff(url, fetch_opts or {}, function(diff, err)
+  function client.fetch_diff(pr, fetch_opts, cb)
+    deps.pullrequests.fetch_diff(pr, fetch_opts or {}, function(diff, err)
       if err then cb(nil, err); return end
       cb(diff or {}, nil)
     end)
@@ -54,22 +54,22 @@ function M.new(opts)
     end)
   end
 
-  function client.create_comment(url, body, comment_opts, cb)
-    deps.comments.create_comment(url, body, comment_opts or {}, function(result, err)
+  function client.create_comment(pr, body, comment_opts, cb)
+    deps.comments.add_comment(pr, body, comment_opts or {}, function(result, err)
       if err then cb(nil, err); return end
       cb(result, nil)
     end)
   end
 
-  function client.reply_comment(url, parent_id, body, reply_opts, cb)
-    deps.comments.reply_comment(url, parent_id, body, reply_opts, function(result, err)
+  function client.reply_comment(pr, parent_id, body, reply_opts, cb)
+    deps.comments.reply_comment(pr, parent_id, body, reply_opts, function(result, err)
       if err then cb(nil, err); return end
       cb(result, nil)
     end)
   end
 
-  function client.delete_comment(url, cb)
-    deps.comments.delete_comment(url, function(ok, err)
+  function client.delete_comment(pr, comment_id, cb)
+    deps.comments.delete_comment(pr, comment_id, function(ok, err)
       if err or not ok then cb(nil, err or "delete returned false"); return end
       cb(true, nil)
     end)

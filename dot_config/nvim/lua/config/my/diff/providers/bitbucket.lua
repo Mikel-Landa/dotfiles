@@ -209,10 +209,7 @@ function M.new(atlas_client)
   end
 
   function provider.fetch_diff_files(pr, callback)
-    local url = links.diff(pr)
-    if url == "" then callback({}); return end
-
-    atlas_client.fetch_diff(url, { force_load = true }, function(diff, _err)
+    atlas_client.fetch_diff(pr, { force_load = true }, function(diff, _err)
       local by_path = {}
       for _, file in ipairs(diff or {}) do
         local path = file.path or file.new_path
@@ -238,21 +235,15 @@ function M.new(atlas_client)
   end
 
   function provider.add_comment(pr, context, body, opts, callback)
-    local url = links.comments(pr)
-    if url == "" then callback(nil, "No comments URL available"); return end
-
     local inline = inline_for(context)
-    atlas_client.create_comment(url, body, { inline = inline }, function(result, err)
+    atlas_client.create_comment(pr, body, { inline = inline }, function(result, err)
       if err then callback(nil, "Failed to post comment: " .. err); return end
       callback(result)
     end)
   end
 
   function provider.reply(pr, root_comment, body, callback)
-    local url = links.comments(pr)
-    if url == "" then callback(nil, "No comments URL available"); return end
-
-    atlas_client.reply_comment(url, root_comment.id, body, nil, function(result, err)
+    atlas_client.reply_comment(pr, root_comment.id, body, nil, function(result, err)
       if err then callback(nil, "Failed to post reply: " .. err); return end
       callback(result)
     end)
@@ -286,14 +277,11 @@ function M.new(atlas_client)
     end
 
     if body and body ~= "" then
-      local url = links.comments(pr)
-      if url ~= "" then
-        atlas_client.create_comment(url, body, {}, function(_, err)
-          if err then callback(nil, "Failed to post review comment: " .. tostring(err)); return end
-          submit_action()
-        end)
-        return
-      end
+      atlas_client.create_comment(pr, body, {}, function(_, err)
+        if err then callback(nil, "Failed to post review comment: " .. tostring(err)); return end
+        submit_action()
+      end)
+      return
     end
     submit_action()
   end
@@ -320,17 +308,12 @@ function M.new(atlas_client)
     end)
   end
 
-  function provider.delete_comment(_pr, comment, callback)
+  function provider.delete_comment(pr, comment, callback)
     if not comment or not comment.id then
       callback(nil, "No comment selected"); return
     end
 
-    local self_url = links.self(comment)
-    if self_url == "" then
-      callback(nil, "No self URL on comment"); return
-    end
-
-    atlas_client.delete_comment(self_url, function(_, err)
+    atlas_client.delete_comment(pr, comment.id, function(_, err)
       if err then callback(nil, "Failed to delete comment: " .. tostring(err)); return end
       callback(true)
     end)

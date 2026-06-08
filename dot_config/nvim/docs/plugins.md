@@ -238,7 +238,7 @@ VSCode-style "sticky scroll": as you scroll inside a function or class, the encl
 
 ### neovim/nvim-lspconfig + mason.nvim — Language servers
 
-Servers auto-install on first use. Base: json, yaml, html, css, bash, toml (tombi). Per-language bundles in `lua/plugins/lang/*.lua`: lua (lua_ls + lazydev), python (pyright + ruff), typescript (vtsls), rust (rustaceanvim), go (gopls), c/c++ (clangd), markdown (marksman). Tools (formatters, linters, DAP adapters) install via `mason-tool-installer.nvim` (lists merge across lang files). Manage with `:Mason`, `:MasonToolsUpdate`.
+Servers auto-install on first use. Base: json, yaml, html, css, bash, toml (tombi). Per-language bundles in `lua/plugins/lang/*.lua`: lua (lua_ls + lazydev), python (pyright + ruff), typescript (vtsls), rust (rustaceanvim), go (gopls), c/c++ (clangd), markdown (marksman), terraform (terraform-ls). Tools (formatters, linters, DAP adapters) install via `mason-tool-installer.nvim` (lists merge across lang files). Manage with `:Mason`, `:MasonToolsUpdate`.
 
 LSP keymaps (active when an LSP attaches):
 
@@ -286,7 +286,7 @@ Format on save runs automatically (500ms timeout, falls back to LSP). Manual:
 | `<leader>cf` | Format buffer / selection |
 | `grf` | Format file |
 
-Formatters declared per-language in `lua/plugins/lang/*.lua` and merged into conform. Current: stylua (lua), ruff_format + ruff_organize_imports (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt (rust, lsp fallback), goimports + gofumpt (go), shfmt (sh), markdownlint-cli2 + markdown-toc (markdown, conditional). Install via `:Mason`.
+Formatters declared per-language in `lua/plugins/lang/*.lua` and merged into conform. Current: stylua (lua), ruff_format + ruff_organize_imports (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt (rust, lsp fallback), goimports + gofumpt (go), terraform_fmt (terraform/tf) + packer_fmt (hcl), shfmt (sh), markdownlint-cli2 + markdown-toc (markdown, conditional). Install via `:Mason`.
 
 Line width target: **100 chars** for stylua / ruff_format / prettier(d). Project config files (`.stylua.toml`, `pyproject.toml`, `.prettierrc`) override.
 
@@ -298,7 +298,7 @@ Line width target: **100 chars** for stylua / ruff_format / prettier(d). Project
 
 ### mfussenegger/nvim-lint — On-save linters
 
-Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `markdownlint-cli2` (markdown), `shellcheck` (sh/bash). Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>xx` Trouble panel).
+Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `terraform_validate` (terraform/tf), `markdownlint-cli2` (markdown), `shellcheck` (sh/bash). Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>xx` Trouble panel).
 
 ---
 

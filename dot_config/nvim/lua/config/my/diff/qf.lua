@@ -75,8 +75,10 @@ local function is_mine(comment)
 end
 
 -- Forward declarations: mutators are defined at the bottom of the file
--- and closed over by show_popup_for_thread.
+-- and closed over by show_popup_for_thread. `bind_buffer` is defined below
+-- but called earlier from preview_entry.
 local edit_comment, delete_comment, reply_to_thread
+local bind_buffer
 
 -- Floating popup ("K" peek)
 
@@ -135,26 +137,38 @@ local function render_virt_for_entry(qf_bufnr, lnum, thread)
   active_virt = { bufnr = qf_bufnr, id = id }
 end
 
--- Returns the first non-qf, normal-buftype window in the same tabpage as
--- `qf_winid`, or nil if none exists.
+-- Picks the window to host the code preview in `qf_winid`'s tabpage.
+-- Prefers a real file window (buftype ""). When none exists — e.g. the tab
+-- only has a starter dashboard (nofile) filling the main area — falls back
+-- to the largest non-qf, non-floating window so the code lands in the main
+-- pane instead of `:cc` spawning a cramped split above the qf. Returns nil
+-- only when nothing but the qf (and floats) is on screen.
 local function preview_target_window(qf_winid)
   local tabpage = vim.api.nvim_win_get_tabpage(qf_winid)
+  local fallback, fallback_area = nil, -1
   for _, w in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
-    if w ~= qf_winid then
+    if w ~= qf_winid and vim.api.nvim_win_get_config(w).relative == "" then
       local b = vim.api.nvim_win_get_buf(w)
       if vim.bo[b].buftype == "" then return w end
+      if vim.bo[b].buftype ~= "quickfix" then
+        local area = vim.api.nvim_win_get_width(w) * vim.api.nvim_win_get_height(w)
+        if area > fallback_area then
+          fallback, fallback_area = w, area
+        end
+      end
     end
   end
-  return nil
+  return fallback
 end
 
 local function preview_entry(qf_winid, item)
-  if not item or not item.filename or item.filename == "" then return end
+  -- getqflist() returns `bufnr` (resolved from the `filename` we set), never a
+  -- `filename` field — so previewing must go through bufnr, else it no-ops and
+  -- the target window keeps whatever buffer was already there.
+  if not item or not item.bufnr or item.bufnr <= 0 then return end
   local target = preview_target_window(qf_winid)
   if not target then return end
-  local fname = vim.fn.fnamemodify(item.filename, ":p")
-  local bufnr = vim.fn.bufnr(fname, true)
-  if bufnr <= 0 then return end
+  local bufnr = item.bufnr
   vim.fn.bufload(bufnr)
   if vim.api.nvim_win_get_buf(target) ~= bufnr then
     vim.api.nvim_win_set_buf(target, bufnr)
@@ -162,6 +176,16 @@ local function preview_entry(qf_winid, item)
   if item.lnum and item.lnum > 0 then
     pcall(vim.api.nvim_win_set_cursor, target, { item.lnum, 0 })
     vim.api.nvim_win_call(target, function() vim.cmd("normal! zz") end)
+  end
+  -- nvim_win_set_buf doesn't fire BufWinEnter, so the autocmd that paints
+  -- signs + binds code-buffer K never runs for the previewed file. Wire them
+  -- here so K peeks the thread on the comment line (the `:cc` path did this
+  -- for free).
+  if state then
+    sign_painter.refresh_buffer(bufnr)
+    if sign_painter.threads_for_buffer(bufnr) then
+      bind_buffer(bufnr)
+    end
   end
 end
 
@@ -252,7 +276,7 @@ end
 
 -- Code-buffer K (peek-or-hover) binding
 
-local function bind_buffer(bufnr)
+bind_buffer = function(bufnr)
   vim.keymap.set("n", "K", function()
     if vim.bo[bufnr].buftype ~= "" then return vim.lsp.buf.hover() end
     local threads = sign_painter.threads_for_buffer(bufnr)

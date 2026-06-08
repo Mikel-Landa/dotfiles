@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-check-update.js\""
+            "command": "node \"/home/mikel/.claude/hooks/gsd-check-update.js\""
           }
         ]
       },
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/caveman-activate.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/caveman-activate.js\"",
             "timeout": 5,
             "statusMessage": "Loading caveman mode..."
           }
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
           }
         ]
@@ -63,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-read-injection-scanner.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/gsd-read-injection-scanner.js\"",
             "timeout": 5
           }
         ]
@@ -95,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-prompt-guard.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/gsd-prompt-guard.js\"",
             "timeout": 5
           }
         ]
@@ -105,7 +105,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-read-guard.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/gsd-read-guard.js\"",
             "timeout": 5
           }
         ]
@@ -115,7 +115,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-workflow-guard.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/gsd-workflow-guard.js\"",
             "timeout": 5
           }
         ]
@@ -135,7 +135,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/gsd-worktree-path-guard.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/gsd-worktree-path-guard.js\"",
             "timeout": 5
           }
         ]
@@ -146,7 +146,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/installs/node/24.15.0/bin/node\" \"/home/mikel/.claude/hooks/caveman-mode-tracker.js\"",
+            "command": "node \"/home/mikel/.claude/hooks/caveman-mode-tracker.js\"",
             "timeout": 5,
             "statusMessage": "Tracking caveman mode..."
           }

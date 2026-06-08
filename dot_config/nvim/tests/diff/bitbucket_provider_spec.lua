@@ -17,8 +17,8 @@ local function stub_client()
     local n = c.next.fetch_open_prs or { result = {}, err = nil }
     cb(n.result, n.err)
   end
-  function c.fetch_diff(url, opts, cb)
-    table.insert(c.calls, { name = "fetch_diff", args = { url, opts } })
+  function c.fetch_diff(pr, opts, cb)
+    table.insert(c.calls, { name = "fetch_diff", args = { pr, opts } })
     local n = c.next.fetch_diff or { result = {}, err = nil }
     cb(n.result, n.err)
   end
@@ -27,18 +27,18 @@ local function stub_client()
     local n = c.next.fetch_comments or { result = {}, err = nil }
     cb(n.result, n.err)
   end
-  function c.create_comment(url, body, opts, cb)
-    table.insert(c.calls, { name = "create_comment", args = { url, body, opts } })
+  function c.create_comment(pr, body, opts, cb)
+    table.insert(c.calls, { name = "create_comment", args = { pr, body, opts } })
     local n = c.next.create_comment or { result = { id = 1 }, err = nil }
     cb(n.result, n.err)
   end
-  function c.reply_comment(url, parent_id, body, opts, cb)
-    table.insert(c.calls, { name = "reply_comment", args = { url, parent_id, body, opts } })
+  function c.reply_comment(pr, parent_id, body, opts, cb)
+    table.insert(c.calls, { name = "reply_comment", args = { pr, parent_id, body, opts } })
     local n = c.next.reply_comment or { result = { id = 2 }, err = nil }
     cb(n.result, n.err)
   end
-  function c.delete_comment(url, cb)
-    table.insert(c.calls, { name = "delete_comment", args = { url } })
+  function c.delete_comment(pr, comment_id, cb)
+    table.insert(c.calls, { name = "delete_comment", args = { pr, comment_id } })
     local n = c.next.delete_comment or { result = true, err = nil }
     cb(n.result, n.err)
   end
@@ -79,26 +79,27 @@ describe("bitbucket.new", function()
 end)
 
 describe("bitbucket.fetch_diff_files", function()
-  it("returns {} when pr has no diff link", function()
+  it("returns {} when diff is empty", function()
     local p = bitbucket.new(stub_client())
     local files
     p.fetch_diff_files(make_pr({}), function(f) files = f end)
     assert.are.same({}, files)
   end)
 
-  it("groups by path and old_path", function()
+  it("groups by path and old_path, passing the pr to the client", function()
     local client = stub_client()
     client.next.fetch_diff = { result = {
       { path = "a.lua", old_path = "old_a.lua" },
       { new_path = "b.lua" },
     }, err = nil }
     local p = bitbucket.new(client)
+    local pr = make_pr({ diff = { href = "http://diff" } })
     local files
-    p.fetch_diff_files(make_pr({ diff = { href = "http://diff" } }), function(f) files = f end)
+    p.fetch_diff_files(pr, function(f) files = f end)
     assert.is_not_nil(files["a.lua"])
     assert.is_not_nil(files["old_a.lua"])
     assert.is_not_nil(files["b.lua"])
-    assert.equals("http://diff", client.calls[1].args[1])
+    assert.equals(pr, client.calls[1].args[1])
     assert.is_true(client.calls[1].args[2].force_load)
   end)
 end)
@@ -143,13 +144,14 @@ describe("bitbucket.add_comment", function()
   it("posts inline.to for RIGHT side", function()
     local client = stub_client()
     local p = bitbucket.new(client)
+    local pr = make_pr({ comments = { href = "http://c" } })
     p.add_comment(
-      make_pr({ comments = { href = "http://c" } }),
+      pr,
       { file_path = "a.lua", start_line = 10, end_line = 12, side = "RIGHT" },
       "body", { pending = true }, function() end
     )
     local args = client.calls[1].args
-    assert.equals("http://c", args[1])
+    assert.equals(pr, args[1])
     assert.equals("body", args[2])
     assert.equals(12, args[3].inline.to)
     assert.equals(10, args[3].inline.start_to)
@@ -180,27 +182,19 @@ describe("bitbucket.reply", function()
 end)
 
 describe("bitbucket.delete_comment", function()
-  it("uses the comment._raw.links.self.href", function()
+  it("passes the pr and comment id to the client", function()
     local client = stub_client()
     local p = bitbucket.new(client)
-    p.delete_comment(nil,
-      { id = 7, _raw = { links = { self = { href = "http://self" } } } },
-      function() end)
-    assert.equals("http://self", client.calls[1].args[1])
-  end)
-
-  it("errors when no self URL", function()
-    local p = bitbucket.new(stub_client())
-    local ok, err
-    p.delete_comment(nil, { id = 7, _raw = { links = {} } }, function(r, e) ok, err = r, e end)
-    assert.is_nil(ok)
-    assert.matches("self URL", err)
+    local pr = make_pr({ comments = { href = "http://c" } })
+    p.delete_comment(pr, { id = 7 }, function() end)
+    assert.equals(pr, client.calls[1].args[1])
+    assert.equals(7, client.calls[1].args[2])
   end)
 
   it("errors when no id", function()
     local p = bitbucket.new(stub_client())
     local ok, err
-    p.delete_comment(nil, {}, function(r, e) ok, err = r, e end)
+    p.delete_comment(make_pr({}), {}, function(r, e) ok, err = r, e end)
     assert.is_nil(ok)
     assert.matches("No comment selected", err)
   end)
@@ -228,11 +222,11 @@ describe("bitbucket.submit_review", function()
   it("posts review comment first when body is non-empty", function()
     local client = stub_client()
     local p = bitbucket.new(client)
-    p.submit_review(
-      make_pr({ approve = { href = "http://a" }, comments = { href = "http://c" } }),
-      "APPROVE", "looks good", function() end)
+    local pr = make_pr({ approve = { href = "http://a" }, comments = { href = "http://c" } })
+    p.submit_review(pr, "APPROVE", "looks good", function() end)
     assert.equals("create_comment", client.calls[1].name)
-    assert.equals("http://c", client.calls[1].args[1])
+    assert.equals(pr, client.calls[1].args[1])
+    assert.equals("looks good", client.calls[1].args[2])
     assert.equals("approve", client.calls[2].name)
   end)
 
