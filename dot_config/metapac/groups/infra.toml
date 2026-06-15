@@ -1,0 +1,6 @@
+mise = {
+  packages = [
+    "opentofu",
+    "packer",
+  ]
+}

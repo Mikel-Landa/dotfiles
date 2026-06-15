@@ -7,6 +7,8 @@ vim.filetype.add({
   extension = {
     mdx = "markdown.mdx",
     gotmpl = "gotmpl",
+    cedar = "cedar",
+    cedarschema = "cedar",
   },
   filename = {
     [".gitlab-ci.yml"] = "yaml.gitlab",

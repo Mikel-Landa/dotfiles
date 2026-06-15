@@ -37,7 +37,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id="firefox-startup"
+    match app-id="browser-startup"
     open-on-workspace "browser"
     open-maximized true
 }
@@ -91,6 +91,7 @@ window-rule {
 
 window-rule {
     match app-id="firefox" title=r#"(?i)(bitwarden|1password|password|otp)"#
+    match app-id="zen-browser" title=r#"(?i)(bitwarden|1password|password|otp)"#
     block-out-from "screencast"
 }
 

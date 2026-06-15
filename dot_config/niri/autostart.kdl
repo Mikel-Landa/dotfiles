@@ -3,7 +3,7 @@ spawn-sh-at-startup "wl-paste --watch cliphist store &"
 // Stash workspace daemon — must run for niri-scratchpad target/create to work.
 spawn-at-startup "niri-scratchpad" "daemon"
 
-spawn-at-startup "firefox" "--class=firefox-startup"
+spawn-at-startup "zen-browser" "--class=browser-startup"
 
 spawn-at-startup "kitty" "--class=kitty-term"
 
