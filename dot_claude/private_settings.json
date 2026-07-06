@@ -10,6 +10,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -164,7 +165,9 @@
     "frontend-design@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
-    "superpowers@superpowers-marketplace": true
+    "superpowers@superpowers-marketplace": true,
+    "overkill@overkill-marketplace": true,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "karpathy-skills": {
@@ -183,6 +186,18 @@
       "source": {
         "source": "github",
         "repo": "obra/superpowers-marketplace"
+      }
+    },
+    "overkill-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "santiago-vargas-de-kruijf/claude-overkill"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
       }
     }
   },

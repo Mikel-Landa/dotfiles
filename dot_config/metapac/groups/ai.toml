@@ -29,6 +29,12 @@ uv = {
           "graphify install && graphify cursor install"
         ]
       }
+    },
+    {
+      name = "peasyai-mcp",
+      options = {
+        from = "https://github.com/p-org/P/releases/download/peasyai-v1.0.0/peasyai_mcp-1.0.0-py3-none-any.whl",
+      }
     }
   ]
 }

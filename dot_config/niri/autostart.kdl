@@ -1,5 +1,9 @@
 spawn-sh-at-startup "wl-paste --watch cliphist store &"
 
+// Secret Service daemon (KWallet/ksecretd). niri has no Plasma to autostart it;
+// libsecret apps (iloader, etc.) need org.freedesktop.secrets on the bus.
+spawn-at-startup "/usr/bin/ksecretd"
+
 // Stash workspace daemon — must run for niri-scratchpad target/create to work.
 spawn-at-startup "niri-scratchpad" "daemon"
 
