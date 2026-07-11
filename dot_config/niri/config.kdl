@@ -144,3 +144,5 @@ include "binds.kdl"
 include "rules.kdl"
 
 include "autostart.kdl"
+
+include "dms/outputs.kdl"
