@@ -1,0 +1,22 @@
+<!-- Copyright (c) Microsoft Corporation. Licensed under the MIT license. -->
+
+> Source: https://microsoft.github.io/rust-guidelines/agents/all.txt
+
+## Use the proper type family (M-STRONG-TYPES) { #M-STRONG-TYPES }
+
+<why>the right data and safety invariants, at the right time.</why>
+
+Use the appropriate `std` type for your task. In general you should use the strongest type available, as early as possible in your API flow. Common offenders are
+
+| Do not use ... | use instead ... | Explanation |
+| --- | --- | --- |
+| `String`* | `PathBuf`* | Anything dealing with the OS should be `Path`-like |
+
+That said, you should also follow common Rust `std` conventions. Purely numeric types at public API boundaries (e.g., `window_size()`) are expected to
+be regular numbers, not `Saturating<usize>`, `NonZero<usize>`, or similar.
+
+<footnotes>
+
+<sup>*</sup> Including their siblings, e.g., `&str`, `Path`, ...
+
+</footnotes>

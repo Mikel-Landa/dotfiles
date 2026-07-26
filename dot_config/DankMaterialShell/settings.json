@@ -421,6 +421,7 @@
       "rightWidgets": [
         "systemTray",
         "clipboard",
+        "intervalCommand:ai_usagebar",
         "cpuUsage",
         "memUsage",
         "notificationButton",

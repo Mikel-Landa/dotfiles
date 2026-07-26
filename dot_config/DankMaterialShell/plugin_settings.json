@@ -5,5 +5,20 @@
 	"commandRunner": {
 		"enabled": true,
 		"terminal": "kitty"
+	},
+	"intervalCommand": {
+		"enabled": true,
+		"variants": [
+			{
+				"id": "ai_usagebar",
+				"name": "AI Usage",
+				"command": "ai-usagebar --vendor openai | jq -r '.text' | sed -E 's/<[^>]+>//g'",
+				"icon": "smart_toy",
+				"refreshInterval": 300,
+				"clickCommand": "kitty -e ai-usagebar-tui",
+				"popoutEnabled": false,
+				"tabularNumbers": true
+			}
+		]
 	}
 }

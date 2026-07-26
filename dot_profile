@@ -71,6 +71,12 @@ path_push "$HOME/.local/bin"
 path_push "$HOME/bin"
 path_push "$GOBIN"
 path_push "$HOME/.cargo/bin"
+path_push "$HOME/.opencode/bin"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+path_push "$BUN_INSTALL/bin"
+
 # mise shims expose mise-managed tools (node, python, etc.) to non-interactive
 # shells (scripts) without needing `mise activate` to run.
 path_push "$HOME/.local/share/mise/shims"

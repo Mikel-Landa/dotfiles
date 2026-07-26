@@ -8,6 +8,7 @@ arch = { packages = [{ name = "zig" }] }
 
 cargo = {
   packages = [
+    "ai-usagebar",
     {
       name = "fff-mcp",
       options = {
