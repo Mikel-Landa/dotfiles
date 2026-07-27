@@ -1,5 +1,6 @@
 /AGENTS.md
 install.sh
+graphify-out/
 .config/zsh/secrets.zsh
 .config/nvim/lazy-lock.json
 .config/tmux/plugins/**
