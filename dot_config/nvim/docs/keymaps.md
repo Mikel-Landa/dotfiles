@@ -139,12 +139,12 @@ VSCode-parity diff viewer. Inline layout by default; toggle with `t` inside the 
 | `<leader>gvh` | File history (repo) |
 | `<leader>gvf` | File history (current file) |
 | `<leader>gvp` | PR-like diff vs origin default branch (merge-base) |
-| `<leader>gG` | Toggle codediff vs origin default branch (PR overlay) |
-| `<leader>gz` | Toggle compressed view (fold unchanged regions) |
+| `<leader>gG` | Toggle codediff vs origin default branch |
+| `<leader>gz` | Toggle compact view (fold unchanged regions) |
 
-Compressed view is on by default: unchanged regions fold away, leaving only changed lines plus 5 lines of context. `gz` inside a CodeDiff window does the same toggle.
+Compact mode is on by default: unchanged regions fold away, leaving only changed lines plus 5 lines of context. `gz` inside a CodeDiff window does the same toggle.
 
-Inside a CodeDiff view: `]c`/`[c` next/prev hunk, `]f`/`[f` next/prev file, `]x`/`[x` next/prev conflict, `do`/`dp` get/put change, `gf` open in previous tab, `-` stage/unstage file, `<leader>hs`/`<leader>hu`/`<leader>hr` stage/unstage/discard hunk, `t` toggle inline ↔ side-by-side, `gz` toggle compressed view, `q` close, `g?` help. Merge conflict: `<leader>co`/`<leader>ct`/`<leader>cb`/`<leader>cx` accept ours/theirs/both/discard.
+Inside a CodeDiff view: `]c`/`[c` next/prev hunk, `]f`/`[f` next/prev file, `]x`/`[x` next/prev conflict, `do`/`dp` get/put change, `gf` open in previous tab, `-` stage/unstage file, `<leader>hs`/`<leader>hu`/`<leader>hr` stage/unstage/discard hunk, `t` toggle inline ↔ side-by-side, `gz` toggle compact view, `q` close, `g?` help. Merge conflict: `<leader>co`/`<leader>ct`/`<leader>cb`/`<leader>cx` accept ours/theirs/both/discard.
 
 ### Toggles
 
@@ -155,27 +155,23 @@ Inside a CodeDiff view: `]c`/`[c` next/prev hunk, `]f`/`[f` next/prev file, `]x`
 | `<leader>gtw` | Toggle word diff |
 | `<leader>gti` | Toggle inline diff (linehl + deleted + word, composite) |
 
-### PR comments overlay (CodeDiff + Bitbucket)
+### Atlas PR review
 
-Active inside a CodeDiff session for a Bitbucket PR. Signs `` (published) / `` (pending) appear in the gutter at commented lines.
+Open a PR from Atlas (`<leader>op`, then `gd`) — comments overlay the CodeDiff, and the review panel opens at the bottom.
 
-| Key | Mode | Action |
-|---|---|---|
-| `<leader>oc` | n | Load PR comments for current branch into quickfix |
-| `<leader>oC` | n | Clear PR comments: drop qf list, signs, and `K` peek bindings |
-| `K` | n | Code buffer: peek thread popup at cursor (falls through to LSP hover if no thread); qf list: peek selected entry's thread |
-| `]q` / `[q` | n | Native `:cnext` / `:cprev` — advances qf entry, code window auto-previews |
+| Key | Action |
+|---|---|
+| `<leader>oc` | Dump Atlas inline comments into the quickfix list |
+| `<leader>oC` | Close that quickfix list |
+| `gR` | Toggle the Atlas review panel |
+| `]c` / `[c` | Next / prev comment (inside an Atlas-attached diff) |
+| `c` | Add a comment at the cursor |
+| `ga` | Approve / unapprove |
+| `gr` | Request changes |
+| `gs` | Start / submit review |
+| `A` | Action menu (also from the Atlas PR list) |
 
-Inside the qf list (title `PR Comments`):
-
-- cursor on entry → thread renders inline as `virt_lines` below the entry; the adjacent code window silently scrolls to the entry's `file:line` (cursor stays in qf)
-- `<CR>` → jump focus into the previewed code window
-- `r` → reply to the entry's thread root
-- `d` → delete the whole thread (confirm prompt)
-- `e` → edit the thread root body (own root only)
-- `K` → floating popup with full per-comment `r` / `e` / `d` (use this for actions on individual replies)
-
-Review actions (Approve / Request changes) are exposed as atlas-pulls custom actions — open `:AtlasPulls bitbucket`, select a PR, press `A` to invoke.
+`]q` / `[q` still walk the quickfix list after `<leader>oc`. Reply / edit / delete live on the Atlas overlay and review panel, not on the qf entries.
 
 ### Text object
 
@@ -442,13 +438,15 @@ Format on save runs automatically.
 
 ## Workflow / remote PR & issue browsers (`<leader>o`)
 
-`:Workflow` opens a picker; direct keymaps below skip it. See [plugins.md](plugins.md#workflow-remote-pr--issue-browsers) for atlas + octo command reference.
+`:Workflow` opens a picker; direct keymaps below skip it. See [plugins.md](plugins.md#workflow-remote-pr--issue-browsers) for atlas command reference.
 
 | Key | Action |
 |---|---|
 | `<leader>oo` | Workflow picker (PRs + issues, all providers) |
 | `<leader>op` | PRs — auto-detects GitHub/Bitbucket from `git remote`; falls back to picker |
-| `<leader>oi` | Issues — GitHub repo → Octo, else → Jira (Atlas) |
+| `<leader>oi` | Issues — GitHub repo → Atlas GitHub, else → Jira |
+| `<leader>oc` | Atlas PR comments → quickfix (needs an Atlas review attached) |
+| `<leader>oC` | Close Atlas PR-comments quickfix |
 
 ## Avante (AI assistant)
 

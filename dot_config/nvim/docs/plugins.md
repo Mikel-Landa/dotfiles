@@ -347,7 +347,7 @@ Inside status: `s`/`u` stage/unstage, `x` discard, `c` commit, `p`/`P` pull/push
 
 ### esmuellert/codediff.nvim — VSCode-parity diff viewer
 
-Day-to-day diff viewer. C-based diff engine with VSCode's algorithm: two-tier line+char highlights, moved-code detection (opt-in via `compute_moves`), and an inline (unified) layout as default — toggle to side-by-side with `t` inside the view. 3-way merge layout (`conflict_result_position = "center"`) for conflict resolution. Used by Neogit's `d` action, the unstaged-files quickfix `<CR>`, atlas.nvim PR diffs, and the Bitbucket PR-comments overlay. First run downloads a small pre-built C library — run `:CodeDiff install` if it does not auto-install.
+Day-to-day diff viewer. C-based diff engine with VSCode's algorithm: two-tier line+char highlights, moved-code detection (opt-in via `compute_moves`), and an inline (unified) layout as default — toggle to side-by-side with `t` inside the view. 3-way merge layout (`conflict_result_position = "center"`) for conflict resolution. Used by Neogit's `d` action, the unstaged-files quickfix `<CR>`, and atlas.nvim PR diffs (Atlas attaches its review overlay when you open a PR with `gd`). First run downloads a small pre-built C library — run `:CodeDiff install` if it does not auto-install.
 
 | Key | Action |
 |---|---|
@@ -356,10 +356,10 @@ Day-to-day diff viewer. C-based diff engine with VSCode's algorithm: two-tier li
 | `<leader>gvh` | File history (repo) |
 | `<leader>gvf` | File history (current file) |
 | `<leader>gvp` | PR-like diff vs origin default branch (merge-base) |
-| `<leader>gG` | Toggle codediff vs origin default branch (PR overlay) |
-| `<leader>gz` | Toggle compressed view (fold unchanged regions) |
+| `<leader>gG` | Toggle codediff vs origin default branch |
+| `<leader>gz` | Toggle compact view (fold unchanged regions) |
 
-Compressed view (custom, `lua/config/my/codediff_folds.lua`): on by default. Scans codediff's `codediff-highlight` extmarks, then drives `foldmethod=expr` to collapse every line not within 5 lines of a change. Inside a CodeDiff window press `gz` to toggle; outside use `<leader>gz`.
+Compact mode (native): on by default. Folds unchanged regions, leaving hunks plus 5 lines of context. Inside a CodeDiff window press `gz` to toggle; outside use `<leader>gz`.
 
 Inside a CodeDiff view:
 
@@ -373,6 +373,7 @@ Inside a CodeDiff view:
 | `-` | Stage / unstage current file |
 | `<leader>hs` / `<leader>hu` / `<leader>hr` | Stage / unstage / discard hunk |
 | `t` | Toggle inline ↔ side-by-side layout |
+| `gz` | Toggle compact view |
 | `q` | Close diff tab |
 | `g?` | Help |
 
@@ -402,56 +403,35 @@ Signs in signcolumn show added/changed/deleted lines. Inline blame on current li
 |---|---|
 | `<leader>oo` | Workflow picker (PRs + issues, all providers) |
 | `<leader>op` | PRs — auto-detects GitHub/Bitbucket from `git remote`; falls back to picker |
-| `<leader>oi` | Issues — GitHub repo → Octo, else → Jira (Atlas) |
+| `<leader>oi` | Issues — GitHub repo → Atlas GitHub, else → Jira |
+| `<leader>oc` | Atlas PR comments → quickfix |
+| `<leader>oC` | Close Atlas PR-comments quickfix |
 
 ### emrearmagan/atlas.nvim — GitHub + Bitbucket + Jira
 
-GitHub & Bitbucket PR browser + Jira issue browser. Loads on `:AtlasPulls`, `:AtlasIssues`, `:AtlasJqlSearch`. PR diffs open in CodeDiff. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in `lua/plugins/atlas.lua` with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
+GitHub & Bitbucket PR browser + GitHub & Jira issue browser. Loads on `:AtlasPulls`, `:AtlasIssues`, `:AtlasDiff`, and related commands. PR diffs open in CodeDiff with Atlas's native comment overlay and review panel. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in the atlas plugin spec with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
 
 | Command | Action |
 |---|---|
 | `:AtlasPulls github` | Open GitHub PR picker |
 | `:AtlasPulls bitbucket` | Open Bitbucket PR picker |
+| `:AtlasIssues github` | Open GitHub issue picker |
 | `:AtlasIssues jira` | Open Jira issue picker |
+| `:AtlasDiff <base>...<head>` | Open a local range in AtlasDiff |
+| `:AtlasDiff <pr-url>` | Open a pull request review |
+| `:AtlasNotes` | Inspect local review notes |
+| `:AtlasCreatePR` | Create a PR from the current branch |
 | `:AtlasJqlSearch <jql>` | Run a one-off JQL search |
 | `:AtlasClearCache` | Drop disk + memory cache |
 | `:AtlasLogs` | Toggle plugin logs |
 
-Custom actions in the Bitbucket PR list (open via `:AtlasPulls bitbucket`, press `A`):
+**Review:** from a PR in Atlas, press `gd` to open the diff. Comments, tasks, and local notes overlay the CodeDiff. The review panel starts open (`gR` toggles it). Approve / request-changes / submit are native (`ga` / `gr` / `gs`, or `A` from the PR list). `<leader>oc` copies inline comments into the quickfix so `]q` / `[q` work; it no-ops unless an Atlas review is attached.
 
-| Action | Effect |
-|---|---|
-| Approve PR | Prompts for optional review body, then approves |
-| Request changes | Prompts for optional review body, then requests changes |
-
-### Bitbucket PR comments overlay (custom, `lua/config/my/diff/`)
-
-Inline PR-comment markers in CodeDiff sessions for Bitbucket PRs. Activates on `:CodeDiff <base>...<source-branch>` (or any codediff session whose modified revision matches an open Bitbucket PR head). Reuses atlas.nvim's Bitbucket API for fetch / post / delete.
-
-How it works: on `CodeDiffOpen` and per-file `CodeDiffFileSelect`, the overlay finds an open PR matching the diff's right revision (or current branch as fallback), fetches comments + diff metadata, and places sign-column markers at commented lines on both LEFT and RIGHT diff buffers.
-
-Module layout (see `lua/config/my/diff/CONTEXT.md` for full vocab):
-
-- `init.lua` — wires keymaps and CodeDiff autocmds.
-- `registry.lua` — per-tabpage session map + async refresh state machine.
-- `codediff_session.lua` — single seam onto codediff internals (`codediff.ui.lifecycle.get_session`).
-- `commands.lua` — user-facing actions (`add_comment`, `view_thread`, `submit_review`, `reload`).
-- `providers/<name>.lua` — host adapter; emits the normalized comment shape.
-
-Keymaps: see [PR comments overlay](keymaps.md#pr-comments-overlay-codediff--bitbucket).
+Keymaps: see [Atlas PR review](keymaps.md#atlas-pr-review).
 
 ### Unstaged-files quickfix (custom, `lua/config/my/unstaged_qf.lua`)
 
 `<leader>gq` populates the quickfix with every file that has unstaged changes (modified, deleted, untracked). The list refreshes automatically on gitsigns/neogit events, so files drop out as soon as they're staged. No-op while a different qf list is active. Inside the list, `<CR>` opens the file in CodeDiff against `HEAD` (falls back to plain edit for untracked files with no index entry).
-
-### pwntester/octo.nvim — GitHub issues
-
-Kept solely for GitHub *issues* (atlas.nvim handles GitHub PRs). Auth: `gh auth login`. Loads on `:Octo`. Picker backed by snacks. `?` shows buffer-local mappings inside an Octo buffer.
-
-| Command | Action |
-|---|---|
-| `:Octo issue list` | List issues |
-| `:Octo issue create` | Create new issue |
 
 ---
 

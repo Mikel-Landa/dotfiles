@@ -1,11 +1,10 @@
 -- :Workflow — vim.ui.select dispatcher for remote PR/issue browsers.
--- Owns the <leader>o* root keymaps; sub-features (PR comments overlay) own
--- their own <leader>oc* subtree.
+-- Owns the <leader>o* root keymaps; Atlas PR-comment qf owns <leader>oc*.
 local actions = {
   { label = "󰊤  GitHub PRs",      command = "AtlasPulls github" },
   { label = "  Bitbucket PRs",   command = "AtlasPulls bitbucket" },
   { label = "󰌃  Jira issues",     command = "AtlasIssues jira" },
-  { label = "󰊤  GitHub issues",   command = "Octo issue list" },
+  { label = "󰊤  GitHub issues",   command = "AtlasIssues github" },
 }
 
 vim.api.nvim_create_user_command("Workflow", function()
@@ -38,10 +37,10 @@ local function open_prs()
   end
 end
 
--- Issues: GitHub repo → Octo (atlas has no GitHub-issues provider); else → Jira.
+-- Issues: GitHub repo → Atlas GitHub; else → Jira.
 local function open_issues()
   if detect_pr_host() == "github" then
-    vim.cmd("Octo issue list")
+    vim.cmd("AtlasIssues github")
   else
     vim.cmd("AtlasIssues jira")
   end

@@ -163,7 +163,7 @@ map("n", "]d", function()
 end, { desc = "Next diagnostic" })
 
 -- Workflow root keys (<leader>o*) live in lua/config/my/workflow.lua
--- PR comments subtree (<leader>oc*) lives in lua/config/my/diff/init.lua
+-- Atlas PR-comment qf (<leader>oc*) lives in lua/config/my/atlas_qf.lua
 
 -- Quickfix list (unimpaired-style nav)
 -- Bulk edit across qf entries: :cdo s/foo/bar/g | update

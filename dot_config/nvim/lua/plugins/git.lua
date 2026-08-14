@@ -199,16 +199,31 @@ return {
 					end
 					vim.cmd(("CodeDiff %s...HEAD"):format(base))
 				end,
-				desc = "Toggle codediff vs origin default branch (PR overlay)",
+				desc = "Toggle codediff vs origin default branch",
+			},
+			{
+				"<leader>gz",
+				function()
+					require("codediff.ui.view.compact").toggle()
+				end,
+				desc = "CodeDiff: toggle compact view",
 			},
 		},
 		opts = {
 			diff = {
 				layout = "inline",
 				conflict_result_position = "center",
+				compact = true,
+				compact_context_lines = 5,
 			},
 			explorer = {
 				view_mode = "tree",
+			},
+			keymaps = {
+				view = {
+					-- Native default is `gc`; that is nvim's comment operator.
+					toggle_compact = "gz",
+				},
 			},
 		},
 	},
