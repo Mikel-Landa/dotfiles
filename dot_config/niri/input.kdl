@@ -4,7 +4,8 @@ input {
 
     keyboard {
         xkb {
-            layout "us"
+            layout "us,us"
+            variant ",intl"
             // options "caps:swapescape"  // handled by keyd
         }
         numlock

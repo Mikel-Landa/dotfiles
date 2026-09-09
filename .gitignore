@@ -1,1 +1,20 @@
 graphify-out/
+
+# Repository-local agent state, never dotfiles.
+/.claude/
+/.codex/
+/.omp/
+
+# Secrets and runtime state accidentally copied into managed agent directories.
+/dot_claude/*credentials*
+/dot_claude/*settings.local.json
+/dot_codex/*auth.json
+/dot_omp/**/auth.json
+/dot_omp/**/private_auth.json
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.sqlite*
+**/*.jsonl
+**/__pycache__/
+**/node_modules/

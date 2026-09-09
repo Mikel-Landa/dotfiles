@@ -5,8 +5,6 @@ description: Required behavioral guidelines for every coding task. Always use th
 
 # Karpathy Guidelines
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
-
 **Requirement:** Apply these guidelines to every coding task.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.

@@ -1,0 +1,12 @@
+[tools]
+awscli = { version = "latest", symlink_bins = "true" }
+bun = "latest"
+fzf = "latest"
+go = "latest"
+java = "11"
+kubectl = "latest"
+node = "lts"
+opentofu = "latest"
+packer = "latest"
+terraform = "latest"
+uv = "latest"

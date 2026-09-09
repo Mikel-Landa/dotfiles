@@ -1,11 +1,40 @@
 /AGENTS.md
 install.sh
 graphify-out/
+/README.md
+/tests{,/**}
+.config/surfingkeys{,/**}
+.config/DankMaterialShell/.{firstlaunch,changelog-*}
+.agents/skills/rust-skills/{checks,.github}{,/**}
+.agents/skills/rust-skills/{CONTRIBUTING,CHANGELOG}.md
+# Agent roots contain credentials and application-owned state. Import selectively.
+.agents/*
+!.agents/{AGENTS.md,skills}
+.omp/*
+!.omp/agent
+.omp/agent/*
+!.omp/agent/config.yml
+.codex/*
+!.codex/{AGENTS.md,config.toml}
+.gsd/*
+!.gsd/defaults.json
+.config/gh/*
+!.config/gh/config.yml
+.config/Code/User/*
+!.config/Code/User/{settings.json,keybindings.json,snippets}
 .config/zsh/secrets.zsh
 .config/nvim/lazy-lock.json
 .config/tmux/plugins/**
 **/.claude/*
 !.claude/{settings.json,skills,scripts,hooks,CLAUDE.md}
+# GSD owns its installed runtime; chezmoi keeps only custom hooks and scripts.
+.claude/hooks/*
+!.claude/hooks/{block-dangerous-git.sh,read-agents-md.sh,package.json}
+!.claude/hooks/caveman-{activate,config,mode-tracker,stats}.js
+!.claude/hooks/caveman-statusline.{sh,ps1}
+.claude/scripts/*
+!.claude/scripts/statusline.sh
+.claude/skills/gsd-*
 {{ if not .work -}}
 .config/metapac/groups/work.toml
 {{- end }}

@@ -3,6 +3,7 @@ binds {
     Mod+D repeat=false { toggle-overview; }
     Mod+Tab repeat=false { toggle-overview; }
     Mod+Shift+Slash { show-hotkey-overlay; }
+    Alt+Shift+Space repeat=false hotkey-overlay-title="Switch Keyboard Layout" { switch-layout "next"; }
 
     // === Application Launchers ===
     Mod+Return repeat=false hotkey-overlay-title="Open Terminal" { spawn "kitty"; }

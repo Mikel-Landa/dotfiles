@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/read-agents-md.sh"
+            "command": "\"$HOME/.claude/hooks/read-agents-md.sh\""
           }
         ]
       },
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-check-update.js\""
+            "command": "node \"$HOME/.claude/hooks/gsd-check-update.js\""
           }
         ]
       },
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"/home/mikel/.claude/hooks/gsd-session-state.sh\""
+            "command": "bash \"$HOME/.claude/hooks/gsd-session-state.sh\""
           }
         ]
       },
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/mikel/.claude/hooks/caveman-activate.js\"",
+            "command": "node \"$HOME/.claude/hooks/caveman-activate.js\"",
             "timeout": 5,
             "statusMessage": "Loading caveman mode..."
           }
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
           }
         ]
@@ -74,7 +74,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-read-injection-scanner.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-read-injection-scanner.js\"",
             "timeout": 5
           }
         ]
@@ -84,7 +84,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"/home/mikel/.claude/hooks/gsd-graphify-update.sh\"",
+            "command": "bash \"$HOME/.claude/hooks/gsd-graphify-update.sh\"",
             "timeout": 5
           }
         ]
@@ -94,7 +94,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"/home/mikel/.claude/hooks/gsd-phase-boundary.sh\"",
+            "command": "bash \"$HOME/.claude/hooks/gsd-phase-boundary.sh\"",
             "timeout": 5
           }
         ]
@@ -106,7 +106,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-prompt-guard.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-prompt-guard.js\"",
             "timeout": 5
           }
         ]
@@ -116,7 +116,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-read-guard.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-read-guard.js\"",
             "timeout": 5
           }
         ]
@@ -126,7 +126,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-workflow-guard.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-workflow-guard.js\"",
             "timeout": 5
           }
         ]
@@ -136,7 +136,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"/home/mikel/.claude/hooks/gsd-validate-commit.sh\"",
+            "command": "bash \"$HOME/.claude/hooks/gsd-validate-commit.sh\"",
             "timeout": 5
           }
         ]
@@ -146,7 +146,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/mikel/.claude/hooks/gsd-worktree-path-guard.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-worktree-path-guard.js\"",
             "timeout": 5
           }
         ]
@@ -157,7 +157,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/mikel/.claude/hooks/caveman-mode-tracker.js\"",
+            "command": "node \"$HOME/.claude/hooks/caveman-mode-tracker.js\"",
             "timeout": 5,
             "statusMessage": "Tracking caveman mode..."
           }
@@ -169,7 +169,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
           }
         ]
@@ -180,7 +180,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
           }
         ]
@@ -191,7 +191,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
           }
         ]
@@ -203,7 +203,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/mikel/.local/share/mise/shims/node\" \"/home/mikel/.claude/hooks/gsd-config-reload.js\"",
+            "command": "node \"$HOME/.claude/hooks/gsd-config-reload.js\"",
             "timeout": 8
           }
         ]
@@ -212,7 +212,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/scripts/statusline.sh"
+    "command": "bash \"$HOME/.claude/scripts/statusline.sh\""
   },
   "effortLevel": "high",
   "awaySummaryEnabled": false,

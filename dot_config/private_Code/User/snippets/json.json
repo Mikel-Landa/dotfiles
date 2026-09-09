@@ -1,0 +1,17 @@
+{
+	"bootstrap path": {
+		"prefix": "bootstrap",
+		"body": [ " \"node_modules/bootstrap/dist/css/bootstrap.min.css\"," ],
+		"description": "bootstrap path"
+	},
+	"animate.css": {
+		"prefix": "animate",
+		"body": [ "\"node_modules/animate.css/animate.min.css\"," ],
+		"description": "animate.css"
+	},
+	"jquery": {
+		"prefix": "jquery",
+		"body": [ "\"node_modules/jquery/dist/jquery.min.js\"" ],
+		"description": "jquery"
+	}
+}

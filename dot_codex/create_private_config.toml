@@ -1,0 +1,33 @@
+# Initial preferences only: Codex also writes trust grants, hook approvals,
+# plugin locations, and desktop state here. Preserve those on existing systems.
+model = "gpt-5.6-sol"
+model_reasoning_effort = "xhigh"
+approvals_reviewer = "auto_review"
+
+[features]
+hooks = true
+js_repl = false
+
+[agents]
+max_depth = 1
+
+[mcp_servers.fff]
+command = "fff-mcp"
+
+[tui]
+status_line = [
+    "model-with-reasoning",
+    "used-tokens",
+    "context-used",
+    "current-dir",
+    "weekly-limit",
+]
+status_line_use_colors = true
+
+[shell_environment_policy]
+inherit = "core"
+
+[desktop]
+external-agent-import-sync-enabled = true
+conversationDetailMode = "STEPS_COMMANDS"
+followUpQueueMode = "queue"

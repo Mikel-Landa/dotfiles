@@ -1,0 +1,213 @@
+{
+    "[html]": {
+        "editor.defaultFormatter": "remimarsal.prettier-now"
+    },
+    "files.autoSave": "off",
+    "files.associations": {
+        "*.html": "html",
+        "*.vim": "viml"
+    },
+    "liveServer.settings.donotShowInfoMsg": true,
+    "bracket-pair-colorizer-2.colors": [
+        "#ffbd00 ",
+        "#ec407a",
+        "#ec00ff"
+    ],
+    "editor.minimap.enabled": false,
+    "emmet.showAbbreviationSuggestions": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": true,
+    "htmltagwrap.tag": "div",
+    "cSpell.language": "en,es,en-GB,es-ES",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "explorer.confirmDragAndDrop": false,
+    "editor.minimap.maxColumn": 300,
+    "editor.wordWrap": "on",
+    "html-css-class-completion.enableEmmetSupport": true,
+    "editor.suggest.shareSuggestSelections": true,
+    "editor.suggestSelection": "first",
+    "javascript.format.insertSpaceAfterCommaDelimiter": false,
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "javascript.format.insertSpaceAfterSemicolonInForStatements": false,
+    "javascript.format.insertSpaceBeforeAndAfterBinaryOperators": false,
+    "typescript.format.enable": false,
+    "explorer.confirmDelete": false,
+    "vsicons.dontShowNewVersionMessage": true,
+    "git.ignoreMissingGitWarning": true,
+    "liveServer.settings.donotVerifyTags": true,
+    "emmet.optimizeStylesheetParsing": false,
+    "emmet.showExpandedAbbreviation": "inMarkupAndStylesheetFilesOnly",
+    "prettier.breakBeforeElse": true,
+    "editor.wordBasedSuggestions": "off",
+    "window.newWindowDimensions": "maximized",
+    "extensions.ignoreRecommendations": true,
+    "python.formatting.provider": "black",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "octref.vetur"
+    },
+    "python.languageServer": "Pylance",
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook"
+    },
+    "todo-tree.general.tags": [
+        "BUG",
+        "HACK",
+        "FIXME",
+        "TODO",
+        "XXX",
+        "[ ]",
+        "[x]"
+    ],
+    "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+    "kite.showWelcomeNotificationOnStartup": false,
+    "[javascript]": {
+        "editor.defaultFormatter": "remimarsal.prettier-now"
+    },
+    "files.defaultLanguage": " ${activeEditorLanguage}",
+    "launch": {
+        "configurations": [],
+        "compounds": []
+    },
+    "vim.easymotion": true,
+    "vim.incsearch": true,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.hlsearch": true,
+    "vim.insertModeKeyBindings": [
+        {
+            "before": [
+                "j",
+                "j"
+            ],
+            "after": [
+                "<Esc>"
+            ]
+        }
+    ],
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "<leader>",
+                "d"
+            ],
+            "after": [
+                "d",
+                "d"
+            ]
+        },
+        {
+            "before": [
+                "<C-n>"
+            ],
+            "commands": [
+                ":nohl"
+            ]
+        }
+    ],
+    "vim.leader": "<space>",
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-f>": false
+    },
+    "keyboard.dispatch": "keyCode",
+    "prettier.singleQuote": false,
+    "prettier.typescriptEnable": [
+        "typescript",
+        "typescriptreact"
+    ],
+    "oneDarkPro.editorTheme": "ayu",
+    "oneDarkPro.bold": true,
+    "editor.tokenColorCustomizations": {
+        "[One Dark Pro]": {
+            "textMateRules": [
+                {
+                    "name": "js object key",
+                    "scope": "meta.object-literal.key",
+                    "settings": {
+                        "foreground": "#56b6c2"
+                    }
+                },
+                {
+                    "scope": [
+                        "string",
+                        "meta.embedded.assembly"
+                    ],
+                    "settings": {
+                        "foreground": "#ce9178"
+                    }
+                }
+            ]
+        }
+    },
+    "workbench.editor.scrollToSwitchTabs": true,
+    "editor.cursorStyle": "line",
+    "editor.insertSpaces": false,
+    "editor.wordSeparators": "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?-",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "git.enableSmartCommit": true,
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "vscode-neovim.neovimExecutablePaths.linux": "/bin/nvim",
+    "gitlens.advanced.messages": {
+        "suppressGitMissingWarning": true
+    },
+    "vscode-neovim.mouseSelectionStartVisualMode": true,
+    "vscode-neovim.useWSL": true,
+    "editor.scrollBeyondLastLine": false,
+    "tabnine.experimentalAutoImports": true,
+    "diffEditor.wordWrap": "on",
+    "remote.WSL.server.connectThroughLocalhost": true,
+    "bracket-pair-colorizer-2.depreciation-notice": false,
+    "workbench.startupEditor": "none",
+    "editor.unicodeHighlight.includeComments": true,
+    "json.schemas": [],
+    "aws.telemetry": false,
+    "yaml.customTags": [
+        "!And",
+        "!And sequence",
+        "!If",
+        "!If sequence",
+        "!Not",
+        "!Not sequence",
+        "!Equals",
+        "!Equals sequence",
+        "!Or",
+        "!Or sequence",
+        "!FindInMap",
+        "!FindInMap sequence",
+        "!Base64",
+        "!Join",
+        "!Join sequence",
+        "!Cidr",
+        "!Ref",
+        "!Sub",
+        "!Sub sequence",
+        "!GetAtt",
+        "!GetAZs",
+        "!ImportValue",
+        "!ImportValue sequence",
+        "!Select",
+        "!Select sequence",
+        "!Split",
+        "!Split sequence"
+    ],
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "redhat.telemetry.enabled": false,
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "rust-analyzer.cargo.extraEnv": {},
+    "workbench.colorTheme": "Monokai"
+}

@@ -1,0 +1,11 @@
+{
+	"Django Management Command": {
+		"prefix": "command",
+		"body": [
+			"from django.core.management.base import BaseCommand",
+			"class Command(BaseCommand):",
+			"\tdef handle(self,*args,**options):",
+			"\t\t$0"
+		]
+	}
+}

@@ -1,0 +1,63 @@
+providers:
+  {}
+symbolPreset: nerd
+theme:
+  dark: titanium
+statusLine:
+  preset: default
+tui:
+  textSizing: true
+display:
+  showTokenUsage: false
+advisor:
+  enabled: true
+  syncBacklog: "off"
+  immuneTurns: 3
+steeringMode: all
+tools:
+  approvalMode: yolo
+edit:
+  mode: hashline
+task:
+  enableLsp: true
+  agentAdvisor:
+    task: "on"
+  maxRecursionDepth: -1
+  prewalk: false
+  showResolvedModelBadge: true
+modelRoles:
+  commit: openai-codex/gpt-5.6-luna:low
+  slow: openai-codex/gpt-5.6-sol
+  default: openai-codex/gpt-6-astra:high
+  advisor: openai-codex/gpt-6-astra:xhigh
+browser:
+  headless: false
+interruptMode: wait
+ask:
+  timeout: 0
+  notify: "on"
+  enabled: true
+recap:
+  enabled: false
+skills:
+  enableClaudeUser: true
+  enableClaudeProject: true
+  enableCodexUser: true
+  enableAgentsUser: true
+  enableAgentsProject: true
+  enableSkillCommands: true
+disabledExtensions:
+  []
+composer:
+  shape: box
+followUpMode: all
+error:
+  notify: "on"
+magicKeywords:
+  enabled: false
+startup:
+  quiet: true
+extendedContext: true
+hideThinkingBlock: false
+compaction:
+  thresholdTokens: 200000

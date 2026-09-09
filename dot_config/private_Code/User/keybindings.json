@@ -1,0 +1,109 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  {
+    "key": "ctrl+b",
+    "command": "-workbench.action.toggleSidebarVisibility",
+  },
+  {
+    "key": "ctrl+b",
+    "command": "copyFilePath",
+    "when": "!editorFocus",
+  },
+  {
+    "key": "shift+alt+c",
+    "command": "-copyFilePath",
+    "when": "!editorFocus",
+  },
+  {
+    "key": "ctrl+shift+numpad_divide",
+    "command": "editor.action.blockComment",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+  {
+    "key": "shift+alt+a",
+    "command": "-editor.action.blockComment",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+  {
+    "key": "ctrl+numpad_divide",
+    "command": "editor.action.commentLine",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+  {
+    "key": "ctrl+oem_2",
+    "command": "-editor.action.commentLine",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+  {
+    "key": "ctrl+shift+backspace",
+    "command": "editor.action.deleteLines",
+    "when": "textInputFocus && !editorReadonly",
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "-editor.action.deleteLines",
+    "when": "textInputFocus && !editorReadonly",
+  },
+  {
+    "key": "ctrl+shift+i",
+    "command": "editor.action.reindentlines",
+  },
+  {
+    "key": "ctrl+shift+unknown",
+    "command": "workbench.files.action.focusOpenEditorsView",
+    "when": "workbench.explorer.openEditorsView.active",
+  },
+  {
+    "key": "ctrl+k e",
+    "command": "-workbench.files.action.focusOpenEditorsView",
+    "when": "workbench.explorer.openEditorsView.active",
+  },
+  {
+    "key": "ctrl+k ctrl+e",
+    "command": "workbench.view.explorer",
+    "when": "viewContainer.workbench.view.explorer.enabled",
+  },
+  {
+    "key": "ctrl+shift+e",
+    "command": "-workbench.view.explorer",
+    "when": "viewContainer.workbench.view.explorer.enabled",
+  },
+  {
+    "key": "ctrl+alt+v",
+    "command": "editor.emmet.action.balanceIn",
+  },
+  {
+    "key": "ctrl+alt+b",
+    "command": "editor.emmet.action.balanceOut",
+  },
+  {
+    "key": "tab",
+    "command": "selectNextSuggestion",
+    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus",
+  },
+  {
+    "key": "down",
+    "command": "-selectNextSuggestion",
+    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus",
+  },
+  {
+    "key": "shift+tab",
+    "command": "selectPrevSuggestion",
+    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus",
+  },
+  {
+    "key": "up",
+    "command": "-selectPrevSuggestion",
+    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus",
+  },
+  {
+    "key": "ctrl+/",
+    "command": "editor.action.addCommentLine",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+  {
+    "key": "ctrl+k ctrl+c",
+    "command": "-editor.action.addCommentLine",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+]
