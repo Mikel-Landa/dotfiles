@@ -2,7 +2,6 @@
 install.sh
 graphify-out/
 /README.md
-/tests{,/**}
 .config/surfingkeys{,/**}
 .config/DankMaterialShell/.{firstlaunch,changelog-*}
 .agents/skills/rust-skills/{checks,.github}{,/**}
@@ -16,8 +15,7 @@ graphify-out/
 !.omp/agent/config.yml
 .codex/*
 !.codex/{AGENTS.md,config.toml}
-.gsd/*
-!.gsd/defaults.json
+.gsd{,/**}
 .config/gh/*
 !.config/gh/config.yml
 .config/Code/User/*
@@ -27,7 +25,7 @@ graphify-out/
 .config/tmux/plugins/**
 **/.claude/*
 !.claude/{settings.json,skills,scripts,hooks,CLAUDE.md}
-# GSD owns its installed runtime; chezmoi keeps only custom hooks and scripts.
+# Keep only custom hooks and scripts.
 .claude/hooks/*
 !.claude/hooks/{block-dangerous-git.sh,read-agents-md.sh,package.json}
 !.claude/hooks/caveman-{activate,config,mode-tracker,stats}.js
