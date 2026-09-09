@@ -2,6 +2,7 @@
 install.sh
 graphify-out/
 /README.md
+.config/mise{,/**}
 .config/surfingkeys{,/**}
 .config/DankMaterialShell/.{firstlaunch,changelog-*}
 .agents/skills/rust-skills/{checks,.github}{,/**}

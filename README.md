@@ -27,7 +27,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Mikel-Landa
 | `dot_agents/`, `dot_claude/` | Shared skills, Claude instructions, preferences and custom hooks |
 | `dot_omp/` | OMP model roles, tools, UI and skill discovery preferences |
 | `dot_codex/` | Codex instructions and portable initial preferences |
-| `dot_config/mise/`, `dot_config/gh/` | Tool versions and GitHub CLI preferences |
+| `dot_config/gh/` | GitHub CLI preferences |
 | `dot_config/private_Code/` | VS Code initial preferences, keybindings and snippets |
 
 ## Portable agent configuration
@@ -53,6 +53,9 @@ telemetry consent are not copied. Install/login to each application separately.
 ## Package management
 
 Packages declared in `dot_config/metapac/groups/`. See [`metapac/AGENTS.md`](dot_config/metapac/AGENTS.md) for the group breakdown and rules.
+
+Metapac is the source of truth for cross-PC packages, including mise tools.
+`~/.config/mise/` is local-only and excluded from chezmoi.
 
 ## Colors
 
