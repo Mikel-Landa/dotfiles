@@ -13,6 +13,7 @@ return {
 				disabled_filetypes = {
 					statusline = {
 						"snacks_dashboard",
+						"atlas",
 						"Avante",
 						"AvanteInput",
 						"AvanteSelectedFiles",

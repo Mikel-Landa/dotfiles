@@ -409,21 +409,22 @@ Signs in signcolumn show added/changed/deleted lines. Inline blame on current li
 
 ### emrearmagan/atlas.nvim — GitHub + Bitbucket + Jira
 
-GitHub & Bitbucket PR browser + GitHub & Jira issue browser. Loads on `:AtlasPulls`, `:AtlasIssues`, `:AtlasDiff`, and related commands. PR diffs open in CodeDiff with Atlas's native comment overlay and review panel. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). After install, fill in the `views = {…}` blocks in the atlas plugin spec with real workspaces/repos and JQL. Run `:checkhealth atlas` to verify connectivity.
+GitHub & Bitbucket PR browser + GitHub & Jira issue browser. Loads on `:Atlas`, `:AtlasDiff`, and related subcommands. PR diffs open in CodeDiff with Atlas's native comment overlay and review panel. GitHub auth via `gh auth login`; Bitbucket/Jira tokens read from env (`BITBUCKET_USER`, `BITBUCKET_TOKEN`, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN` — keep them in `~/.config/zsh/secrets.zsh`, gitignored). Run `:checkhealth atlas` to verify connectivity.
 
 | Command | Action |
 |---|---|
-| `:AtlasPulls github` | Open GitHub PR picker |
-| `:AtlasPulls bitbucket` | Open Bitbucket PR picker |
-| `:AtlasIssues github` | Open GitHub issue picker |
-| `:AtlasIssues jira` | Open Jira issue picker |
+| `:Atlas pulls github` | Open GitHub PR dashboard |
+| `:Atlas pulls bitbucket` | Open Bitbucket PR dashboard |
+| `:Atlas issues github` | Open GitHub issue dashboard |
+| `:Atlas issues jira` | Open Jira issue dashboard |
+| `:Atlas review [pr-url]` | Review a PR (picker if no URL) |
 | `:AtlasDiff <base>...<head>` | Open a local range in AtlasDiff |
 | `:AtlasDiff <pr-url>` | Open a pull request review |
-| `:AtlasNotes` | Inspect local review notes |
-| `:AtlasCreatePR` | Create a PR from the current branch |
-| `:AtlasJqlSearch <jql>` | Run a one-off JQL search |
-| `:AtlasClearCache` | Drop disk + memory cache |
-| `:AtlasLogs` | Toggle plugin logs |
+| `:Atlas notes` | Inspect local review notes |
+| `:Atlas create pr` | Create a PR from the current branch |
+| `:Atlas search jira` | Run a one-off JQL search |
+| `:Atlas clear cache` | Drop disk + memory cache |
+| `:Atlas logs` | Toggle plugin logs |
 
 **Review:** from a PR in Atlas, press `gd` to open the diff. Comments, tasks, and local notes overlay the CodeDiff. The review panel starts open (`gR` toggles it). Approve / request-changes / submit are native (`ga` / `gr` / `gs`, or `A` from the PR list). `<leader>oc` copies inline comments into the quickfix so `]q` / `[q` work; it no-ops unless an Atlas review is attached.
 

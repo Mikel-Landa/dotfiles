@@ -1,5 +1,6 @@
 -- Dump Atlas review comments into the quickfix list.
 -- Atlas has no qf API; this reads `atlas.pulls.diff.session.get()`.
+-- Atlas 0.7 stores comments on `session.review.data.comments`.
 local M = {}
 
 local QF_TITLE = "Atlas PR Comments"
@@ -53,7 +54,8 @@ function M.open()
     vim.notify("No Atlas review attached. Open a PR: <leader>op, then gd.", vim.log.levels.WARN)
     return
   end
-  local items = M.qf_items(s.source and s.source.root, s.review.comments)
+  local comments = s.review.data and s.review.data.comments
+  local items = M.qf_items(s.source and s.source.root, comments)
   if #items == 0 then
     vim.notify("No inline review comments", vim.log.levels.INFO)
     return

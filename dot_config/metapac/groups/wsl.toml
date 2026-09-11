@@ -1,5 +1,12 @@
-apt = {
-  packages = ["imagemagick"]
-}
+apt = { packages = ["imagemagick"] }
 
-uv = { packages = ["xdg-open-wsl"] }
+uv = {
+  packages = [
+    {
+      name = "xdg-open-wsl",
+      options = {
+        from = "git+https://github.com/cpbotha/xdg-open-wsl.git",
+      }
+    }
+  ]
+}

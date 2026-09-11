@@ -1,4 +1,4 @@
-# Supply-chain hardening — global npm defaults. See docs/superpowers/specs/2026-05-31-supply-chain-hardening-design.md
+# Supply-chain hardening — global npm defaults (npm >= 11.10).
 ignore-scripts=true
 allow-git=none
 min-release-age=1

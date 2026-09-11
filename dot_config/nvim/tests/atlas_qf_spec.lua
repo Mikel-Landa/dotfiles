@@ -38,4 +38,21 @@ describe("atlas_qf.qf_items", function()
     assert.equals(4, items[1].lnum)
     assert.equals("[pending] bob: nits", items[1].text)
   end)
+
+  it("reads comments from atlas 0.7 review.data", function()
+    local review = {
+      data = {
+        comments = {
+          {
+            author = { nickname = "ada" },
+            content_raw = "please fix",
+            inline = { path = "lua/foo.lua", to = 12 },
+          },
+        },
+      },
+    }
+    local items = atlas_qf.qf_items("/repo", review.data.comments)
+    assert.equals(1, #items)
+    assert.equals("/repo/lua/foo.lua", items[1].filename)
+  end)
 end)

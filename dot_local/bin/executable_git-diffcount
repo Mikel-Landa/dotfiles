@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# git-diffcount — line counts for a diff (all change types: add/remove/modify/rename/delete)
+# usage: git-diffcount [-c|--code-only] [ref]
+#   -c  skip tests, docs, lockfiles (extension/pattern match only)
+#   ref given        -> diff ref..HEAD  (two-dot; direct diff, not merge-base)
+#   no ref, dirty    -> diff of uncommitted changes vs HEAD (incl. staged + untracked)
+#   no ref, clean    -> diff main-or-master..HEAD
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)" # ls-files --others only sees cwd-down
+
+ref=""
+code_only=false
+untracked=false
+for arg in "$@"; do
+    case "$arg" in
+    -c | --code-only) code_only=true ;;
+    *) ref="$arg" ;;
+    esac
+done
+
+# ponytail: fixed pattern list, edit here if repo conventions differ; renamed paths "{a => b}" dodge globs
+filter() {
+    $code_only || { cat; return; }
+    while IFS=$'\t' read -r a d f; do
+        case "$f" in
+        *_test.* | test_* | */test_* | *.test.* | *.spec.* | *_spec.*) ;;
+        tests/* | */tests/* | test/* | */test/* | __tests__/* | */__tests__/*) ;;
+        *.md | *.rst | *.txt | *.adoc) ;;
+        *.lock | *-lock.json | *.sum) ;;
+        *) printf '%s\t%s\t%s\n' "$a" "$d" "$f" ;;
+        esac
+    done
+}
+
+if [[ -n "$ref" ]]; then
+    range=("$ref" HEAD)
+    mode="HEAD vs $ref"
+elif [[ -n "$(git status --porcelain)" ]]; then
+    range=(HEAD)
+    untracked=true
+    mode="uncommitted vs HEAD"
+else
+    if git rev-parse --verify -q refs/heads/main >/dev/null; then
+        base=main
+    elif git rev-parse --verify -q refs/heads/master >/dev/null; then
+        base=master
+    else
+        echo "git-diffcount: no main/master branch found; pass a ref" >&2
+        exit 1
+    fi
+    range=("$base" HEAD)
+    mode="HEAD vs $base"
+fi
+
+$code_only && mode="$mode (code only)"
+echo "# $mode"
+
+{
+    git diff --numstat "${range[@]}" --
+    if $untracked; then
+        # ponytail: wc -l undercounts 1 on no-trailing-newline files, counts "lines" in binaries; use git add -N flow if exactness matters
+        git ls-files --others --exclude-standard -z |
+            while IFS= read -r -d '' f; do
+                printf '%s\t0\t%s\n' "$(wc -l <"$f")" "$f"
+            done
+    fi
+} | filter | awk -F'\t' '
+    { files++ }
+    $1 != "-" { add += $1 }
+    $2 != "-" { del += $2 }
+    END { printf "files:   %d\nadded:   %d\nremoved: %d\ntotal:   %d\n", files, add, del, add + del }
+'

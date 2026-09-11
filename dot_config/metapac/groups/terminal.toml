@@ -36,7 +36,6 @@ cargo = {
     "tsql",
     "cargo-deny",
     "cargo-audit",
-    "nu",
   ]
 }
 
