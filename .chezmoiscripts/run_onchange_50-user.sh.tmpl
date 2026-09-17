@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Phase 50 — user identity. Login shell + (work-only) GPG signing key.
+# Phase 50 — user identity. Login shell + work-machine GPG identity.
 # All steps idempotent: re-run is no-op when already configured.
 
 set -euo pipefail
@@ -17,7 +17,8 @@ fi
 
 {{- if .work }}
 
-# Work GPG signing key + ~/.gitconfig-work. Skip entirely if gitconfig-work exists.
+# Work GPG signing key + local ~/.config/git/config-work.
+# Personal repos override this identity via Git's conditional include.
 GITCONFIG_WORK="$HOME/.config/git/config-work"
 if [ ! -f "$GITCONFIG_WORK" ]; then
     echo "Enter work email address:"

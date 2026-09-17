@@ -15,9 +15,11 @@ if [ ! -d "$metapac_src/.git" ]; then
     git -C "$metapac_src" checkout metapac-go
 fi
 git -C "$metapac_src" pull --ff-only || true
-metapac_bin="$metapac_src/target/release/metapac"
+# Ask Cargo so environment overrides and .cargo/config.toml are both respected.
+metapac_target=$(cd "$metapac_src" && cargo metadata --no-deps --format-version 1 | jq -er '.target_directory')
+metapac_bin="$metapac_target/release/metapac"
 metapac_head=$(git -C "$metapac_src" rev-parse HEAD)
-metapac_built_marker="$metapac_src/target/.built-rev"
+metapac_built_marker="$metapac_target/.metapac-built-rev"
 if [ ! -x "$metapac_bin" ] || [ ! -f "$metapac_built_marker" ] || [ "$(cat "$metapac_built_marker")" != "$metapac_head" ]; then
     (cd "$metapac_src" && cargo build --release)
     printf '%s' "$metapac_head" > "$metapac_built_marker"
@@ -25,7 +27,8 @@ fi
 ln -sf "$metapac_bin" "$HOME/bin/metapac"
 
 # tmux plugin manager.
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    mkdir -p "$HOME/.tmux/plugins"
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+tpm_dir="$HOME/.config/tmux/plugins/tpm"
+if [ ! -d "$tpm_dir" ]; then
+    mkdir -p "${tpm_dir%/*}"
+    git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
 fi

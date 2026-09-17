@@ -1,3 +1,5 @@
 function _evalcache_clear () {
-  rm -i "$ZSH_EVALCACHE_DIR"/init-*.sh
+  local -a caches=( "$ZSH_EVALCACHE_DIR"/init-*.sh(N) )
+  (( $#caches )) && rm -i -- "${caches[@]}"
+  return 0
 }

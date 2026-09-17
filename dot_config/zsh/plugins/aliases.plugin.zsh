@@ -60,17 +60,21 @@ alias dc='docker compose'
 
 # navigation
 cx() { cd "$@" && l; }
-fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }
-_clipcopy() {
-    if (( $+commands[wl-copy] )); then wl-copy
-    elif (( $+commands[xclip] )); then xclip -selection clipboard
-    elif (( $+commands[xsel] )); then xsel --clipboard --input
-    elif (( $+commands[pbcopy] )); then pbcopy
-    else cat >/dev/null
-    fi
+fcd() {
+    local dir
+    dir=$(FZF_DEFAULT_COMMAND="$FZF_ALT_C_COMMAND" fzf --preview 'eza --tree --level=2 --color=always -- {}') || return
+    [[ -n $dir ]] && cd -- "$dir" && l
 }
-f() { find . -type f -not -path '*/.*' | fzf | _clipcopy }
-fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
+f() {
+    local file
+    file=$(fzf --preview 'bat --paging=never --color=always --line-range=:300 -- {}') || return
+    [[ -n $file ]] && print -rn -- "$file" | uclip
+}
+fv() {
+    local file
+    file=$(fzf --preview 'bat --paging=never --color=always --line-range=:300 -- {}') || return
+    [[ -n $file ]] && nvim -- "$file"
+}
 
 # vim: filetype=zsh syntax=zsh
 

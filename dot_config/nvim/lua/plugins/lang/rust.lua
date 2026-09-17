@@ -1,6 +1,13 @@
 -- Rust: rustaceanvim (replaces lspconfig rust_analyzer) + crates.nvim + codelldb DAP
 return {
   {
+    "nvim-neotest/neotest",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(opts.adapters, require("rustaceanvim.neotest"))
+    end,
+  },
+  {
     "nvim-treesitter/nvim-treesitter",
     optional = true,
     opts = function(_, opts)

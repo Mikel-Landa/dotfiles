@@ -13,12 +13,6 @@
 
 return {
 	{
-		"j-hui/fidget.nvim",
-		event = "LspAttach",
-		opts = {},
-	},
-
-	{
 		"williamboman/mason.nvim",
 		cmd = {
 			"Mason",
@@ -51,6 +45,12 @@ return {
 			},
 			run_on_start = true,
 			start_delay = 3000,
+			-- Entries use Mason package names; integrations would eagerly load LSP/DAP.
+			integrations = {
+				["mason-lspconfig"] = false,
+				["mason-null-ls"] = false,
+				["mason-nvim-dap"] = false,
+			},
 		},
 		-- The plugin's `plugin/mason-tool-installer.lua` registers a VimEnter
 		-- autocmd to trigger `run_on_start()`. Under `event = "VeryLazy"` the
@@ -83,6 +83,15 @@ return {
 			"williamboman/mason.nvim",
 			"saghen/blink.cmp",
 			{ "b0o/SchemaStore.nvim", lazy = true },
+			{
+				"cenk1cenk2/schema-companion.nvim",
+				dependencies = { "nvim-lua/plenary.nvim" },
+				opts = {},
+				keys = {
+					{ "<leader>ly", function() require("schema-companion").select_schema() end, desc = "Select YAML schema" },
+					{ "<leader>lY", function() require("schema-companion").match() end, desc = "Rematch YAML schema" },
+				},
+			},
 		},
 		opts = {
 			-- Base servers — lang files merge their servers in here.
@@ -140,6 +149,20 @@ return {
 					},
 				},
 			})
+
+			-- Wrap the final configs so schema hooks survive SchemaStore injection.
+			local companion = require("schema-companion")
+			servers.yamlls = companion.setup_client(companion.adapters.yamlls.setup({
+				sources = {
+					companion.sources.matchers.kubernetes.setup({ version = "master" }),
+					companion.sources.lsp.setup(),
+				},
+			}), servers.yamlls)
+			if servers.helm_ls then
+				servers.helm_ls = companion.setup_client(companion.adapters.helmls.setup({
+					sources = { companion.sources.matchers.kubernetes.setup({ version = "master" }) },
+				}), servers.helm_ls)
+			end
 
 			-- Toggle diagnostics globally
 			local diag_enabled = true

@@ -1,6 +1,6 @@
 -- Completion: blink.cmp (replaces nvim-cmp + sources)
 --
--- Snippets via LuaSnip + friendly-snippets.
+-- Snippets via vim.snippet + friendly-snippets.
 -- Default keymap preset: <C-n>/<C-p> select, <CR> confirm, <C-j>/<C-k> snippet-jump/select.
 
 local function newline_skip_completion(motion)
@@ -17,19 +17,10 @@ vim.keymap.set("i", "<C-S-CR>", newline_skip_completion("O"), { desc = "Newline 
 
 return {
   {
-    "L3MON4D3/LuaSnip",
-    lazy = true,
-    build = "make install_jsregexp",
-    dependencies = { "rafamadriz/friendly-snippets" },
-    config = function()
-      require("luasnip.loaders.from_vscode").lazy_load()
-    end,
-  },
-  {
     "saghen/blink.cmp",
     event = "InsertEnter",
     version = "*",
-    dependencies = { "L3MON4D3/LuaSnip" },
+    dependencies = { "rafamadriz/friendly-snippets" },
     opts = {
       keymap = {
         preset      = "default",
@@ -39,7 +30,7 @@ return {
         ["<S-Tab>"] = { "fallback" },
         ["<CR>"]    = { "accept", "fallback" },
       },
-      snippets = { preset = "luasnip" },
+      snippets = { preset = "default" },
       sources = {
         default = { "lsp", "snippets", "path", "buffer" },
       },

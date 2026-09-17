@@ -1,7 +1,6 @@
 [user]
 	name = Mikel Landa
 	useConfigOnly = true
-	signingkey = 7C906F517916F1BB
 	
 [url "git@github.com:Mikel-Landa/"]
 	insteadOf = "ml:"
@@ -57,12 +56,15 @@
 	mnemonicPrefix = true
 	renames = true
 
+# Personal identity is the default when no work identity is configured.
 [include]
     path = ~/.config/git/config-personal
 
+# A local work identity overrides the default email and signing key.
 [include]
     path = ~/.config/git/config-work
 
+# Personal repositories override both email and signing key.
 [includeIf "gitdir:~/personal/"]
     path = ~/.config/git/config-personal
 

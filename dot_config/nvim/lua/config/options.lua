@@ -43,6 +43,24 @@ opt.backup = false
 opt.updatetime = 250 -- also drives CursorHold delay (diagnostic float hover)
 opt.timeoutlen = 300 -- reduce chord ambiguity wait (default 1000ms causes cS flash delay)
 
+-- Skip expensive clipboard-tool probing across Windows PATH entries on WSL.
+-- Linux desktops keep Neovim's automatic Wayland/X11 provider selection.
+if vim.fn.has("wsl") == 1 then
+  if vim.env.TMUX then
+    g.clipboard = "tmux"
+  else
+    local paste = {
+      "powershell.exe", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command",
+      '[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); [Console]::Out.Write(([string](Get-Clipboard -Raw)).Replace("`r", ""))',
+    }
+    g.clipboard = {
+      name = "WSL",
+      copy = { ["+"] = { "clip.exe" }, ["*"] = { "clip.exe" } },
+      paste = { ["+"] = paste, ["*"] = paste },
+      cache_enabled = 0,
+    }
+  end
+end
 opt.clipboard = "unnamedplus" -- sync with system clipboard
 
 -- UI polish

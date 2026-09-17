@@ -8,6 +8,8 @@ arch = {
     "tmux",
     "go-yq",
     "jq",
+    "wl-clipboard",
+    "xclip",
   ]
 }
 
@@ -20,6 +22,8 @@ apt = {
     "ripgrep",
     "yq",
     "jq",
+    "wl-clipboard",
+    "xclip",
   ]
 }
 

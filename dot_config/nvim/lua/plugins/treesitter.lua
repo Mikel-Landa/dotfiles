@@ -14,12 +14,14 @@ return {
         "git_config",
         "gitcommit",
         "gitignore",
+        "helm",
         "lua",
         "luadoc",
         "query",
         "regex",
         "vim",
         "vimdoc",
+        "yaml",
       },
     },
     config = function(_, opts)
@@ -41,7 +43,6 @@ return {
           if not lang then return end
           if not pcall(vim.treesitter.language.add, lang) then return end
           pcall(vim.treesitter.start, ev.buf, lang)
-          vim.bo[ev.buf].syntax = "ON" -- keep vim regex syntax as fallback for unhandled groups
           vim.wo.foldmethod = "expr"
           vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
           vim.wo.foldenable = false

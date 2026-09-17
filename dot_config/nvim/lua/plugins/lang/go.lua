@@ -20,6 +20,7 @@ return {
         "goimports",
         "golangci-lint",
         "delve",
+        "gotestsum",
       })
     end,
   },
@@ -92,5 +93,13 @@ return {
     dependencies = { "mfussenegger/nvim-dap" },
     ft = "go",
     opts = {},
+  },
+  {
+    "nvim-neotest/neotest",
+    optional = true,
+    dependencies = { "fredrikaverpil/neotest-golang" },
+    opts = function(_, opts)
+      table.insert(opts.adapters, require("neotest-golang")({ runner = "gotestsum" }))
+    end,
   },
 }

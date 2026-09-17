@@ -2,6 +2,8 @@
 # Consumers call shell_evals_for <shell> and decide their caching strategy
 # (zsh uses _evalcache; bash uses plain eval).
 
+. "$HOME/.config/shell/fzf.sh"
+
 shell_evals_for() {
     _s=$1
     printf '%s\n' \

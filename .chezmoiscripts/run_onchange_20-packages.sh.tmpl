@@ -6,8 +6,8 @@ set -euo pipefail
 
 {{- if eq .chezmoi.osRelease.id "arch" }}
 
-# Arch base build deps (paru/makepkg need base-devel).
-sudo pacman -S --needed --noconfirm base-devel git curl
+# Bootstrap build deps (jq reads Cargo metadata before metapac is available).
+sudo pacman -S --needed --noconfirm base-devel git curl jq
 
 # AUR helper.
 if ! command -v paru >/dev/null 2>&1; then
@@ -26,6 +26,7 @@ sudo apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     git \
+    jq \
     gnupg \
     pkg-config
 

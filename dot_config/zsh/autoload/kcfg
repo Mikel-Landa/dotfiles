@@ -1,4 +1,7 @@
 function kcfg(){
-    file=$(ls ~/.kube | egrep  '^[^a-z.]|config' | fzf)
-    export KUBECONFIG=~/.kube/$file
+    local file
+    file=$(fd --type f --max-depth 1 . "$HOME/.kube" \
+        | fzf --prompt='kubeconfig> ') || return
+    [[ -n $file ]] || return 0
+    export KUBECONFIG="$file"
 }

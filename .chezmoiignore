@@ -22,7 +22,7 @@ graphify-out/
 .config/Code/User/*
 !.config/Code/User/{settings.json,keybindings.json,snippets}
 .config/zsh/secrets.zsh
-.config/nvim/lazy-lock.json
+.config/nvim/nvim.log
 .config/tmux/plugins/**
 **/.claude/*
 !.claude/{settings.json,skills,scripts,hooks,CLAUDE.md}

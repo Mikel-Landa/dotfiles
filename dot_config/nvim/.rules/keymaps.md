@@ -36,4 +36,4 @@ Rules:
 - Don't shadow core Vim motions (`w`, `b`, `e`, `gg`, `G`, `f`, `t`, etc.)
 - Plugin keymaps that only apply in a buffer → set inside `on_attach` with `buffer = bufnr`
 - Use `]`/`[` prefix for next/prev navigation (consistent with gitsigns, diagnostics)
-- `<C-h/j/k/l>` reserved for tmux-navigator pane navigation
+- `<C-h/j/k/l>` navigate panes in normal/terminal mode. Insert-mode `<C-j>/<C-k>` belong to Blink; picker-local keys stay scoped to their buffers.

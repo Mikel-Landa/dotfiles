@@ -4,11 +4,11 @@
 
 return {
 	{
-		"dmtrKovalenko/fff.nvim",
+		"dmtrKovalenko/fff",
 		build = function()
 			require("fff.download").download_or_build_binary()
 		end,
-		event = "VeryLazy",
+		lazy = false, -- fff initializes its search engine lazily.
 		opts = {
 			prompt = "> ",
 			title = "FFFiles",

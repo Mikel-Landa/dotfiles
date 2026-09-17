@@ -1,51 +1,37 @@
-# Caches the output of a binary initialization command, to avoid the time to
-# execute it in the future.
-#
-# Usage: _evalcache [NAME=VALUE]... COMMAND [ARG]...
-
-# default cache directory
-
+# Cache generated shell initialization. Usage: _evalcache COMMAND [ARG]...
 function _evalcache () {
-  local cmdHash="nohash" data="$*" name
+  local executable=${commands[$1]:-$1} output cacheFile temporary data cmdHash
+  local -A metadata
 
-  # use the first non-variable argument as the name
-  for name in $@; do
-    if [ "${name}" = "${name#[A-Za-z_][A-Za-z0-9_]*=}" ]; then
-      break
-    fi
-  done
+  # A mise shim can stay unchanged while the selected tool version changes.
+  if [[ $executable == ${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims/* ]]; then
+    executable=$(mise which "$1") || return
+  fi
+  executable=${executable:A}
+  [[ -x $executable ]] || { print -u2 -- "evalcache: command not found: $1"; return 127; }
 
-  # if command is a function, include its definition in data
-  if typeset -f "${name}" > /dev/null; then
-    data=${data}$(typeset -f "${name}")
+  if [[ $ZSH_EVALCACHE_DISABLE == true ]]; then
+    output=$("$@") || return
+    eval "$output"
+    return
   fi
 
-  # Native zsh polynomial hash (no subprocess fork).
-  local -i _h=0 _i
-  for (( _i = 1; _i <= ${#data}; _i++ )); do
-    _h=$(( (_h * 33 + #data[_i]) & 0x7fffffff ))
-  done
-  cmdHash=${$(( [#16] _h ))##*\#}
+  zmodload -F zsh/stat b:zstat
+  zstat -H metadata -- "$executable" || return
+  data="${(j: :)${(q)@}}:$executable:$metadata[inode]:$metadata[mtime]:$metadata[ctime]:$metadata[size]"
+  cmdHash=$(print -rn -- "$data" | sha256sum) || return
+  cmdHash=${cmdHash%% *}
+  cacheFile="$ZSH_EVALCACHE_DIR/init-${1:t}-${cmdHash}.sh"
 
-  local cacheFile="$ZSH_EVALCACHE_DIR/init-${name##*/}-${cmdHash}.sh"
-
-  if [ "$ZSH_EVALCACHE_DISABLE" = "true" ]; then
-    eval ${(q)@}
-  elif [ -s "$cacheFile" ]; then
-    source "$cacheFile"
-  else
-    if type "${name}" > /dev/null; then
-      echo "evalcache: ${name} initialization not cached, caching output of: $*" >&2
-      mkdir -p "$ZSH_EVALCACHE_DIR"
-      if eval ${(q)@} > "$cacheFile" && [ -s "$cacheFile" ]; then
-        source "$cacheFile"
-      else
-        echo "evalcache: ERROR: ${name} produced empty/failed output; removing cache" >&2
-        rm -f "$cacheFile"
-      fi
-    else
-      echo "evalcache: ERROR: ${name} is not installed or in PATH" >&2
+  if [[ ! -s $cacheFile ]]; then
+    output=$("$@") || return
+    [[ -n $output ]] || return 1
+    mkdir -p -- "$ZSH_EVALCACHE_DIR" || return
+    temporary=$(mktemp "$cacheFile.XXXXXX") || return
+    if ! print -r -- "$output" >| "$temporary" || ! mv -f -- "$temporary" "$cacheFile"; then
+      rm -f -- "$temporary"
+      return 1
     fi
   fi
+  source "$cacheFile"
 }
-

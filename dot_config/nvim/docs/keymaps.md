@@ -19,6 +19,8 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>e` | File explorer |
 | `<leader>o` | Workflow (remote PR/issue browsers) |
 | `<leader>p` | Path |
+| `<leader>T` | Tests (Neotest) |
+| `<leader>k` | Kubernetes |
 | `<leader>a` | Avante (AI assistant) |
 | `<leader>n` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
@@ -199,6 +201,8 @@ References / implementation / type-def / rename / code-action use Neovim 0.11 bu
 | `<leader>ls` | Document symbols |
 | `<leader>lS` | Workspace symbols |
 | `<leader>lv` | Definition in vertical split |
+| `<leader>ly` | Select YAML / Helm schema |
+| `<leader>lY` | Detect YAML / Helm schemas again |
 | `<leader>uh` | Toggle inlay hints |
 
 ### TypeScript / JavaScript (vtsls)
@@ -238,6 +242,8 @@ References / implementation / type-def / rename / code-action use Neovim 0.11 bu
 | Key | Action |
 |---|---|
 | `<leader>cp` | Toggle browser preview (markdown-preview.nvim) |
+| `<leader>ud` | Toggle diagnostics in current Markdown buffer (off by default) |
+| `<leader>um` | Toggle Markdown rendering (off by default) |
 
 ## AI inline completions (windsurf.nvim)
 
@@ -281,6 +287,28 @@ Two-letter keys under `<leader>d` (single-letter `<leader>dd` reserved for diagn
 | `<leader>dw` | Widgets hover |
 | `<leader>du` | Toggle DAP UI |
 | `<leader>de` (n, v) | Eval expression / selection |
+
+## Tests (Neotest, Go / Rust)
+
+| Key | Action |
+|---|---|
+| `<leader>Tr` | Run nearest test |
+| `<leader>Tf` | Run file tests |
+| `<leader>Tl` | Rerun last test |
+| `<leader>Td` | Debug nearest test |
+| `<leader>Ts` | Toggle test summary |
+| `<leader>To` | Open test output |
+| `<leader>Tx` | Stop test |
+
+## Kubernetes
+
+| Key | Action |
+|---|---|
+| `<leader>kk` | Toggle cluster browser |
+| `<leader>kc` | Select context |
+| `<leader>kn` | Select namespace |
+
+Inside the browser: `g?` shows actions, `gl` opens logs, `gp` forwards a pod/service port, `gy` shows YAML.
 
 ## Quickfix / loclist
 
@@ -335,13 +363,14 @@ Format on save runs automatically.
 | `<leader>na` | n | All messages |
 | `<leader>nd` | n | Dismiss all |
 | `<S-Enter>` | c | Redirect cmdline output |
-| `<C-f>` / `<C-b>` | n, i, s | Scroll forward/back inside LSP hover/signature |
+| `<C-f>` / `<C-b>` | n, i, s | Scroll forward/back inside Noice LSP hover |
 
 ## UI toggles
 
 | Key | Action |
 |---|---|
-| `<leader>ud` | Toggle diagnostics on/off |
+| `<leader>ud` | Toggle diagnostics (current buffer in Markdown/MDX, globally otherwise) |
+| `<leader>um` | Toggle Markdown rendering (off by default) |
 | `<leader>un` | Dismiss notifications (snacks.notifier) |
 | `<leader>uh` | Toggle inlay hints |
 | `<leader>ui` | Toggle indent guides (current buffer) |
@@ -353,9 +382,11 @@ Format on save runs automatically.
 
 ## Window / pane navigation
 
+In insert mode, `<C-j>` / `<C-k>` navigate completion/snippets. Press `<Esc>` before moving panes. Picker-local navigation stays unchanged.
+
 | Key | Action |
 |---|---|
-| `<C-h/j/k/l>` | Move pane (works across tmux) |
+| `<C-h/j/k/l>` | Move pane in normal/terminal mode (works across tmux) |
 | `<C-Up>` | Resize up |
 | `<C-Down>` | Resize down |
 | `<C-Left>` | Resize left |

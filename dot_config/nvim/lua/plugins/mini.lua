@@ -1,5 +1,5 @@
 -- mini.nvim: collection of editing micro-plugins
--- Replaces: Comment.nvim, nvim-surround, nvim-web-devicons, native <A-j/k> move maps
+-- Commenting uses Neovim's native gc/gcc mappings.
 return {
   {
     "echasnovski/mini.nvim",
@@ -8,25 +8,13 @@ return {
       -- Auto-close brackets and quotes
       require("mini.pairs").setup()
 
-      -- Highlight + trim trailing whitespace on save
+      -- Highlight trailing whitespace; formatters preserve language-specific meaning.
       require("mini.trailspace").setup()
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        group = vim.api.nvim_create_augroup("mini_trailspace_trim", { clear = true }),
-        callback = function()
-          if vim.bo.filetype ~= "" and vim.bo.modifiable then
-            ---@diagnostic disable-next-line: undefined-global
-            MiniTrailspace.trim()
-          end
-        end,
-      })
 
       -- Icons (replaces nvim-web-devicons; mock its API for plugins that require it)
       require("mini.icons").setup()
       ---@diagnostic disable-next-line: undefined-global
       MiniIcons.mock_nvim_web_devicons()
-
-      -- Commenting (replaces Comment.nvim; same gc/gcc keymaps)
-      require("mini.comment").setup()
 
       -- Surround (replaces nvim-surround; ys/ds/cs for muscle memory compatibility).
       -- These need flash.nvim's operator-pending `s` OFF (or {y,d,c}s would race);

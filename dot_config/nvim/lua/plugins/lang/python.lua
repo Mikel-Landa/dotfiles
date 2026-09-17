@@ -27,9 +27,6 @@ return {
       formatters_by_ft = {
         python = { "ruff_organize_imports", "ruff_format" },
       },
-      formatters = {
-        ruff_format = { prepend_args = { "--line-length", "100" } },
-      },
     },
   },
 

@@ -1,9 +1,39 @@
 #!/usr/bin/env bash
 # "code"-style tmux session: editor (nvim) + shell (2 panes).
 # Usage:
-#   code-session PATH   create/attach session named after basename(PATH)
+#   code-session PATH   create/attach a session identified by its canonical path
+#   code-session --pick [ROOT]   pick a repo/worktree (default: ~/repos)
 #   code-session        apply layout to current session, exec nvim in this pane
 set -euo pipefail
+
+list_projects() {
+  local root=$1 repo record directory
+  local -A seen=()
+  while IFS= read -r -d '' repo; do
+    repo=$(cd -- "$repo" && pwd -P) || continue
+    if [[ -z ${seen["$repo"]+yes} ]]; then
+      seen["$repo"]=1
+      printf '%s\0' "$repo"
+    fi
+    while IFS= read -r -d '' record; do
+      [[ $record == 'worktree '* ]] || continue
+      directory=${record#worktree }
+      [[ -d $directory && -z ${seen["$directory"]+yes} ]] || continue
+      seen["$directory"]=1
+      printf '%s\0' "$directory"
+    done < <(git -C "$repo" worktree list --porcelain -z)
+  done < <(
+    while IFS= read -r directory; do
+      [[ $directory == "$root" || $directory == "$root/"* ]] || continue
+      [[ -e $directory/.git ]] && printf '%s\0' "$directory"
+    done < <(zoxide query -l)
+    fd --glob .git --hidden --no-ignore --follow --type d --type f \
+      --max-depth 6 --prune --print0 "$root" | while IFS= read -r -d '' directory; do
+        directory=${directory%/}
+        printf '%s\0' "${directory%/.git}"
+      done
+  )
+}
 
 apply_layout() {
   local sess="$1" cwd="${2:-}" cflag=()
@@ -21,14 +51,25 @@ if [ "$#" -eq 0 ]; then
   exec "${SHELL:-bash}" -l
 fi
 
-path="${1/#\~/$HOME}"
-name="$(basename "$path" | tr '. ' '__')"
+if [[ $1 == --pick ]]; then
+  root=$(cd -- "${2:-$HOME/repos}" && pwd -P)
+  IFS= read -r -d '' path < <(list_projects "$root" | fzf --read0 --print0 --reverse \
+    --header='code project / worktree' --preview 'eza --all --git --color=always -- {}') || exit 0
+else
+  path="${1/#\~/$HOME}"
+fi
+[[ -n $path ]] || exit 0
+path=$(cd -- "$path" && pwd -P)
+name=${path##*/}
+name=${name//[^[:alnum:]_-]/_}
+digest=$(printf '%s' "$path" | sha256sum)
+name="${name}-${digest:0:12}"
 
-attach() {
+attach_session() {
   if [ -n "${TMUX:-}" ]; then
-    tmux switch-client -t "$name"
+    tmux switch-client -t "=$name"
   else
-    tmux attach -t "$name"
+    tmux attach -t "=$name"
   fi
 }
 
@@ -37,4 +78,4 @@ if ! tmux has-session -t="$name" 2>/dev/null; then
   apply_layout "$name" "$path"
   tmux send-keys -t "$name:editor" 'nvim' C-m
 fi
-attach
+attach_session

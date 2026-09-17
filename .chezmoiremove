@@ -1,0 +1,2 @@
+# Atlas owns GitHub issues and pull requests; remove the obsolete local spec.
+.config/nvim/lua/plugins/octo.lua

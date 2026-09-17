@@ -27,7 +27,7 @@ return {
 | `cmd = { "CmdName" }` | Plugins only needed via an Ex command |
 | `ft = { "lua", "python" }` | Filetype-specific plugins |
 | `keys = { ... }` | Plugins triggered only by keymaps (lazy.nvim auto-creates the stub) |
-| `lazy = false` | **Avoid** — only colorscheme, treesitter, and snacks.nvim (provides core APIs: `vim.notify`, `vim.ui.input`, statuscolumn) need it |
+| `lazy = false` | Maintainer-required startup setup: treesitter, Snacks (core UI APIs), fff (self-managed lazy initialization), or an eager colorscheme |
 
 Don't use `BufEnter`/`BufWinEnter` — they fire on every buffer switch and tank perf. `BufReadPre`+`BufNewFile` is the canonical "file is open" pair.
 

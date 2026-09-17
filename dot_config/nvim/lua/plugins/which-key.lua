@@ -23,6 +23,8 @@ return {
         { "<leader><tab>", group = "tabs" },
         { "<leader>o", group = "workflow" },
         { "<leader>p", group = "path" },
+        { "<leader>T", group = "tests" },
+        { "<leader>k", group = "kubernetes" },
         { "<leader>a", group = "avante (AI)" },
       },
     },

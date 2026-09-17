@@ -68,6 +68,21 @@ return {
   {
     "neovim/nvim-lspconfig",
     optional = true,
+    init = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("markdown_diagnostics", { clear = true }),
+        pattern = { "markdown", "markdown.mdx" },
+        callback = function(event)
+          vim.diagnostic.enable(false, { bufnr = event.buf })
+          vim.keymap.set("n", "<leader>ud", function()
+            local filter = { bufnr = event.buf }
+            local enabled = not vim.diagnostic.is_enabled(filter)
+            vim.diagnostic.enable(enabled, filter)
+            vim.notify(enabled and "Diagnostics on" or "Diagnostics off", vim.log.levels.INFO)
+          end, { buffer = event.buf, desc = "Toggle diagnostics" })
+        end,
+      })
+    end,
     opts = {
       servers = { marksman = {} },
     },
@@ -99,9 +114,13 @@ return {
     ft = { "markdown" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      "echasnovski/mini.icons",
+      "echasnovski/mini.nvim",
+    },
+    keys = {
+      { "<leader>um", "<cmd>RenderMarkdown toggle<cr>", desc = "Toggle Markdown rendering" },
     },
     opts = {
+      enabled = false,
       file_types = { "markdown" },
       completions = { lsp = { enabled = true } },
     },

@@ -12,11 +12,6 @@ return {
       formatters_by_ft = {
         sh = { "shfmt" },
       },
-      -- Target 100-char line width by default; project config files override.
-      formatters = {
-        prettier = { prepend_args = { "--print-width", "100" } },
-        prettierd = { prepend_args = { "--print-width", "100" } },
-      },
       format_on_save = {
         timeout_ms = 500,
         lsp_format = "fallback",

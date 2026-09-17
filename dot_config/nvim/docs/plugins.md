@@ -50,11 +50,12 @@ After pressing leader, wait briefly to see grouped popup of all leader-prefixed 
 ### akinsho/bufferline.nvim — Buffer tabs
 Top bar showing open buffers as tab-like entries. LSP diagnostics shown per buffer. Snacks explorer offset reserves the explorer column. See [Buffers](keymaps.md#buffers) for full keymaps. Highlights: `<S-h>`/`<S-l>` cycle, `<leader>bp` pin, `<leader>br/bl` delete to one side.
 
-### j-hui/fidget.nvim — LSP progress notifications
-Spinner in bottom-right while LSP servers index/load.
+### folke/noice.nvim — Messages, command line and LSP progress
+
+Owns command-line UI, messages, hover docs and LSP progress. Blink provides signature help; Snacks provides notifications.
 
 ### christoomey/vim-tmux-navigator — Tmux pane navigation
-Move between Neovim splits and tmux panes seamlessly.
+Move between Neovim splits and tmux panes in normal and terminal modes. In insert mode, `<C-j>` / `<C-k>` navigate completion and snippet fields; press `<Esc>` before navigating panes.
 
 | Key | Action |
 |---|---|
@@ -63,12 +64,11 @@ Move between Neovim splits and tmux panes seamlessly.
 | `<C-k>` | Up |
 | `<C-l>` | Right |
 
-### sphamba/smear-cursor.nvim — Animated cursor trail
-Smooth motion smear when cursor jumps. Auto-disables in cmdline (no smear while typing `:`).
-
 ### folke/snacks.nvim — QoL suite (explorer, picker, notifier, statuscolumn, indent, terminal)
 
-Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml`, `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (neogit) for in-editor git, or run `lazygit` in the floating terminal (`<leader>t`).
+Replaces telescope, neo-tree. Notifier handles toast pop-ups (intentionally kept alongside noice — noice owns cmdline/messages/popupmenu, snacks owns toasts and picker-based history). Indent guides draw a faint `│` at every level (VSCode-style) plus a slightly brighter line for the current scope; on by default only in `python`, `yaml` (including compound YAML filetypes), `html`, `json`/`jsonc`, `toml` — toggle for the current buffer with `<leader>ui`. Lazygit module is disabled — use `<leader>gg` (neogit) for in-editor git, or run `lazygit` in the floating terminal (`<leader>t`).
+
+Large-file protection disables LSP/Treesitter attachment for files over 1.5 MiB or averaging over 1,000 bytes per line. Cursor and scrolling animations are disabled. Helm template detection requires a parent `Chart.yaml` and its `templates/` directory.
 
 Toggle the explorer with `<leader>e`. Inside the tree:
 
@@ -90,9 +90,13 @@ Toggle the explorer with `<leader>e`. Inside the tree:
 
 ## Search & navigation
 
+### dmtrKovalenko/fff — File and text search
+
+`<leader>ff` finds files, `<leader>fg` searches text, and `<leader>fc` searches the Neovim configuration. Results use frecency ranking.
+
 ### folke/snacks.nvim — Picker (fuzzy finder)
 
-Replaces telescope. Driven by `<leader>f*` keys (find), `<leader>g{f,l,L,B}` (git pickers), and LSP keymaps. See [Find](keymaps.md#find) and [LSP](keymaps.md#lsp) for the full list.
+Handles buffers, help, recent files, diagnostics, `<leader>g{f,l,L,B}` (git pickers), and LSP keymaps. See [Find](keymaps.md#find) and [LSP](keymaps.md#lsp) for the full list.
 
 Inside picker: `<C-n>`/`<C-p>` next/prev, `<CR>` open, `<C-x>` horizontal split, `<C-v>` vertical split, `<C-t>` tab, `<Esc>` close.
 
@@ -128,7 +132,7 @@ Inside panel: `<CR>` jump, `q` close, `r` refresh.
 
 ### echasnovski/mini.nvim — Editing micro-plugins
 
-Six modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (icons), native line-move keymaps.
+Five modules active: surround, move, pairs, trailspace and icons. Commenting uses Neovim directly.
 
 **mini.surround** — Surround text (replaces nvim-surround, same keymaps):
 
@@ -141,7 +145,7 @@ Six modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (ic
 | `gsf` / `gsF` | Find surround right / left |
 | `gsh` | Highlight surround |
 
-**mini.comment** — Toggle comments (same keymaps as Comment.nvim):
+**Native Neovim commenting** — Toggle comments with Treesitter-aware comment strings:
 
 | Key | Action |
 |---|---|
@@ -158,7 +162,7 @@ Six modules active. Replaces: Comment.nvim, nvim-surround, nvim-web-devicons (ic
 
 **mini.pairs** — Auto-close `()`, `[]`, `{}`, `""`, `''`.
 
-**mini.trailspace** — Highlights trailing whitespace; trims it on save.
+**mini.trailspace** — Highlights trailing whitespace. Saving preserves Markdown hard breaks; language-aware formatters handle whitespace edits.
 
 **mini.icons** — File and filetype icons (replaces nvim-web-devicons; API-compatible).
 
@@ -186,7 +190,7 @@ Inside the tree buffer: `<CR>` jumps to that undo state, `q` closes. Persistent 
 
 ### MeanderingProgrammer/render-markdown.nvim — In-buffer markdown rendering
 
-Renders markdown directly in the buffer: styled headers, fenced code-block backgrounds, bullet glyphs, checkbox icons, callouts, table borders. Loads on `markdown` filetype. Toggle with `:RenderMarkdown toggle`; `:RenderMarkdown expand` / `contract` cycles concealment level.
+Renders markdown directly in the buffer: styled headers, fenced code-block backgrounds, bullet glyphs, checkbox icons, callouts, table borders. Rendering is off by default. Toggle with `<leader>um` or `:RenderMarkdown toggle`; `:RenderMarkdown expand` / `contract` cycles concealment level.
 
 ### NvChad/nvim-colorizer.lua — Inline color preview
 
@@ -240,6 +244,8 @@ VSCode-style "sticky scroll": as you scroll inside a function or class, the encl
 
 Servers auto-install on first use. Base: json, yaml, html, css, bash, toml (tombi). Per-language bundles in `lua/plugins/lang/*.lua`: lua (lua_ls + lazydev), python (pyright + ruff), typescript (vtsls), rust (rustaceanvim), go (gopls), c/c++ (clangd), markdown (marksman), terraform (terraform-ls), cedar (cedar-language-server). Tools (formatters, linters, DAP adapters) install via `mason-tool-installer.nvim` (lists merge across lang files). Manage with `:Mason`, `:MasonToolsUpdate`. Cedar is the exception — its server isn't in mason; install manually: `cargo install --git https://github.com/cedar-policy/cedar cedar-language-server --features bin`.
 
+Markdown's Marksman server starts automatically. Diagnostics are hidden by default in Markdown and MDX buffers; `<leader>ud` toggles them for the current Markdown buffer.
+
 LSP keymaps (active when an LSP attaches):
 
 | Key | Action |
@@ -260,7 +266,7 @@ LSP keymaps (active when an LSP attaches):
 
 ### saghen/blink.cmp — Completion
 
-Pops up automatically while typing. Sources: LSP, snippets (LuaSnip), path, buffer.
+Pops up automatically while typing. Sources: LSP, native snippets, path, buffer.
 
 | Key | Action |
 |---|---|
@@ -270,8 +276,8 @@ Pops up automatically while typing. Sources: LSP, snippets (LuaSnip), path, buff
 | `<C-Space>` | Trigger menu |
 | `<C-e>` | Cancel |
 
-### L3MON4D3/LuaSnip + friendly-snippets
-VSCode snippet pack auto-loaded. Trigger via blink.cmp; jump fields with `<C-j>` / `<C-k>`.
+### Native snippets + friendly-snippets
+VSCode snippet pack loaded by Blink using Neovim’s native snippet engine. Trigger via blink.cmp; jump fields with `<C-j>` / `<C-k>`.
 
 ---
 
@@ -286,9 +292,9 @@ Format on save runs automatically (500ms timeout, falls back to LSP). Manual:
 | `<leader>cf` | Format buffer / selection |
 | `grf` | Format file |
 
-Formatters declared per-language in `lua/plugins/lang/*.lua` and merged into conform. Current: stylua (lua), ruff_format + ruff_organize_imports (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt (rust, lsp fallback), goimports + gofumpt (go), terraform_fmt (terraform/tf) + packer_fmt (hcl), shfmt (sh), markdownlint-cli2 + markdown-toc (markdown, conditional), cedar (cedar, needs the `cedar` CLI: `cargo install cedar-policy-cli`). Install via `:Mason`.
+Formatters declared per-language in `lua/plugins/lang/*.lua` and merged into conform. Current: stylua (lua), ruff_format + ruff_organize_imports (python), prettierd → prettier (js/ts/json/yaml/html/css/md), rustfmt (rust, lsp fallback), goimports + gofumpt (go), tofu_fmt (Terraform/OpenTofu files and variables) + packer_fmt (hcl), shfmt (sh), markdownlint-cli2 + markdown-toc (markdown, conditional), cedar (cedar, needs the `cedar` CLI: `cargo install cedar-policy-cli`). Install via `:Mason`.
 
-Line width target: **100 chars** for stylua / ruff_format / prettier(d). Project config files (`.stylua.toml`, `pyproject.toml`, `.prettierrc`) override.
+Formatting follows project configuration (`.stylua.toml`, `pyproject.toml`, `.prettierrc`). Without project settings, each formatter uses its own defaults.
 
 `:ConformInfo` shows status.
 
@@ -298,7 +304,7 @@ Line width target: **100 chars** for stylua / ruff_format / prettier(d). Project
 
 ### mfussenegger/nvim-lint — On-save linters
 
-Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `terraform_validate` (terraform/tf), `markdownlint-cli2` (markdown), `shellcheck` (sh/bash). Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>xx` Trouble panel).
+Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `tofu validate` + `tflint` (Terraform/OpenTofu files and variables), `markdownlint-cli2` (markdown). ShellCheck diagnostics come from bash-language-server, which invokes the installed ShellCheck executable. Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>xx` Trouble panel).
 
 ---
 
@@ -328,6 +334,40 @@ See [Debug (DAP)](keymaps.md#debug-dap) for the full keymap reference.
 - **go**: `leoluz/nvim-dap-go`.
 - **c/c++**: `p00f/clangd_extensions.nvim` (cmp scoring, AST view, inlay hint tweaks).
 - **markdown**: `iamcco/markdown-preview.nvim` (browser preview, `<leader>cp`), `MeanderingProgrammer/render-markdown.nvim` (in-buffer rendering).
+
+---
+
+## Platform engineering
+
+### qvalentin/helm-ls.nvim + Helm language server
+
+Chart templates get Helm completion, value hover, definition jumps and lint diagnostics. Chart `values*.yaml` / `values*.yml` files get values completion. The Helm Treesitter parser provides highlighting; `%` jumps between template block boundaries. Experimental value concealment and indentation hints are disabled.
+
+Helm LS uses the YAML language server internally; standalone YAML LSP does not attach to chart values files. Mason installs `helm-ls`; the `helm` CLI must be available. Download chart dependencies with `helm dependency build` when you need dependency values/completion.
+
+### cenk1cenk2/schema-companion.nvim — Kubernetes and CRD schemas
+
+Detects Kubernetes resources and catalogued CRDs in YAML and Helm templates. SchemaStore remains available for ordinary YAML. Built-in resources use the upstream Kubernetes `master` schema set; CRDs use the CRDs catalog, so private or uncatalogued CRDs need an explicit schema.
+
+Use `<leader>ly` to select a schema, `<leader>lY` to detect again after adding `apiVersion` / `kind`. Schema downloads need network access.
+
+### Terraform / OpenTofu
+
+OpenTofu is the default CLI: formatting uses `tofu fmt`, validation uses `tofu validate`, and TFLint adds lint diagnostics. `.tf`, `.tofu`, `.tfvars` and `.tofuvars` are recognized. Initialize modules with `tofu init` before provider-dependent validation. Terraform LS continues to provide completion/navigation; OpenTofu-specific language features may differ. Packer HCL still uses `packer fmt`.
+
+### ramilito/kubectl.nvim — Cluster browser
+
+`<leader>kk` opens the cluster browser; `<leader>kc` selects context; `<leader>kn` selects namespace. Also available through `:Kubectl`, `:Kubectx`, and `:Kubens`. Inside: `g?` lists actions, `gl` opens logs, `gp` forwards pod/service ports, `gy` shows YAML. Uses your kubeconfig and CLI authentication, including configured AKS credentials.
+
+Uses tagged v2 releases and `saghen/blink.download` for its native binary. First use may download the binary and require restarting Neovim.
+
+## Tests
+
+### nvim-neotest/neotest + fredrikaverpil/neotest-golang
+
+Run Go and Rust tests with `<leader>Tr` (nearest), `<leader>Tf` (file), `<leader>Tl` (last), or `<leader>Td` (debug nearest). `<leader>Ts` toggles the summary, `<leader>To` opens output, and `<leader>Tx` stops a run. Commands are available under `:Neotest`.
+
+Go uses `gotestsum` (installed through Mason), with table/subtest discovery and existing Delve integration. Rust uses rustaceanvim's built-in Neotest adapter and existing codelldb integration; wait for rust-analyzer to attach before discovering Rust tests.
 
 ---
 

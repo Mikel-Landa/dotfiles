@@ -57,6 +57,10 @@ Packages declared in `dot_config/metapac/groups/`. See [`metapac/AGENTS.md`](dot
 Metapac is the source of truth for cross-PC packages, including mise tools.
 `~/.config/mise/` is local-only and excluded from chezmoi.
 
+Metapac bootstrap reads Cargo metadata to locate build output, respecting
+`CARGO_TARGET_DIR` and Cargo's `build.target-dir` configuration. Existing compiler
+wrappers such as sccache remain unchanged.
+
 ## Colors
 
 [Matugen](https://github.com/InioX/matugen) generates a Material You palette from the current wallpaper and writes color configs for Kitty and Neovim. To regenerate:
@@ -67,7 +71,42 @@ matugen image /path/to/wallpaper.jpg
 
 ## Git configuration
 
-Personal/work split via `includeIf`:
+Identity follows this include order:
 
-- `~/.config/git/config-personal` — default for all repos
-- `~/.config/git/config-work` — applied for repos under `~/repos/` (local-only, not in repo)
+1. `~/.config/git/config-personal` sets the default personal email and signing key.
+2. `~/.config/git/config-work`, when present, overrides both (local-only).
+3. Repositories under `~/personal/`, including their linked worktrees, override
+   both back to the personal identity.
+
+Personal PCs without a work config use personal identity everywhere. Work laptops
+use work identity except in personal repositories. The user setup script creates
+the work config only when chezmoi's `work` setting is true. Provision the personal
+secret key locally.
+
+## Shell workflow
+
+- **Ctrl-R** searches history; **Ctrl-T** inserts paths with file/tree previews;
+  **Alt-C** picks a directory with a tree preview. Searches respect `.gitignore`,
+  include dotfiles, and skip `.git`, `node_modules`, `target`, and `.venv`.
+- `fcd` changes directory, `f` copies a file path, and `fv` opens a file in the
+  editor. Escape leaves the current directory, clipboard, and editor untouched.
+- `kcfg` selects a file in `~/.kube`; Escape preserves `KUBECONFIG`.
+- `uclip` copies stdin through WSL, Wayland, X11, or macOS. Missing clipboard
+  support produces an error. `f` uses the same helper.
+- `cat` uses bat with automatic colors/paging, keeping redirected output plain.
+- Zsh caches generated tool initialization by executable path/metadata and
+  arguments, resolving mise shims to their selected binaries. Tool changes
+  regenerate initialization; `ZSH_EVALCACHE_DISABLE=true` bypasses caching.
+  `_evalcache_clear` removes cached initialization interactively.
+
+## Project sessions
+
+Tmux **prefix + Space** opens `code-session --pick`: projects under `~/repos/`,
+ordered by zoxide history then filesystem discovery, plus their linked worktrees.
+Full paths distinguish projects with identical directory names. Use
+`code-session --pick ~/personal` for personal projects, or `code-session PATH`
+directly. Escape opens no session. Session names combine directory name and a
+canonical-path hash; symlinks to the same directory reuse its session.
+
+TPM installs and loads from `~/.config/tmux/plugins/tpm`. After bootstrap, use
+**prefix + I** to install configured plugins.

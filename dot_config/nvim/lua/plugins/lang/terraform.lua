@@ -1,4 +1,4 @@
--- Terraform: terraform-ls + terraform_fmt + tflint/terraform_validate
+-- Terraform/OpenTofu: terraform-ls + tofu fmt/validate + TFLint.
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -24,9 +24,8 @@ return {
     opts = {
       formatters_by_ft = {
         hcl = { "packer_fmt" },
-        terraform = { "terraform_fmt" },
-        tf = { "terraform_fmt" },
-        ["terraform-vars"] = { "terraform_fmt" },
+        terraform = { "tofu_fmt" },
+        ["terraform-vars"] = { "tofu_fmt" },
       },
     },
   },
@@ -36,8 +35,8 @@ return {
     optional = true,
     opts = {
       linters_by_ft = {
-        terraform = { "terraform_validate" },
-        tf = { "terraform_validate" },
+        terraform = { "tofu", "tflint" },
+        ["terraform-vars"] = { "tofu", "tflint" },
       },
     },
   },

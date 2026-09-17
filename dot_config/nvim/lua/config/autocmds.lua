@@ -7,6 +7,10 @@ vim.filetype.add({
   extension = {
     mdx = "markdown.mdx",
     gotmpl = "gotmpl",
+    tofu = "terraform",
+    tf = "terraform",
+    tfvars = "terraform-vars",
+    tofuvars = "terraform-vars",
     cedar = "cedar",
     cedarschema = "cedar",
   },
@@ -14,8 +18,15 @@ vim.filetype.add({
     [".gitlab-ci.yml"] = "yaml.gitlab",
   },
   pattern = {
-    [".*/templates/.*%.tpl"] = "gotmpl",
-    [".*/templates/.*%.ya?ml"] = "yaml.helm-values",
+    -- Higher priority than helm-ls.nvim's broad templates/ and values rules.
+    [".*/templates/.*"] = { function(path)
+      local root = vim.fs.root(path, "Chart.yaml")
+      if root and vim.startswith(path, root .. "/templates/") then return "helm" end
+      return vim.filetype.match({ filename = vim.fs.basename(path) }) or "text"
+    end, { priority = 100 } },
+    [".*/values.*%.ya?ml"] = { function(path)
+      return vim.fs.root(path, "Chart.yaml") and "yaml.helm-values" or "yaml"
+    end, { priority = 100 } },
     ["docker%-compose.*%.ya?ml"] = "yaml.docker-compose",
     ["compose.*%.ya?ml"] = "yaml.docker-compose",
   },
@@ -151,6 +162,7 @@ autocmd("TermClose", {
 autocmd("CursorHold", {
   group = augroup("diagnostic_hover", { clear = true }),
   callback = function()
+    if not vim.diagnostic.is_enabled({ bufnr = 0 }) then return end
     for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
       if vim.api.nvim_win_get_config(winid).relative ~= "" then return end
     end

@@ -1,4 +1,4 @@
--- Bash / shell: bashls + shfmt (base) + shellcheck linter
+-- Bash / shell: bashls owns ShellCheck diagnostics; shfmt formats via Conform.
 return {
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -7,16 +7,5 @@ return {
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, { "shellcheck" })
     end,
-  },
-
-  {
-    "mfussenegger/nvim-lint",
-    optional = true,
-    opts = {
-      linters_by_ft = {
-        sh = { "shellcheck" },
-        bash = { "shellcheck" },
-      },
-    },
   },
 }

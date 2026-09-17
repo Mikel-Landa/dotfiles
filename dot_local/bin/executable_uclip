@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
+# Copy stdin to the active desktop clipboard.
+set -euo pipefail
 
-#WSL
-if command -v "clip.exe" >/dev/null 2>&1;then
-    clip.exe
-#Linux
-elif command -v "xclip" >/dev/null 2>&1; then
-    xclip -sel clip
+if command -v clip.exe >/dev/null 2>&1; then
+    exec clip.exe
+elif [[ -n ${WAYLAND_DISPLAY:-} ]] && command -v wl-copy >/dev/null 2>&1; then
+    exec wl-copy
+elif [[ -n ${DISPLAY:-} ]] && command -v xclip >/dev/null 2>&1; then
+    exec xclip -selection clipboard
+elif [[ -n ${DISPLAY:-} ]] && command -v xsel >/dev/null 2>&1; then
+    exec xsel --clipboard --input
+elif command -v pbcopy >/dev/null 2>&1; then
+    exec pbcopy
 else
-    echo "Not a valid clip command (clip.exe|xclip)"
+    echo 'uclip: no clipboard available (clip.exe, wl-copy, xclip, xsel, pbcopy)' >&2
     exit 1
 fi

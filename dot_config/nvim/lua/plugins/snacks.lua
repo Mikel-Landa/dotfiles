@@ -22,7 +22,8 @@ local function should_show_indent(buf)
 	if override ~= nil then
 		return override
 	end
-	return indent_allowlist[vim.bo[buf].filetype] == true
+	local filetype = vim.bo[buf].filetype:match("^[^.]+")
+	return indent_allowlist[filetype] == true
 end
 
 return {
@@ -31,6 +32,7 @@ return {
 		priority = 1000,
 		lazy = false,
 		opts = {
+			bigfile = { enabled = true },
 			explorer = { enabled = true },
 			input = { enabled = true },
 			notifier = {
@@ -88,7 +90,6 @@ return {
 			},
 			rename = { enabled = true },
 			scope = { enabled = true },
-			scroll = { enabled = true },
 			statuscolumn = { enabled = true },
 			indent = {
 				enabled = true,
