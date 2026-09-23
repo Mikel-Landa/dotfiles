@@ -285,7 +285,7 @@ VSCode snippet pack loaded by Blink using Neovim’s native snippet engine. Trig
 
 ### stevearc/conform.nvim — Formatter
 
-Format on save runs automatically (500ms timeout, falls back to LSP). Manual:
+Format on save runs automatically (3-second timeout to allow Go import lookups, falls back to LSP). Manual:
 
 | Key | Action |
 |---|---|
