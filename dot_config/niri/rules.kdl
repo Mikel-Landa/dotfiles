@@ -37,7 +37,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id="browser-startup"
+    match app-id="^zen-browser$" at-startup=true
     open-on-workspace "browser"
     open-maximized true
 }

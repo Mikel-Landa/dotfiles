@@ -7,7 +7,7 @@ spawn-at-startup "/usr/bin/ksecretd"
 // Stash workspace daemon — must run for niri-scratchpad target/create to work.
 spawn-at-startup "niri-scratchpad" "daemon"
 
-spawn-at-startup "zen-browser" "--class=browser-startup"
+spawn-at-startup "zen-browser"
 
 spawn-at-startup "kitty" "--class=kitty-term"
 
