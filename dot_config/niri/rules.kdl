@@ -82,6 +82,31 @@ window-rule {
     default-floating-position x=0 y=0 relative-to="top"
 }
 
+// Only individual-window shares match; monitor shares appear in `niri msg casts`.
+window-rule {
+    match is-window-cast-target=true
+
+    border {
+        on
+        width 3
+        active-color "#ff4050"
+        inactive-color "#ff4050"
+        urgent-color "#ff4050"
+    }
+
+    focus-ring {
+        active-color "#ff4050"
+        inactive-color "#ff4050"
+        urgent-color "#ff4050"
+    }
+
+    tab-indicator {
+        active-color "#ff4050"
+        inactive-color "#ff4050"
+        urgent-color "#ff4050"
+    }
+}
+
 // === Privacy: redact sensitive windows from xdg-desktop-portal screencasts.
 // Replaced with solid black; not effective vs. third-party screenshot tools.
 window-rule {

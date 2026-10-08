@@ -209,6 +209,15 @@ binds {
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
 
+    // === Screen Sharing ===
+    // Select "niri Dynamic Cast Target" in the meeting app first.
+    Mod+Ctrl+S repeat=false hotkey-overlay-title="Share Focused Window" { set-dynamic-cast-window; }
+    Mod+Ctrl+Shift+S repeat=false hotkey-overlay-title="Share Focused Monitor" { set-dynamic-cast-monitor; }
+    Mod+Alt+S repeat=false hotkey-overlay-title="Blank Dynamic Share" { clear-dynamic-cast-target; }
+    Mod+Alt+Shift+S repeat=false hotkey-overlay-title="Show Active Screen Shares" {
+        spawn "kitty" "--title" "Screen sharing" "--hold" "watch" "--no-title" "--interval" "1" "niri" "msg" "casts";
+    }
+
     // === KVM at home ===
     Mod+F1 allow-when-locked=true repeat=false { spawn "switch_monitor" "1"; }
     Mod+F2 allow-when-locked=true repeat=false { spawn "switch_monitor" "2"; }
