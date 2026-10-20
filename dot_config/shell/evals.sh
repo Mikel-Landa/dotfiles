@@ -11,6 +11,7 @@ shell_evals_for() {
         "mise activate $_s" \
         "fzf --$_s" \
         "kubectl completion $_s" \
-        "helm completion $_s"
+        "helm completion $_s" \
+        "wt config shell init $_s"
     unset _s
 }

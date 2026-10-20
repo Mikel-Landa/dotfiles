@@ -40,6 +40,7 @@ cargo = {
     "tsql",
     "cargo-deny",
     "cargo-audit",
+    "worktrunk",
   ]
 }
 
