@@ -7,15 +7,15 @@
     "DISABLE_FEEDBACK_COMMAND": "1",
     "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1"
   },
-  "permissions": {
-    "defaultMode": "auto",
-    "deny": [
-      "Read(.env)",
-      "Read(.env.*)",
-      "Read(.secrets)"
-    ]
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
-  "model": "fable",
+  "permissions": {
+    "deny": ["Read(.env)", "Read(.env.*)", "Read(.secrets)"],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -54,7 +54,16 @@
     "type": "command",
     "command": "bash \"$HOME/.claude/scripts/statusline.sh\""
   },
+  "extraKnownMarketplaces": {
+    "worktrunk": {
+      "source": {
+        "source": "github",
+        "repo": "max-sixty/worktrunk"
+      }
+    }
+  },
   "effortLevel": "high",
+  "advisorModel": "fable",
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
@@ -62,7 +71,10 @@
   "editorMode": "normal",
   "preferredNotifChannel": "kitty",
   "showTurnDuration": true,
-  "teammateMode": "tmux",
+  "teammateMode": "auto",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "enabledPlugins": {
+    "worktrunk@worktrunk": true
+  }
 }
