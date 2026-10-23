@@ -14,10 +14,6 @@ return {
 					statusline = {
 						"snacks_dashboard",
 						"atlas",
-						"Avante",
-						"AvanteInput",
-						"AvanteSelectedFiles",
-						"AvantePromptInput",
 					},
 				},
 			},

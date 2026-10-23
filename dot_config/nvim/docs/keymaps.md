@@ -21,7 +21,6 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>p` | Path |
 | `<leader>T` | Tests (Neotest) |
 | `<leader>k` | Kubernetes |
-| `<leader>a` | Avante (AI assistant) |
 | `<leader>n` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
 | `<leader><tab>` | Tabs |
@@ -245,18 +244,6 @@ References / implementation / type-def / rename / code-action use Neovim 0.11 bu
 | `<leader>ud` | Toggle diagnostics in current Markdown buffer (off by default) |
 | `<leader>um` | Toggle Markdown rendering (off by default) |
 
-## AI inline completions (windsurf.nvim)
-
-Insert mode. Ghost text appears automatically while typing.
-
-| Key | Action |
-|---|---|
-| `<M-CR>` | Accept full suggestion |
-| `<M-]>` | Next suggestion |
-| `<M-[>` | Prev suggestion |
-
-Codeium suggestions also surface in the blink.cmp menu. Auth once with `:Codeium Auth`.
-
 ## Diagnostics
 
 | Key | Action |
@@ -478,29 +465,6 @@ In insert mode, `<C-j>` / `<C-k>` navigate completion/snippets. Press `<Esc>` be
 | `<leader>oi` | Issues — GitHub repo → Atlas GitHub, else → Jira |
 | `<leader>oc` | Atlas PR comments → quickfix (needs an Atlas review attached) |
 | `<leader>oC` | Close Atlas PR-comments quickfix |
-
-## Avante (AI assistant)
-
-Avante drives Claude Code via ACP (no API key — uses `claude` CLI auth). `<leader>ac` opens Cursor's CLI agent in a floating terminal as an alternative.
-
-| Key | Action |
-|---|---|
-| `<leader>aa` | Open Avante sidebar (ask) — claude-code |
-| `<leader>at` | Toggle sidebar |
-| `<leader>an` | New ask prompt |
-| `<leader>ae` | Edit selected blocks (visual mode) |
-| `<leader>ar` | Refresh sidebar |
-| `<leader>af` | Switch focus between windows |
-| `<leader>ac` | `cursor-agent` floating terminal |
-
-In the Avante sidebar:
-
-| Key | Action |
-|---|---|
-| `<CR>` | Submit prompt (normal mode) |
-| `<C-s>` | Submit prompt (insert mode) |
-| `<M-l>` | Accept inline suggestion |
-| `co` / `ct` / `cb` | Choose ours / theirs / both on conflict |
 
 ## Completion (blink.cmp, in insert mode)
 

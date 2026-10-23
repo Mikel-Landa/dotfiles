@@ -115,23 +115,10 @@ autocmd("RecordingLeave", {
   end,
 })
 
--- Auto-resize splits when window is resized.
--- Skip if avante sidebar is open in current tab: its nested split (input is
--- relative to result winid) does not survive `wincmd =` cleanly under rapid
--- resize streams (e.g. tmux pane zoom toggle), spawning orphan AvanteInput
--- windows. Also drop `tabdo` — current tab is enough and avoids hitting
--- non-active tabs that may host avante.
+-- Auto-resize splits when the window is resized.
 autocmd("VimResized", {
   group = augroup("resize_splits", { clear = true }),
-  callback = function()
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-      local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
-      if ft == "Avante" or ft == "AvanteInput" or ft == "AvanteSelectedFiles" then
-        return
-      end
-    end
-    vim.cmd("wincmd =")
-  end,
+  command = "tabdo wincmd =",
 })
 
 -- Terminal buffers: hide line numbers and sign column

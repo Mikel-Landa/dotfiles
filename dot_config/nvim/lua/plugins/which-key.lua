@@ -25,7 +25,6 @@ return {
         { "<leader>p", group = "path" },
         { "<leader>T", group = "tests" },
         { "<leader>k", group = "kubernetes" },
-        { "<leader>a", group = "avante (AI)" },
       },
     },
   },
