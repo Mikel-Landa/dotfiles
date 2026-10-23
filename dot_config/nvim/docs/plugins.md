@@ -190,7 +190,7 @@ Inside the tree buffer: `<CR>` jumps to that undo state, `q` closes. Persistent 
 
 ### MeanderingProgrammer/render-markdown.nvim — In-buffer markdown rendering
 
-Renders markdown directly in the buffer: styled headers, fenced code-block backgrounds, bullet glyphs, checkbox icons, callouts, table borders. Rendering is off by default. Toggle with `<leader>um` or `:RenderMarkdown toggle`; `:RenderMarkdown expand` / `contract` cycles concealment level.
+Renders markdown directly in the buffer: styled headers, fenced code-block backgrounds, bullet glyphs, checkbox icons, callouts, table borders. Off until toggled with `<leader>um` or `:RenderMarkdown toggle`; `:RenderMarkdown expand` / `contract` cycles concealment level. Checkbox and callout completions come from the plugin.
 
 ### NvChad/nvim-colorizer.lua — Inline color preview
 
@@ -333,7 +333,7 @@ See [Debug (DAP)](keymaps.md#debug-dap) for the full keymap reference.
 - **rust**: `mrcjkb/rustaceanvim` (replaces lspconfig rust_analyzer), `Saecki/crates.nvim` (Cargo.toml).
 - **go**: `leoluz/nvim-dap-go`.
 - **c/c++**: `p00f/clangd_extensions.nvim` (cmp scoring, AST view, inlay hint tweaks).
-- **markdown**: `iamcco/markdown-preview.nvim` (browser preview, `<leader>cp`), `MeanderingProgrammer/render-markdown.nvim` (in-buffer rendering).
+- **markdown**: `MeanderingProgrammer/render-markdown.nvim` (in-buffer rendering).
 
 ---
 

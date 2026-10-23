@@ -1,4 +1,4 @@
--- Markdown: marksman LSP + render-markdown + markdown-preview + markdownlint-cli2 + markdown-toc
+-- Markdown: marksman LSP + render-markdown + markdownlint-cli2 + markdown-toc
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -88,27 +88,7 @@ return {
     },
   },
 
-  -- Browser preview
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    build = function()
-      vim.fn["mkdp#util#install"]()
-    end,
-    keys = {
-      {
-        "<leader>cp",
-        ft = "markdown",
-        "<cmd>MarkdownPreviewToggle<cr>",
-        desc = "Markdown preview",
-      },
-    },
-    config = function()
-      vim.cmd([[do FileType]])
-    end,
-  },
-
-  -- In-buffer rendering (was in plugins/markdown.lua before refactor)
+  -- In-buffer rendering. Off by default; <leader>um toggles.
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = { "markdown" },
@@ -121,7 +101,6 @@ return {
     },
     opts = {
       enabled = false,
-      file_types = { "markdown" },
       completions = { lsp = { enabled = true } },
     },
   },

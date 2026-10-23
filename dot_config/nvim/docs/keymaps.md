@@ -240,7 +240,6 @@ References / implementation / type-def / rename / code-action use Neovim 0.11 bu
 
 | Key | Action |
 |---|---|
-| `<leader>cp` | Toggle browser preview (markdown-preview.nvim) |
 | `<leader>ud` | Toggle diagnostics in current Markdown buffer (off by default) |
 | `<leader>um` | Toggle Markdown rendering (off by default) |
 
