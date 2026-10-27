@@ -33,7 +33,6 @@ by commands and consumed via navigation keymaps.
 | `<leader>qx`      | Clear quickfix list                       |
 | `<leader>q[` / `<leader>q]` | Older / newer qf list (history) |
 | `<leader>lo` / `<leader>lc` | Open / close loclist            |
-| `<leader>xq`      | Trouble qflist viewer (alt UI)            |
 
 All jumps recenter cursor (`zz`).
 

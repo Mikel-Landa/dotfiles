@@ -12,7 +12,6 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>l` | LSP (symbols) |
 | `<leader>d` | Debug + diagnostics |
 | `<leader>dP` | Python debug (subgroup) |
-| `<leader>x` | Trouble panel |
 | `<leader>q` | Quickfix |
 | `<leader>u` | UI toggles |
 | `<leader>c` | Code (action, format) |
@@ -20,7 +19,6 @@ User-defined keybinds in this config. Leader = `<Space>`. For built-in motions a
 | `<leader>o` | Workflow (remote PR/issue browsers) |
 | `<leader>p` | Path |
 | `<leader>T` | Tests (Neotest) |
-| `<leader>k` | Kubernetes |
 | `<leader>n` | Noice (messages/cmdline) |
 | `<leader>w` | Windows (proxy of `<C-w>`) |
 | `<leader><tab>` | Tabs |
@@ -286,16 +284,6 @@ Two-letter keys under `<leader>d` (single-letter `<leader>dd` reserved for diagn
 | `<leader>To` | Open test output |
 | `<leader>Tx` | Stop test |
 
-## Kubernetes
-
-| Key | Action |
-|---|---|
-| `<leader>kk` | Toggle cluster browser |
-| `<leader>kc` | Select context |
-| `<leader>kn` | Select namespace |
-
-Inside the browser: `g?` shows actions, `gl` opens logs, `gp` forwards a pod/service port, `gy` shows YAML.
-
 ## Quickfix / loclist
 
 Navigation (unimpaired-style):
@@ -319,17 +307,6 @@ Manage:
 | `<leader>lo` / `<leader>lc` | Open / close loclist |
 
 Bulk edit across qf entries: `:cdo s/foo/bar/g | update`. See [Quickfix](quickfix.md) for the full reference.
-
-## Trouble panel
-
-| Key | Action |
-|---|---|
-| `<leader>xx` | Workspace diagnostics |
-| `<leader>xb` | Buffer diagnostics |
-| `<leader>xs` | Symbols |
-| `<leader>xl` | LSP refs/defs |
-| `<leader>xq` | Quickfix |
-| `<leader>xt` | TODO/FIXME comments |
 
 ## Format
 
@@ -484,7 +461,6 @@ In insert mode, `<C-j>` / `<C-k>` navigate completion/snippets. Press `<Esc>` be
 |---|---|
 | `]t` / `[t` | Next / prev TODO marker |
 | `<leader>ft` | TODO list (snacks.picker) |
-| `<leader>xt` | TODO list (Trouble) |
 
 ## Terminal
 

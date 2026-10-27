@@ -5,7 +5,7 @@ Leader: `<Space>` (set in `lua/config/keymaps.lua`).
 Always use `vim.keymap.set`, always provide `desc`:
 
 ```lua
-vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short description" })
+vim.keymap.set("n", "<leader>dd", function() ... end, { desc = "Short description" })
 ```
 
 **Leader group conventions** (follow existing layout):
@@ -19,8 +19,7 @@ vim.keymap.set("n", "<leader>xx", function() ... end, { desc = "Short descriptio
 | `<leader>gv` | CodeDiff (day-to-day diff viewer) |
 | `<leader>gG` | CodeDiff vs origin default branch |
 | `<leader>l` | LSP (symbols, etc.) |
-| `<leader>d` | Diagnostics (`<leader>dd` = float) |
-| `<leader>x` | Trouble panel (diagnostics/symbols/refs) |
+| `<leader>d` | Diagnostics (`<leader>dd` = float) + debug |
 | `<leader>u` | UI toggles (`<leader>uh` = inlay hints, `<leader>un` = dismiss notif) |
 | `<leader>c` | Code (action, format) |
 | `<leader>e` | File explorer |

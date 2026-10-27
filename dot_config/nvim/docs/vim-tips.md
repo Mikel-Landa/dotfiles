@@ -121,9 +121,9 @@ In visual mode, `<leader>gs` stages exactly the highlighted lines (gitsigns). No
 
 `<leader>ca` exposes server-side refactors: extract function, inline variable, organize imports, fill missing fields, etc. Most LSPs surface a lot more than the autofix. Check it before writing the refactor by hand.
 
-## Trouble for fix-everything workflows
+## Diagnostics list
 
-`<leader>xx` opens the workspace diagnostics list. `j`/`k` to navigate, `<CR>` to jump, `r` to refresh. Pair with format-on-save and code actions to chew through diagnostics fast. `<leader>xs` gives a symbol outline of the current buffer — quick way to land on a function in a long file.
+`<leader>fd` opens workspace diagnostics in the picker. `<leader>dd` opens the float at the cursor. `]d` / `[d` move between problems. `<leader>ls` lists symbols in the current buffer. Pair with format-on-save and `<leader>ca` to chew through diagnostics.
 
 ## Inlay hints toggle
 

@@ -114,18 +114,6 @@ Type `s` then 2 chars; pick the labeled match to jump. Works as motion in operat
 
 Inside the prompt: type chars to narrow, then the label letter to jump. `<Esc>` cancels.
 
-### folke/trouble.nvim — Diagnostics / refs panel
-
-| Key | Action |
-|---|---|
-| `<leader>xx` | Workspace diagnostics |
-| `<leader>xb` | Buffer diagnostics |
-| `<leader>xs` | Symbols outline |
-| `<leader>xl` | LSP refs / defs (right split) |
-| `<leader>xq` | Quickfix list |
-
-Inside panel: `<CR>` jump, `q` close, `r` refresh.
-
 ---
 
 ## Editing
@@ -192,23 +180,18 @@ Inside the tree buffer: `<CR>` jumps to that undo state, `q` closes. Persistent 
 
 Renders markdown directly in the buffer: styled headers, fenced code-block backgrounds, bullet glyphs, checkbox icons, callouts, table borders. Off until toggled with `<leader>um` or `:RenderMarkdown toggle`; `:RenderMarkdown expand` / `contract` cycles concealment level. Checkbox and callout completions come from the plugin.
 
-### NvChad/nvim-colorizer.lua — Inline color preview
-
-Highlights hex / rgb / hsl / named / Tailwind class colors with their actual color in the buffer.
-
 ### NMAC427/guess-indent.nvim — Auto-detect indentation
 
 Inspects a buffer on open and sets `shiftwidth` / `tabstop` / `expandtab` to match the file's existing style. Zero config; runs once per buffer. Overrides the global 2-space default when the file uses tabs or 4-space indent. `:GuessIndent` re-runs detection manually.
 
 ### folke/todo-comments.nvim — TODO/FIXME marker highlighting
 
-Highlights `TODO:`, `FIXME:`, `HACK:`, `WARN:`, `PERF:`, `NOTE:`, `TEST:` keywords in comments. Loads on file open; integrates with snacks.picker and Trouble.
+Highlights `TODO:`, `FIXME:`, `HACK:`, `WARN:`, `PERF:`, `NOTE:`, `TEST:` keywords in comments. Loads on file open; list them with snacks.picker.
 
 | Key | Action |
 |---|---|
 | `]t` / `[t` | Next / prev TODO marker |
 | `<leader>ft` | List TODOs (snacks.picker) |
-| `<leader>xt` | List TODOs (Trouble) |
 
 ### nvim-treesitter — Syntax highlighting & text objects
 
@@ -304,7 +287,7 @@ Formatting follows project configuration (`.stylua.toml`, `pyproject.toml`, `.pr
 
 ### mfussenegger/nvim-lint — On-save linters
 
-Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `tofu validate` + `tflint` (Terraform/OpenTofu files and variables), `markdownlint-cli2` (markdown). ShellCheck diagnostics come from bash-language-server, which invokes the installed ShellCheck executable. Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>xx` Trouble panel).
+Triggers on `BufWritePost`, `BufReadPost`, `InsertLeave`. Linters declared per-language in `lua/plugins/lang/*.lua`. Current wired: `golangci-lint` (go), `tofu validate` + `tflint` (Terraform/OpenTofu files and variables), `markdownlint-cli2` (markdown). ShellCheck diagnostics come from bash-language-server, which invokes the installed ShellCheck executable. Diagnostics surface in the standard diagnostic UI (gutter signs, `<leader>dd` float, `<leader>fd` picker).
 
 ---
 
@@ -354,12 +337,6 @@ Use `<leader>ly` to select a schema, `<leader>lY` to detect again after adding `
 ### Terraform / OpenTofu
 
 OpenTofu is the default CLI: formatting uses `tofu fmt`, validation uses `tofu validate`, and TFLint adds lint diagnostics. `.tf`, `.tofu`, `.tfvars` and `.tofuvars` are recognized. Initialize modules with `tofu init` before provider-dependent validation. Terraform LS continues to provide completion/navigation; OpenTofu-specific language features may differ. Packer HCL still uses `packer fmt`.
-
-### ramilito/kubectl.nvim — Cluster browser
-
-`<leader>kk` opens the cluster browser; `<leader>kc` selects context; `<leader>kn` selects namespace. Also available through `:Kubectl`, `:Kubectx`, and `:Kubens`. Inside: `g?` lists actions, `gl` opens logs, `gp` forwards pod/service ports, `gy` shows YAML. Uses your kubeconfig and CLI authentication, including configured AKS credentials.
-
-Uses tagged v2 releases and `saghen/blink.download` for its native binary. First use may download the binary and require restarting Neovim.
 
 ## Tests
 
@@ -485,4 +462,4 @@ Float opens automatically after 250ms idle on a problem (VSCode-style). Underlin
 | `<leader>dd` | Manual diagnostic float |
 | `]d` / `[d` | Next / prev diagnostic |
 
-See also Trouble (`<leader>xx`) for a full panel.
+Workspace diagnostics open in the picker with `<leader>fd`.
