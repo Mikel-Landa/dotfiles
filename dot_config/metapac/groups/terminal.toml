@@ -10,6 +10,7 @@ arch = {
     "jq",
     "wl-clipboard",
     "xclip",
+    "helix",
   ]
 }
 
@@ -24,6 +25,7 @@ apt = {
     "jq",
     "wl-clipboard",
     "xclip",
+    "helix",
   ]
 }
 
@@ -41,6 +43,7 @@ cargo = {
     "cargo-deny",
     "cargo-audit",
     "worktrunk",
+    "sd",
   ]
 }
 
