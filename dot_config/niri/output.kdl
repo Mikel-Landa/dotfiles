@@ -1,5 +1,5 @@
 output "DP-1" {
-    mode "3840x2160@165.058"
-    scale 1
+    mode "2560x1440@143.995"
+    scale 1.25
     variable-refresh-rate
 }
