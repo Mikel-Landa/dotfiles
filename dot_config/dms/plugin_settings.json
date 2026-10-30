@@ -12,7 +12,7 @@
 			{
 				"id": "ai_usagebar",
 				"name": "AI Usage",
-				"command": "ai-usagebar --vendor openai | jq -r '.text' | sed -E 's/<[^>]+>//g'",
+				"command": "ai-usagebar --vendor anthropic | jq -r '.text' | sed -E 's/<[^>]+>//g'",
 				"icon": "smart_toy",
 				"refreshInterval": 300,
 				"clickCommand": "kitty -e ai-usagebar-tui",

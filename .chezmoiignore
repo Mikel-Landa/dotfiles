@@ -4,7 +4,7 @@ graphify-out/
 /README.md
 .config/mise{,/**}
 .config/surfingkeys{,/**}
-.config/DankMaterialShell/.{firstlaunch,changelog-*}
+.config/dms/.{firstlaunch,changelog-*}
 .agents/skills/rust-skills/{checks,.github}{,/**}
 .agents/skills/rust-skills/{CONTRIBUTING,CHANGELOG}.md
 # Agent roots contain credentials and application-owned state. Import selectively.
@@ -39,7 +39,7 @@ graphify-out/
 {{- end }}
 {{ if .isWsl -}}
 .config/niri/**
-.config/DankMaterialShell/**
+.config/dms/**
 .config/nirinit/**
 .config/kitty/**
 .config/matugen/templates/kitty.conf
