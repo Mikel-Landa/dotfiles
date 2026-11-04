@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Print usage for every ai-usagebar vendor that is configured, as one bar line.
+set -uo pipefail
+
+declare -A labels=([anthropic]=Claude [openai]=Codex [zai]=Zai [openrouter]=OR [deepseek]=DS)
+out=()
+for v in anthropic openai zai openrouter deepseek; do
+    text=$(ai-usagebar --vendor "$v" --json | jq -r '.text' | sed -E 's/<[^>]+>//g')
+    # shortcut: unconfigured vendors and real errors both print ⚠, so a broken provider you use is hidden too; check `ai-usagebar-tui`.
+    [[ -n $text && $text != "⚠" ]] && out+=("${labels[$v]} $text")
+done
+
+((${#out[@]})) || { echo "⚠"; exit; }
+((${#out[@]} == 1)) && { echo "${out[0]#* }"; exit; }
+printf '%s' "${out[0]}"; printf ' | %s' "${out[@]:1}"; echo
