@@ -25,15 +25,9 @@ graphify-out/
 .config/nvim/nvim.log
 .config/tmux/plugins/**
 **/.claude/*
-!.claude/{settings.json,skills,scripts,hooks,CLAUDE.md}
-# Keep only custom hooks and scripts.
-.claude/hooks/*
-!.claude/hooks/{block-dangerous-git.sh,read-agents-md.sh,package.json}
-!.claude/hooks/caveman-{activate,config,mode-tracker,stats}.js
-!.claude/hooks/caveman-statusline.{sh,ps1}
-.claude/scripts/*
-!.claude/scripts/statusline.sh
-.claude/skills/gsd-*
+!.claude/{CLAUDE.md,settings.json,statusline.sh,skills}
+# synced is owned by claude.ai; graphify is written by `graphify install` via the metapac hook.
+.claude/skills/{synced,graphify}{,/**}
 {{ if not .work -}}
 .config/metapac/groups/work.toml
 {{- end }}
