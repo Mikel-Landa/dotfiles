@@ -6,7 +6,12 @@ if [[ -r "$HOME/.config/shell/evals.sh" ]]; then
     source "$HOME/.config/shell/evals.sh"
     shell_evals_for zsh | while IFS= read -r _eval_cmd; do
         _eval_tool=${_eval_cmd%% *}
-        if (( $+commands[$_eval_tool] )); then
+        (( $+commands[$_eval_tool] )) || continue
+        # mise activate embeds a snapshot of the current PATH (export PATH /
+        # __MISE_ORIG_PATH); caching it freezes PATH forever. Eval it live.
+        if [[ $_eval_tool == mise ]]; then
+            eval "$(${(z)_eval_cmd})"
+        else
             _evalcache ${(z)_eval_cmd}
         fi
     done

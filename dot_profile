@@ -83,4 +83,11 @@ path_push "$HOME/.local/share/mise/shims"
 # Fallback nvim if mise doesn't have one installed. Pushed to back so mise wins.
 [ -d /opt/nvim/bin ] && path_push_back /opt/nvim/bin
 
+# WSL: curated Windows binaries (symlinks) instead of appendWindowsPath.
+# Always last: removed then re-appended so re-sourcing keeps it at the end.
+if [ -d "$HOME/.local/win-bin" ]; then
+    path_remove "$HOME/.local/win-bin"
+    path_push_back "$HOME/.local/win-bin"
+fi
+
 # vim: ft=sh

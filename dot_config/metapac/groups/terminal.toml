@@ -25,7 +25,6 @@ apt = {
     "jq",
     "wl-clipboard",
     "xclip",
-    "helix",
   ]
 }
 
