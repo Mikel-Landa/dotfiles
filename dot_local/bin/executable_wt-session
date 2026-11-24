@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Pick a branch of the current repo (worktrees first, marked 󰙅). Worktrees open
-# directly; other branches get a worktree via wt first. Opens a sesh session
-# (same as prefix-t).
+# directly; other branches get a worktree via wt first. Opens a tmux session
+# named <repo>@<branch> with the code-session layout (like sesh's startup_command).
 set -euo pipefail
 
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
@@ -35,12 +35,46 @@ list() {
   git for-each-ref --format=$' \t%(refname:short)\t' refs/heads
 }
 
+# keep the popup open on failure so the error is readable
+trap 'read -rsn1 -p "wt-session failed, press a key"' ERR
+
 line=$(
   list | awk -F'\t' '!seen[$2]++' |
-    fzf --reverse --delimiter='\t' --with-nth=1,2 --header='branch (󰙅 = has worktree)' \
+    fzf --reverse --delimiter='\t' --with-nth=1,2 \
+      --header='branch (󰙅 = has worktree) · no match or alt-enter: new branch' \
+      --bind 'enter:accept-or-print-query,alt-enter:print-query' \
       --preview '[ -n {3} ] && git -C {3} log --oneline --color=always -20 || git log --oneline --color=always -20 {2}'
 ) || exit 0
-IFS=$'\t' read -r _ branch path <<<"$line"
 
-[[ -n $path ]] && exec sesh connect "$path"
-exec wt switch --no-cd "$branch" -x sesh -- connect '{{ worktree_path }}'
+if [[ $line == *$'\t'* ]]; then
+  IFS=$'\t' read -r _ branch path <<<"$line"
+else
+  # bare query: new branch name (or an exact existing one via alt-enter)
+  branch=$line path=''
+  [[ -n $branch ]] || exit 0
+  if ! git show-ref --verify -q "refs/heads/$branch"; then
+    git check-ref-format --branch "$branch" >/dev/null
+    def=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
+    cur=$(git branch --show-current)
+    cur=${cur:-HEAD}
+    base=$(printf '%s\n' "$def" "$cur" | fzf --reverse --no-sort \
+      --header="create branch '$branch' + worktree from: (esc cancels)" \
+      --preview 'git log --oneline --color=always -20 {}') || exit 0
+    [[ $base == "$def" ]] && git fetch origin "${def#origin/}"
+    git branch --no-track "$branch" "$base"
+  fi
+fi
+
+if [[ -z $path ]]; then
+  wt switch --no-cd "$branch"
+  path=$(git for-each-ref --format='%(worktreepath)' "refs/heads/$branch")
+fi
+
+repo=$(basename "$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")")
+name="$repo@$branch"
+name=${name//[.:]/_} # tmux rewrites these; match it so has-session finds the session
+if ! tmux has-session -t "=$name" 2>/dev/null; then
+  tmux new-session -d -s "$name" -c "$path"
+  tmux send-keys -t "=$name:" 'exec code-session' Enter
+fi
+tmux switch-client -t "=$name"
