@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Pick a branch of the current repo (worktrees first, marked 󰙅). Worktrees open
+# directly; other branches get a worktree via wt first. Opens a sesh session
+# (same as prefix-t).
+set -euo pipefail
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  tmux display-message "wt-session: not a git repo"
+  exit 0
+fi
+
+path='' branch=''
+emit() {
+  [[ -n $path ]] || return 0
+  if [[ -z $branch ]]; then
+    # detached: name it after the branch being rebased, if any
+    gd=$(git -C "$path" rev-parse --absolute-git-dir)
+    branch=$(cat "$gd"/rebase-merge/head-name "$gd"/rebase-apply/head-name 2>/dev/null) || true
+    branch=${branch#refs/heads/}
+    branch=${branch:-(detached) ${path##*/}}
+  fi
+  printf '󰙅\t%s\t%s\n' "$branch" "$path"
+  path=''
+}
+
+list() {
+  while IFS= read -r line; do
+    case $line in
+      'worktree '*) emit; path=${line#worktree } branch='' ;;
+      'branch '*) branch=${line#branch refs/heads/} ;;
+      bare) path='' ;;
+    esac
+  done < <(git worktree list --porcelain)
+  emit
+  git for-each-ref --format=$' \t%(refname:short)\t' refs/heads
+}
+
+line=$(
+  list | awk -F'\t' '!seen[$2]++' |
+    fzf --reverse --delimiter='\t' --with-nth=1,2 --header='branch (󰙅 = has worktree)' \
+      --preview '[ -n {3} ] && git -C {3} log --oneline --color=always -20 || git log --oneline --color=always -20 {2}'
+) || exit 0
+IFS=$'\t' read -r _ branch path <<<"$line"
+
+[[ -n $path ]] && exec sesh connect "$path"
+exec wt switch --no-cd "$branch" -x sesh -- connect '{{ worktree_path }}'
